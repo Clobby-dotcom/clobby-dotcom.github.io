@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aircraft systems</title>
+<meta name="description" content="How the engine, propeller, induction, fuel, oil, ignition, and electrical systems of a training airplane work, including carburetor ice.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body>
+<header class="site-head">
+  <div class="site-head-in">
+    <a class="wordmark" href="/">Ground School</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="/ground-school/" aria-current="page">Ground school</a>
+      <a href="/aircraft/">Aircraft</a>
+      <a href="/vor-trainer.html">VOR trainer</a>
+    </nav>
+  </div>
+</header>
+<div class="page">
+  <nav class="toc" aria-label="On this page">
+    <h2>On this page</h2>
+    <ol>
+      <li><a href="#engine">The engine and ignition</a></li>
+      <li><a href="#propeller">Propellers</a></li>
+      <li><a href="#induction">Induction, mixture, and carburetor ice</a></li>
+      <li><a href="#fuel">Fuel system</a></li>
+      <li><a href="#oil">Oil and cooling</a></li>
+      <li><a href="#electrical">Electrical system</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ol>
+  </nav>
+  <article>
+    <p class="crumb"><a href="/ground-school/">Ground school</a></p>
+    <h1>Aircraft systems</h1>
+    <p class="lede">You need to know how the engine and its systems work well enough to run them properly, spot trouble early, and handle it when something fails. The details for your airplane are in Sections 7 and 3 of its POH.</p>
+
+    <h2 id="engine">The engine and ignition</h2>
+    <p>Most training airplanes have a horizontally opposed, air-cooled piston engine that turns the propeller directly.</p>
+    <h3>The four-stroke cycle</h3>
+    <p>Each cylinder repeats four strokes, two turns of the crankshaft for each power stroke:</p>
+    <ol class="steps">
+      <li>
+        <h3>Intake</h3>
+        <p>The piston moves down and draws the fuel-air mixture in through the open intake valve.</p>
+      </li>
+      <li>
+        <h3>Compression</h3>
+        <p>Both valves close and the piston moves up, squeezing the mixture.</p>
+      </li>
+      <li>
+        <h3>Power</h3>
+        <p>The spark plugs fire, the mixture burns, and the expanding gas pushes the piston down. This is the only stroke that makes power.</p>
+      </li>
+      <li>
+        <h3>Exhaust</h3>
+        <p>The exhaust valve opens and the piston pushes the burned gas out.</p>
+      </li>
+    </ol>
+    <h3>Magnetos</h3>
+    <p>The spark comes from two engine-driven magnetos, which make their own high voltage from a spinning magnet. They don't need the battery, so the engine keeps running if the electrical system fails.</p>
+    <p>Each cylinder has two spark plugs, and each magneto fires one plug in every cylinder. That gives redundancy and a more complete burn.</p>
+    <p>The ignition switch usually has five positions: off, right, left, both, and start. During the run-up, you check each magneto on its own. Expect a small RPM drop on each one, within the limit and difference the POH allows. No drop at all can mean a magneto isn't being grounded properly when you select the other one. A large drop or rough running can mean a fouled plug or a magneto problem.</p>
+    <div class="callout">
+      <p>The ignition switch turns a magneto off by grounding it through a wire called the P-lead. If a P-lead breaks or comes loose, that magneto stays live even with the key off. Treat every propeller as if it could start, and never stand in its arc.</p>
+    </div>
+    <h3>Engine gauges</h3>
+    <p>With a fixed-pitch propeller, the tachometer is your power gauge. A constant-speed propeller adds a manifold pressure gauge. Other common gauges are oil pressure, oil temperature, cylinder head temperature (CHT), and exhaust gas temperature (EGT).</p>
+
+    <h2 id="propeller">Propellers</h2>
+    <p>A propeller is a rotating airfoil. Each blade is twisted: the tip travels faster than the hub, so the blade angle is steepest near the hub and flattest at the tip, which keeps the angle of attack roughly even along the blade.</p>
+    <h3>Fixed-pitch</h3>
+    <p>The blade angle is set when the propeller is made. A climb propeller (low angle) favors takeoff and climb, and a cruise propeller (high angle) favors cruise speed.</p>
+    <h3>Constant-speed</h3>
+    <p>A governor changes the blade angle automatically to hold the RPM you select. You get two power controls:</p>
+    <ul>
+      <li>The throttle sets manifold pressure.</li>
+      <li>The propeller control (usually blue) sets RPM.</li>
+    </ul>
+    <p>For takeoff and landing, the propeller control normally goes full forward for maximum RPM. In cruise, you reduce it for a more efficient, quieter setting. To avoid overstressing the cylinders with high manifold pressure at low RPM, the PHAK gives this order: when increasing power, increase RPM first and then manifold pressure. When decreasing power, reduce manifold pressure first and then RPM. Use the POH power settings for your airplane.</p>
+    <p>On preflight, check the blades for nicks, which can grow into cracks.</p>
+
+    <h2 id="induction">Induction, mixture, and carburetor ice</h2>
+    <p>The induction system brings outside air in through a filter and mixes it with fuel. Training airplanes use either a carburetor or fuel injection.</p>
+    <h3>Carburetors</h3>
+    <p>In a float-type carburetor, air speeds up through a venturi and its pressure drops, which draws fuel from a float chamber into the airflow. The throttle valve controls how much mixture reaches the cylinders.</p>
+    <h3>Carburetor ice</h3>
+    <p>Two things cool the air inside the carburetor: the pressure drop in the venturi and fuel evaporating into the airflow. The temperature inside can drop well below the outside air temperature. If the air is humid, moisture freezes on the throttle valve and venturi walls and chokes off the airflow.</p>
+    <p>Carburetor ice can form on warm days, even with clear skies. The PHAK says it's most likely below about 70°F with relative humidity above 80 percent. Low power settings, such as descents and the traffic pattern, make it more likely, because the throttle valve is partly closed.</p>
+    <p>Signs of carburetor ice:</p>
+    <ul>
+      <li>With a fixed-pitch propeller, a gradual drop in RPM with no change in throttle.</li>
+      <li>With a constant-speed propeller, a drop in manifold pressure.</li>
+      <li>Rough running as it gets worse.</li>
+    </ul>
+    <p>Carburetor heat sends warm air from around the exhaust into the carburetor. When you apply it, warm air is less dense, so RPM drops a little. If there's ice, the engine may run rough for a moment as the melted water goes through, then RPM rises as the ice clears. If there's no ice, RPM drops and stays down until you turn the heat off. Use full carburetor heat when you suspect ice, and leave it on until the engine runs smoothly.</p>
+    <p>Carburetor heat also richens the mixture. The heated air is unfiltered, so avoid it on the ground except for the run-up check. Many POHs call for it before reducing power for descent or landing.</p>
+    <h3>Fuel injection</h3>
+    <p>Fuel-injected engines spray fuel into each cylinder's intake port. They don't get carburetor ice, though ice can block the air filter, in which case an alternate air source opens. The drawbacks are harder hot starts and more risk of vapor lock.</p>
+    <h3>Mixture</h3>
+    <p>The mixture control sets the ratio of fuel to air. As you climb, the air gets thinner but the carburetor still sends the same amount of fuel, so the mixture gets richer. Lean it to bring the ratio back. Too rich fouls the plugs and runs rough. Too lean at high power causes overheating and detonation. Lean per the POH, including on the ground at high-elevation airports.</p>
+    <h3>Detonation and preignition</h3>
+    <dl class="terms">
+      <dt>Detonation</dt>
+      <dd>The fuel-air charge explodes all at once after the spark, which can destroy an engine fast. Causes include fuel below the required grade, a mixture too lean at high power, high manifold pressure with low RPM, high cylinder temperatures, and long climbs at low airspeed. To stop it, enrich the mixture, reduce power, lower the nose for more cooling airflow, and open the cowl flaps if you have them.</dd>
+      <dt>Preignition</dt>
+      <dd>The mixture ignites before the spark, from a hot spot in the cylinder like a carbon deposit or an overheated plug. It causes rough running and high cylinder temperatures.</dd>
+    </dl>
+
+    <h2 id="fuel">Fuel system</h2>
+    <p>Fuel systems in light airplanes come in two basic types. In a gravity-feed system, used in many high-wing airplanes, the tanks sit above the engine and gravity moves the fuel. In a fuel-pump system, used in low-wing airplanes and most fuel-injected engines, an engine-driven pump moves the fuel and an electric boost pump backs it up. </p>
+    <dl class="terms">
+      <dt>Fuel selector</dt>
+      <dd>Chooses which tank feeds the engine. Low-wing airplanes usually draw from one tank at a time, so you switch to keep fuel balanced. Switch at a safe altitude, so you have time to switch back if the engine quits.</dd>
+      <dt>Fuel strainer and sumps</dt>
+      <dd>Drains at the low points of each tank and the strainer, where water and sediment collect.</dd>
+      <dt>Primer</dt>
+      <dd>A small hand pump that sprays fuel into the cylinders for starting a cold engine. Lock it after use.</dd>
+      <dt>Tank vents</dt>
+      <dd>Let air into the tanks as fuel leaves. A blocked vent can starve the engine, so check them on the preflight.</dd>
+    </dl>
+    <h3>Fuel grades</h3>
+    <div class="table-wrap">
+      <table>
+        <caption>Common fuel colors</caption>
+        <thead><tr><th>Fuel</th><th>Color</th></tr></thead>
+        <tbody>
+          <tr><td>100LL avgas</td><td>Blue</td></tr>
+          <tr><td>Grade 100 avgas</td><td>Green</td></tr>
+          <tr><td>Jet A</td><td>Clear or straw-colored</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Use the grade the POH requires. If it isn't available, the PHAK says the next higher grade can be used, never a lower one. Jet A in a piston engine causes detonation and engine failure, so watch your airplane being fueled.</p>
+    <h3>Checking the fuel</h3>
+    <p>Sump every drain before the first flight of the day and after fueling. Water sinks to the bottom of the cup, so keep draining until samples come out clean and the right color.</p>
+    <p>Check the quantity visually or with a dipstick before flight, and track fuel burn in the air.</p>
+    <h3>Exhaustion and starvation</h3>
+    <p>Fuel exhaustion means the airplane ran out of fuel. Fuel starvation means there's fuel on board, but it isn't reaching the engine because of a wrong selector position, a blocked vent, or contamination. For VFR flight, you need enough fuel to reach your first point of intended landing and then fly at normal cruise for at least 30 more minutes in the daytime or 45 minutes at night (14 CFR 91.151). Many instructors teach a personal minimum of at least an hour.</p>
+
+    <h2 id="oil">Oil and cooling</h2>
+    <p>Engine oil lubricates, cools, helps seal the piston rings, cleans, and protects against corrosion. Most training engines use a wet-sump system, where the oil sits in a sump at the bottom of the engine and an engine-driven pump circulates it.</p>
+    <p>Check the oil quantity on every preflight against the POH minimum, and make sure the dipstick and cap are secure.</p>
+    <h3>The gauges</h3>
+    <p>After start, oil pressure should rise into the green arc within the time the POH gives. If it doesn't, shut down the engine. Oil temperature rises slowly and lags behind what's happening in the engine. In flight, low oil pressure together with high oil temperature points to an oil problem that could lead to engine failure. Plan to land as soon as possible.</p>
+    <h3>Cooling</h3>
+    <p>Air flowing over the cylinder fins, guided by baffles, cools the engine along with the oil. Some airplanes have cowl flaps to let more air through.</p>
+    <p>Engine temperatures go up with high power, low airspeed, a lean mixture, and hot weather. If temperatures run high, you can:</p>
+    <ul>
+      <li>Enrich the mixture.</li>
+      <li>Lower the nose and climb at a higher airspeed.</li>
+      <li>Reduce power.</li>
+      <li>Open the cowl flaps, if equipped.</li>
+    </ul>
+    <h3>Exhaust and carbon monoxide</h3>
+    <p>Cabin heat in most light airplanes comes from a shroud around the exhaust muffler. A crack in the muffler can let carbon monoxide into the cabin. Carbon monoxide has no color or smell, and symptoms include headache, drowsiness, and dizziness. If you suspect it, turn off the cabin heat, open the fresh air vents, and land as soon as practical. </p>
+
+    <h2 id="electrical">Electrical system</h2>
+    <p>Light airplanes run on direct current, usually a 14-volt system with a 12-volt battery or a 28-volt system with a 24-volt battery. An engine-driven alternator powers the system and charges the battery in flight. It runs the starter, radios, lights, and on many airplanes the flaps and fuel gauges.</p>
+    <dl class="terms">
+      <dt>Master switch</dt>
+      <dd>Turns the electrical system on and off. Many airplanes split it into two halves: battery and alternator. Turning the alternator side off while keeping the battery on can help with an alternator problem.</dd>
+      <dt>Avionics master</dt>
+      <dd>Powers the avionics separately, so they can stay off during engine start.</dd>
+      <dt>Bus bar</dt>
+      <dd>The terminal that distributes power from the battery and alternator to each circuit.</dd>
+      <dt>Circuit breakers and fuses</dt>
+      <dd>Protect each circuit from overload. A breaker that pops can be reset once if the POH allows. If it pops again, leave it out. Never hold one in.</dd>
+      <dt>Ammeter</dt>
+      <dd>Shows current flowing into or out of the battery. A positive reading means the alternator is charging the battery. A negative reading means the battery is discharging, so the alternator isn't keeping up or has failed.</dd>
+      <dt>Loadmeter</dt>
+      <dd>Shows the load on the alternator only, and never reads negative.</dd>
+    </dl>
+    <h3>Alternator failure</h3>
+    <p>Signs are a low-voltage light, a negative ammeter, or equipment failing. The battery runs things for a limited time. Follow the POH checklist, shed every load you don't need, and land as soon as practical. Plan for electric flaps and radios to quit.</p>
+
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 7, Aircraft Systems</li>
+      <li>FAA-H-8083-3C, Airplane Flying Handbook, sections on ground operations and the run-up</li>
+      <li>14 CFR 91.151, Fuel requirements for flight in VFR conditions</li>
+      <li>FAA-S-ACS-6C, Private Pilot for Airplane Category Airman Certification Standards</li>
+    </ul>
+    <nav class="next-prev" aria-label="Lessons">
+  <a class="prev" href="/ground-school/flight-controls.html"><small>Previous</small>Flight controls</a>
+  <a class="next" href="/ground-school/flight-instruments.html"><small>Next</small>Flight instruments</a>
+</nav>
+  </article>
+</div>
+<footer class="site-foot">
+  <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
+  <p>Made by Colby Penn</p>
+</footer>
+</body>
+</html>

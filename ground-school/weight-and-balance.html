@@ -8,49 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="/site.css">
 <style>
-.page{max-width:1200px;margin:0 auto;padding:40px 16px 64px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:56px;align-items:start}
-@media (max-width:900px){.page{grid-template-columns:1fr;gap:24px}}
-.toc{position:sticky;top:24px;font-size:.95rem}
-.toc h2{font:700 1rem/1.2 var(--cond);margin:0 0 10px;color:var(--muted)}
-.toc ol{margin:0;padding:0;list-style:none;border-left:2px solid var(--line)}
-.toc a{display:block;padding:5px 0 5px 14px;margin-left:-2px;border-left:2px solid transparent;color:var(--muted);text-decoration:none}
-.toc a:hover{color:var(--text);border-left-color:var(--accent)}
-@media (max-width:900px){.toc{position:static}.toc ol{display:flex;flex-wrap:wrap;gap:4px 16px;border:0}.toc a{padding:2px 0;border:0;margin:0;text-decoration:underline;text-underline-offset:3px}}
-
-article{max-width:72ch}
-h1{font:700 clamp(2.6rem,7vw,4.2rem)/.95 var(--cond);margin:0;letter-spacing:-.02em}
-.lede{font-size:1.2rem;color:var(--muted);margin:16px 0 0}
-article h2{font:700 clamp(1.6rem,3.5vw,2rem)/1.1 var(--cond);margin:56px 0 12px;padding-top:20px;border-top:3px solid var(--text);scroll-margin-top:16px}
-article h3{font:700 1.25rem/1.2 var(--cond);margin:28px 0 6px}
-article p,article li{max-width:68ch}
-article ul{padding-left:1.2em}
-article li{margin-bottom:6px}
-
-dl.terms{margin:0}
-dl.terms dt{font:700 1.15rem/1.2 var(--cond);margin-top:18px}
-dl.terms dd{margin:4px 0 0}
-
-.formula{font:600 1.15rem/1.4 var(--cond);background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--chart);border-radius:6px;padding:12px 16px;margin:14px 0}
-
-.example-note{background:var(--accent-soft);border-radius:6px;padding:12px 16px;margin:16px 0}
-.example-note strong{color:var(--accent)}
-
-.table-wrap{overflow-x:auto;margin:14px 0}
-table{border-collapse:collapse;width:100%;min-width:460px;font-variant-numeric:tabular-nums;background:var(--surface);border:1px solid var(--line)}
-th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line)}
-th:first-child,td:first-child{text-align:left}
-thead th{font:700 .98rem/1.2 var(--cond);background:var(--surface-2)}
-tfoot td{font-weight:600;border-top:2px solid var(--text);border-bottom:0}
-caption{text-align:left;font:600 .95rem/1.3 var(--sans);color:var(--muted);padding-bottom:8px}
-
-ol.steps{list-style:none;counter-reset:step;padding:0;margin:20px 0 0}
-ol.steps > li{counter-increment:step;position:relative;padding-left:56px;margin:0 0 36px;max-width:none}
-ol.steps > li::before{content:counter(step);position:absolute;left:0;top:-2px;width:38px;height:38px;border-radius:50%;background:var(--text);color:var(--bg);font:700 1.2rem/38px var(--cond);text-align:center}
-ol.steps h3{margin:4px 0 6px}
-.answer{font:600 1.1rem/1.4 var(--cond);color:var(--ok)}
-
 .chart{width:100%;max-width:620px;display:block;margin:16px 0 4px;font-family:var(--cond)}
 .chart .grid{stroke:var(--line)}
 .chart .axis{stroke:var(--muted)}
@@ -67,10 +26,11 @@ ol.steps h3{margin:4px 0 6px}
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="./">Ground School</a>
+    <a class="wordmark" href="/">Ground School</a>
     <nav class="site-nav" aria-label="Main">
-      <a href="vor-trainer.html">VOR trainer</a>
-      <a href="weight-and-balance.html" aria-current="page">Weight and balance</a>
+      <a href="/ground-school/" aria-current="page">Ground school</a>
+      <a href="/aircraft/">Aircraft</a>
+      <a href="/vor-trainer.html">VOR trainer</a>
     </nav>
   </div>
 </header>
@@ -89,6 +49,7 @@ ol.steps h3{margin:4px 0 6px}
   </nav>
 
   <article>
+    <p class="crumb"><a href="/ground-school/">Ground school</a></p>
     <h1>Weight and balance</h1>
     <p class="lede">Every flight has two questions to answer before you start the engine: is the airplane too heavy, and is the weight in the right place? Here's how to answer both.</p>
 
@@ -237,11 +198,15 @@ ol.steps h3{margin:4px 0 6px}
       <li>FAA-H-8083-1B, Aircraft Weight and Balance Handbook</li>
       <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 10, Weight and Balance</li>
     </ul>
+    <nav class="next-prev" aria-label="Lessons">
+  <a class="prev" href="/ground-school/documents-and-maintenance.html"><small>Previous</small>Documents, inspections, and equipment</a>
+  <a class="next" href="/ground-school/performance.html"><small>Next</small>Performance</a>
+</nav>
   </article>
 </div>
 
 <footer class="site-foot">
-  <p>For study only. In the airplane, use that aircraft's POH and its current weight and balance record.</p>
+  <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
   <p>Made by Colby Penn</p>
 </footer>
 

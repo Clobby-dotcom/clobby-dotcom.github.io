@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ground School</title>
-<meta name="description" content="Interactive study tools for flight students: a VOR trainer and a weight and balance walkthrough.">
+<meta name="description" content="Private pilot ground school, the training airplanes, and interactive study tools.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="/site.css">
 <style>
 .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
 .hero-in{position:relative;max-width:1200px;margin:0 auto;padding:clamp(56px,10vw,120px) 16px clamp(48px,8vw,96px)}
@@ -33,15 +33,18 @@
 .env{fill:var(--chart-faint);stroke:var(--chart)}
 .env-pt{fill:var(--accent)}
 .env-ax{stroke:var(--muted)}
+.cls-b{stroke:var(--chart)}
+.plane-s{fill:var(--accent)}
 </style>
 </head>
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="./" aria-current="page">Ground School</a>
+    <a class="wordmark" href="/">Ground School</a>
     <nav class="site-nav" aria-label="Main">
-      <a href="vor-trainer.html">VOR trainer</a>
-      <a href="weight-and-balance.html">Weight and balance</a>
+      <a href="/ground-school/">Ground school</a>
+      <a href="/aircraft/">Aircraft</a>
+      <a href="/vor-trainer.html">VOR trainer</a>
     </nav>
   </div>
 </header>
@@ -55,10 +58,37 @@
     </div>
   </section>
 
-  <section class="tools" aria-label="Study tools">
+  <section class="tools" aria-label="What's here">
     <ul>
       <li>
-        <a class="tool" href="vor-trainer.html">
+        <a class="tool" href="/ground-school/">
+          <svg viewBox="0 0 112 112" aria-hidden="true">
+            <path d="M8 92 H104" fill="none" class="env-ax" stroke-width="1.5"/>
+            <path d="M8 46 H30 V66 H42 V82 H70 V66 H82 V46 H104" fill="none" class="cls-b" stroke-width="3"/>
+            <path d="M8 30 H104" fill="none" class="cls-b" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <path d="M56 14 l-4 10 h8 z" class="env-pt"/>
+          </svg>
+          <div>
+            <h2>Ground school</h2>
+            <p>The private pilot knowledge test, topic by topic: aerodynamics and systems, airspace and regulations, weather, navigation, and the decision-making that ties it together.</p>
+            <span class="open">Start ground school</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="tool" href="/aircraft/">
+          <svg viewBox="0 0 112 112" aria-hidden="true">
+            <path d="M56 14 C59 14 60 18 60 24 V42 L104 46 V54 L60 56 L58 80 L72 84 V90 L56 88 L40 90 V84 L54 80 L52 56 L8 54 V46 L52 42 V24 C52 18 53 14 56 14 Z" class="plane-s"/>
+          </svg>
+          <div>
+            <h2>Aircraft</h2>
+            <p>The Piper Pilot 100i, Cessna 172R, and Cessna 172K: specs, V-speeds, systems, avionics, and weight and balance for each.</p>
+            <span class="open">See the aircraft</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="tool" href="/vor-trainer.html">
           <svg viewBox="0 0 112 112" aria-hidden="true">
             <rect width="112" height="112" rx="14" class="i-ring"/>
             <circle cx="56" cy="56" r="48" class="i-face"/>
@@ -78,7 +108,7 @@
         </a>
       </li>
       <li>
-        <a class="tool" href="weight-and-balance.html">
+        <a class="tool" href="/ground-school/weight-and-balance.html">
           <svg viewBox="0 0 112 112" aria-hidden="true">
             <path d="M14 10 V98 H104" fill="none" class="env-ax" stroke-width="1.5"/>
             <path d="M30 88 L30 62 L56 22 L92 22 L92 88 Z" class="env" stroke-width="2"/>
@@ -98,7 +128,7 @@
 </main>
 
 <footer class="site-foot">
-  <p>For study only. In the airplane, use that aircraft's POH and its current weight and balance record.</p>
+  <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
   <p>Made by Colby Penn</p>
 </footer>
 

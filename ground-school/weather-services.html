@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather services</title>
+<meta name="description" content="How to get a weather briefing and read METARs, TAFs, winds aloft, PIREPs, AIRMETs, SIGMETs, and weather charts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body>
+<header class="site-head">
+  <div class="site-head-in">
+    <a class="wordmark" href="/">Ground School</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="/ground-school/" aria-current="page">Ground school</a>
+      <a href="/aircraft/">Aircraft</a>
+      <a href="/vor-trainer.html">VOR trainer</a>
+    </nav>
+  </div>
+</header>
+<div class="page">
+  <nav class="toc" aria-label="On this page">
+    <h2>On this page</h2>
+    <ol>
+      <li><a href="#briefing">Getting a briefing</a></li>
+      <li><a href="#metar">METARs</a></li>
+      <li><a href="#taf">TAFs</a></li>
+      <li><a href="#aloft">Winds aloft and PIREPs</a></li>
+      <li><a href="#advisories">AIRMETs, SIGMETs, and charts</a></li>
+      <li><a href="#inflight">Weather in flight</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ol>
+  </nav>
+  <article>
+    <p class="crumb"><a href="/ground-school/">Ground school</a></p>
+    <h1>Weather services</h1>
+    <p class="lede">Before each flight you have to decide whether the weather is good enough for you and your airplane. These are the reports and forecasts you'll use to make that call, and how to read them.</p>
+
+    <h2 id="briefing">Getting a briefing</h2>
+    <p>Before every flight, you're required to become familiar with all available information concerning it. For a flight not in the vicinity of an airport, that must include weather reports and forecasts (14 CFR 91.103). In practice, that means a full weather briefing before every cross-country, and a good look at the weather before every local flight too.</p>
+    <p>You can get a briefing from Flight Service by phone at 1-800-WX-BRIEF or online, or put one together yourself from sources such as aviationweather.gov and an approved flight planning app. If you brief yourself, make sure you've covered the same items a briefer would, including NOTAMs and temporary flight restrictions.</p>
+    <dl class="terms">
+      <dt>Standard briefing</dt>
+      <dd>The full briefing. Ask for it when you haven't looked at the weather yet. It covers adverse conditions, a synopsis, current conditions, en route and destination forecasts, winds aloft, NOTAMs, and other items such as ATC delays.</dd>
+      <dt>Abbreviated briefing</dt>
+      <dd>For updating an earlier briefing or getting a few specific items. Tell the briefer what you already have and when you got it.</dd>
+      <dt>Outlook briefing</dt>
+      <dd>For a flight six or more hours away. It helps you decide whether the trip looks workable. Get a standard briefing closer to departure.</dd>
+    </dl>
+    <p>Start with the big picture. Look at a surface analysis chart and the forecasts for the day to see where the highs, lows, and fronts are and which way they're moving. Then narrow down to the reports and forecasts for your route. Seeing the system first makes the individual reports much easier to understand.</p>
+    <p>Times in aviation weather are in UTC, written with a Z (Zulu). Learn the conversion for your time zone, and remember it changes when daylight saving time starts and ends.</p>
+
+    <h2 id="metar">METARs</h2>
+    <p>A METAR is a routine surface observation from an airport, usually issued every hour. A SPECI is a special observation issued between routine reports when the weather changes significantly. Here's an example:</p>
+    <div class="formula">METAR KJAN 031753Z 18012G20KT 10SM FEW035 BKN250 28/19 A3002 RMK AO2</div>
+    <dl class="terms">
+      <dt>KJAN</dt>
+      <dd>The station identifier.</dd>
+      <dt>031753Z</dt>
+      <dd>The day of the month and the time: the 3rd, at 1753 UTC.</dd>
+      <dt>18012G20KT</dt>
+      <dd>Wind from 180° true at 12 knots, gusting to 20. Wind in written reports is referenced to true north. Wind you hear on ATIS or from a tower is magnetic, to match the runways. VRB means the direction is variable, and 00000KT means calm.</dd>
+      <dt>10SM</dt>
+      <dd>Visibility in statute miles.</dd>
+      <dt>FEW035 BKN250</dt>
+      <dd>Sky condition. Heights are in hundreds of feet above ground level, so FEW035 is a few clouds at 3,500 feet AGL and BKN250 is a broken layer at 25,000 feet.</dd>
+      <dt>28/19</dt>
+      <dd>Temperature and dewpoint in degrees Celsius. An M in front means minus.</dd>
+      <dt>A3002</dt>
+      <dd>The altimeter setting, 30.02 inches of mercury.</dd>
+      <dt>RMK AO2</dt>
+      <dd>Remarks. AO2 means an automated station that can tell rain from snow. AO1 can't.</dd>
+    </dl>
+    <h3>Sky cover</h3>
+    <div class="table-wrap">
+      <table>
+        <caption>Sky cover abbreviations</caption>
+        <thead><tr><th>Code</th><th>Meaning</th><th>Coverage</th></tr></thead>
+        <tbody>
+          <tr><td>SKC or CLR</td><td>Clear</td><td>None (CLR is used by automated stations, meaning no clouds below 12,000 feet)</td></tr>
+          <tr><td>FEW</td><td>Few</td><td>1/8 to 2/8</td></tr>
+          <tr><td>SCT</td><td>Scattered</td><td>3/8 to 4/8</td></tr>
+          <tr><td>BKN</td><td>Broken</td><td>5/8 to 7/8</td></tr>
+          <tr><td>OVC</td><td>Overcast</td><td>8/8</td></tr>
+          <tr><td>VV</td><td>Vertical visibility</td><td>Sky is obscured, for example by fog</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The ceiling is the lowest layer reported as broken or overcast, or the vertical visibility into an obscuration. A few or scattered layer is never a ceiling. This matters because VFR weather minimums at airports in controlled airspace are based on the ceiling (14 CFR 91.155).</p>
+    <h3>Present weather</h3>
+    <p>When there's weather, it appears after the visibility. A minus sign means light, no sign means moderate, and a plus sign means heavy. VC means in the vicinity of the airport, not at it. Then come descriptors and the weather itself. Common ones are RA (rain), SN (snow), DZ (drizzle), BR (mist), FG (fog), HZ (haze), SH (showers), TS (thunderstorm), and FZ (freezing). So -SHRA is light rain showers and +TSRA is a thunderstorm with heavy rain.</p>
+
+    <h2 id="taf">TAFs</h2>
+    <p>A terminal aerodrome forecast (TAF) is a forecast for the area within 5 statute miles of an airport. TAFs are issued four times a day, at 0000, 0600, 1200, and 1800 UTC, and are usually valid for 24 or 30 hours. They use mostly the same codes as a METAR, with a few additions:</p>
+    <div class="formula">TAF KJAN 031730Z 0318/0418 18010KT P6SM SCT040<br>
+      FM040200 15005KT P6SM SKC<br>
+      TEMPO 0410/0414 3SM BR</div>
+    <ul>
+      <li>0318/0418 is the valid period: from the 3rd at 1800Z to the 4th at 1800Z.</li>
+      <li>P6SM means visibility greater than 6 statute miles.</li>
+      <li>FM040200 means "from" the 4th at 0200Z. A new set of conditions starts at that time and replaces everything before it.</li>
+      <li>TEMPO means temporary changes expected for less than an hour at a time and less than half of the period given.</li>
+      <li>BECMG means a gradual change over the period given.</li>
+      <li>PROB30 or PROB40 gives the probability, in percent, of the conditions that follow.</li>
+    </ul>
+    <p>A TAF in the United States doesn't forecast temperature or altimeter setting. Read every line, not just the first one, and pay close attention to the hours around your planned arrival. In the example, the morning mist would matter if you planned to arrive around sunrise.</p>
+    <p>For areas between airports, the Graphical Forecasts for Aviation (GFA) on aviationweather.gov shows forecast clouds, ceilings, visibility, weather, and more across the country. It replaced the old text area forecast for the contiguous United States.</p>
+
+    <h2 id="aloft">Winds aloft and PIREPs</h2>
+    <h3>Winds and temperatures aloft</h3>
+    <p>The winds and temperatures aloft forecast (FB) gives forecast wind and temperature at set altitudes for points around the country. A group such as 2415+08 at 6,000 feet means wind from 240° true at 15 knots and a temperature of +8°C. Some rules for reading it:</p>
+    <ul>
+      <li>9900 means light and variable, less than 5 knots.</li>
+      <li>Winds aren't forecast for levels within 1,500 feet of the station's elevation, and temperatures aren't forecast for the 3,000-foot level or for levels within 2,500 feet of the station's elevation.</li>
+      <li>For winds of 100 knots or more, 50 is added to the direction. A direction code above 36 tells you to subtract 50 from the direction and add 100 to the speed.</li>
+      <li>Above 24,000 feet, temperatures are always negative and the minus sign is left off.</li>
+    </ul>
+    <p>Use this forecast to pick a cruising altitude with the best tailwind, and to compute your headings and groundspeeds on the nav log.</p>
+    <h3>Pilot reports</h3>
+    <p>A pilot report (PIREP) is the only direct report of conditions in the air: where the cloud tops actually are, whether there's turbulence or ice, and what the visibility is like. UA is a routine PIREP and UUA is an urgent one, for hazards such as severe turbulence, severe icing, or wind shear.</p>
+    <div class="formula">UA /OV JAN270020 /TM 1650 /FL055 /TP C172 /SK BKN040-TOP050 /TB LGT</div>
+    <p>That's a routine report from 20 miles west of the JAN VOR (on the 270° radial), at 1650Z, at 5,500 feet, from a Cessna 172. The pilot reported a broken layer with bases at 4,000 and tops at 5,000, and light turbulence. Other common fields are /WX (weather), /TA (temperature), /WV (wind), /IC (icing), and /RM (remarks).</p>
+    <p>When you see something worth sharing, such as unforecast clouds, turbulence, or a wind shift, give a PIREP to ATC or Flight Service. Other pilots are relying on it.</p>
+
+    <h2 id="advisories">AIRMETs, SIGMETs, and charts</h2>
+    <p>These advisories warn of weather that's hazardous to aircraft. Check them for every flight, even when the METARs and TAFs look good.</p>
+    <dl class="terms">
+      <dt>AIRMET</dt>
+      <dd>Weather that's hazardous mainly to light aircraft. AIRMET Sierra covers IFR conditions and mountain obscuration. AIRMET Tango covers moderate turbulence, sustained surface winds of 30 knots or more, and low-level wind shear. AIRMET Zulu covers moderate icing and freezing levels. On aviationweather.gov they're displayed as graphical AIRMETs (G-AIRMETs).</dd>
+      <dt>SIGMET</dt>
+      <dd>Weather hazardous to all aircraft that isn't associated with thunderstorms: severe icing, severe or extreme turbulence, dust or sandstorms that reduce visibility below 3 miles, and volcanic ash.</dd>
+      <dt>Convective SIGMET</dt>
+      <dd>Thunderstorm hazards, including lines of storms, embedded storms, widespread storms, tornadoes, large hail, and strong surface winds. They're issued every hour at 55 minutes past the hour. Any convective SIGMET implies severe turbulence, severe icing, and low-level wind shear.</dd>
+      <dt>Center weather advisory (CWA)</dt>
+      <dd>A short-term advisory from a weather service unit at an ARTCC for conditions happening now or expected within a couple of hours.</dd>
+    </dl>
+    <h3>Charts and imagery</h3>
+    <ul>
+      <li>The surface analysis chart shows current pressure systems, isobars, and fronts.</li>
+      <li>Prognostic charts forecast where those systems and fronts will be. The low-level significant weather chart covers the surface to 24,000 feet and shows IFR and MVFR areas, freezing levels, and turbulence.</li>
+      <li>Radar shows precipitation, which is how you find thunderstorms. It doesn't show clouds.</li>
+      <li>Satellite images show clouds. Visible images work only in daylight. Infrared images work day and night and show cloud-top temperatures, which hint at how tall the clouds are.</li>
+      <li>The convective outlook forecasts where thunderstorms are possible over the next few days.</li>
+    </ul>
+    <div class="table-wrap">
+      <table>
+        <caption>Flight categories used on weather charts</caption>
+        <thead><tr><th>Category</th><th>Ceiling</th><th></th><th>Visibility</th></tr></thead>
+        <tbody>
+          <tr><td>VFR</td><td>Greater than 3,000 ft</td><td>and</td><td>greater than 5 SM</td></tr>
+          <tr><td>MVFR (marginal VFR)</td><td>1,000 to 3,000 ft</td><td>and/or</td><td>3 to 5 SM</td></tr>
+          <tr><td>IFR</td><td>500 to below 1,000 ft</td><td>and/or</td><td>1 to less than 3 SM</td></tr>
+          <tr><td>LIFR (low IFR)</td><td>Below 500 ft</td><td>and/or</td><td>less than 1 SM</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>These categories are a planning tool. They aren't the legal VFR weather minimums, which depend on the airspace and are covered with the regulations. A student pilot will also usually have more restrictive personal minimums and an instructor's endorsement limits.</p>
+
+    <h2 id="inflight">Weather in flight</h2>
+    <p>The weather keeps changing after you take off, so keep checking it.</p>
+    <ul>
+      <li>ATIS gives recorded current weather and airport information at busier airports. It's updated with each new official weather observation and whenever airport information changes, and each update gets a new letter.</li>
+      <li>ASOS and AWOS are automated stations that broadcast current weather on a frequency printed on the sectional. Many can also be reached by phone.</li>
+      <li>Flight Service can give you updates, PIREPs, and advisories on its published frequencies.</li>
+      <li>ADS-B In receivers get weather through FIS-B, including METARs, TAFs, radar, PIREPs, and advisories, free of charge.</li>
+    </ul>
+    <div class="callout">
+      <p>Datalink radar in the cockpit is not live. By the time you see it, the image can be several minutes old, and storms can move and grow in that time. Use it to stay far away from storms, never to pick a path between them.</p>
+    </div>
+    <p>If the weather ahead looks worse than forecast, turn around or divert early. Before any trip, decide on your personal minimums for ceiling, visibility, and wind, and stick to them. The time to decide is on the ground with a clear head, not in the air with a destination in sight.</p>
+
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 13, Aviation Weather Services</li>
+      <li>FAA-H-8083-28, Aviation Weather Handbook</li>
+      <li>AC 00-45, Aviation Weather Services</li>
+      <li>Aeronautical Information Manual, Chapter 7, Section 1, Meteorology</li>
+      <li>14 CFR 91.103, Preflight action</li>
+      <li>14 CFR 91.155, Basic VFR weather minimums</li>
+    </ul>
+    <nav class="next-prev" aria-label="Lessons">
+  <a class="prev" href="/ground-school/weather-theory.html"><small>Previous</small>Weather theory</a>
+  <a class="next" href="/ground-school/aeromedical.html"><small>Next</small>Aeromedical factors</a>
+</nav>
+  </article>
+</div>
+<footer class="site-foot">
+  <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
+  <p>Made by Colby Penn</p>
+</footer>
+</body>
+</html>
