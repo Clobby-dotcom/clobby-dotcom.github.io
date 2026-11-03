@@ -115,8 +115,7 @@ dl.readouts dt{color:var(--muted)}
 dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
 
-.notes{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}
-@media (max-width:880px){.notes{grid-template-columns:1fr}}
+.notes{margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}
 .notes ul{margin:0;padding-left:1.1em;max-width:70ch}
 .notes li{margin-bottom:6px}
 .notes p{margin:0 0 8px;max-width:70ch}
@@ -171,21 +170,14 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
           <button id="play" class="primary" type="button" style="min-width:86px">Play</button>
           <span class="field">Sim speed
             <span class="seg" id="speedSeg" role="group" aria-label="Simulation speed">
-              <button type="button" data-v="1">1×</button><button type="button" data-v="4">4×</button><button type="button" data-v="10">10×</button><button type="button" data-v="30">30×</button>
+              <button type="button" data-v="1">1×</button><button type="button" data-v="1.5">1.5×</button><button type="button" data-v="2">2×</button>
             </span>
           </span>
-          <label class="field" for="range">Map range
-            <select id="range"><option value="5">5 NM</option><option value="10">10 NM</option><option value="20">20 NM</option><option value="40">40 NM</option></select>
-          </label>
-        </div>
-        <div class="row">
-          <label class="field" for="tas">True airspeed <input id="tas" type="number" min="40" max="250" step="5"> kt</label>
-          <span class="field">Wind from <input id="windDir" type="number" min="0" max="360" step="10" aria-label="Wind direction in degrees">° at <input id="windSpd" type="number" min="0" max="60" step="5" aria-label="Wind speed in knots"> kt</span>
         </div>
         <div class="row">
           <label class="check"><input type="checkbox" id="tZones" checked> TO and FROM sides</label>
           <label class="check"><input type="checkbox" id="tBand" checked> Full-scale band</label>
-          <label class="check"><input type="checkbox" id="tRadial" checked> Radial line</label>
+          <label class="check"><input type="checkbox" id="tRadial" checked> Radial and bearing</label>
           <label class="check"><input type="checkbox" id="tTrail" checked> Trail</label>
           <button id="clearTrail" type="button">Clear trail</button>
         </div>
@@ -287,31 +279,12 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
   </div>
 
   <section class="notes">
-    <div>
-      <h2>How the simulation works</h2>
-      <ul>
-        <li>The needle shows angular distance from the selected course, not miles. Full scale is 10° either side, 2° per dot on a five-dot CDI (PHAK Ch. 16; IFH Ch. 9). That’s why the same offset in miles swings the needle harder near the station.</li>
-        <li>The TO/FROM flag depends only on which side you’re on of the line through the station perpendicular to the selected course. Heading never changes the CDI (PHAK Ch. 16).</li>
-        <li>Flying roughly opposite the selected course on a CDI gives reverse sensing. An HSI turns the course with the airplane, so the picture stays right side up (IFH Ch. 9).</li>
-      </ul>
-      <p style="margin-top:14px"><strong>Simplifications.</strong> These are choices made for the simulation, not FAA figures:</p>
-      <ul>
-        <li>Cone of confusion is a fixed 0.75 NM radius. The real size depends on altitude and the station.</li>
-        <li>The flag drops within 2° of abeam the station. Real receivers vary.</li>
-        <li>No altitude, terrain, line-of-sight, or service volume limits (see AIM 1-1-8 for service volumes).</li>
-        <li>Flat map, magnetic north up, no magnetic variation, no station or receiver error.</li>
-        <li>The HSI is drawn with two dots each side, 5° per dot, full scale 10°. Check the G3X Touch Pilot’s Guide for exactly how the 100i displays it.</li>
-        <li>Wind is steady, and turns are standard rate (3° per second).</li>
-      </ul>
-    </div>
-    <div>
-      <h2>Sources</h2>
-      <ul>
-        <li>FAA-H-8083-25C, Pilot’s Handbook of Aeronautical Knowledge, Chapter 16, Navigation (VOR)</li>
-        <li>FAA-H-8083-15B, Instrument Flying Handbook, Chapter 9, Navigation Systems</li>
-        <li>Aeronautical Information Manual, 1-1-3 (VHF Omni-directional Range) and 1-1-8 (NAVAID Service Volumes)</li>
-      </ul>
-    </div>
+    <h2>Sources</h2>
+    <ul>
+      <li>FAA-H-8083-25C, Pilot’s Handbook of Aeronautical Knowledge, Chapter 16, Navigation (VOR)</li>
+      <li>FAA-H-8083-15B, Instrument Flying Handbook, Chapter 9, Navigation Systems</li>
+      <li>Aeronautical Information Manual, 1-1-3 (VHF Omni-directional Range)</li>
+    </ul>
   </section>
 </div>
 
@@ -329,10 +302,12 @@ const pos = (b, d) => ({ x: d * Math.sin(rad(b)), y: d * Math.cos(rad(b)) });
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 const CONE_NM = 0.75, ABEAM_BAND = 2, FULL_SCALE = 10, TURN_RATE = 3;
+// 1× runs the clock 8 times faster than real time so a leg doesn't take forever; 1.5× and 2× scale from there.
+const SIM_BASE = 8, RANGES = [5, 10, 20, 40];
 
 const S = {
   x: 0, y: -12, hdg: 45, tgtHdg: 45, obs: 45, tas: 100,
-  windDir: 270, windSpd: 0, running: false, speed: 10, range: 20, display: 'cdi',
+  windDir: 0, windSpd: 0, running: false, speed: 1, range: 20, display: 'cdi',
   show: { zones: true, band: true, radial: true, trail: true },
   trail: [], scenario: 'free', quiz: null, needleDisp: 0, t: 0
 };
@@ -341,19 +316,19 @@ const S = {
 const SCENARIOS = [
   { id: 'free', label: 'Free practice',
     brief: 'Click or drag anywhere on the map to put the airplane there, then press Play to fly it. Spin the heading all the way around and watch the needle: it doesn’t move. Only your position and the OBS move it.',
-    setup() { place(pos(225, 12)); headingNow(45); S.obs = 45; S.range = 20; S.windDir = 270; S.windSpd = 0; S.speed = 10; S.tas = 100; } },
+    setup() { place(pos(225, 12)); headingNow(45); S.obs = 45; S.range = 20; } },
   { id: 'reverse', label: 'Reverse sensing',
     brief: 'You’re north of the station, heading 180 toward it, but the OBS is set to 360. The flag reads FROM and the needle is left. Press Play and turn toward the needle. It runs away from you: that’s reverse sensing. Fix it by setting the OBS to 180 so the course agrees with your heading, or switch to the HSI and compare.',
-    setup() { place(pos(5, 10)); headingNow(180); S.obs = 0; S.range = 20; S.windSpd = 0; S.speed = 10; S.tas = 100; S.display = 'cdi'; } },
+    setup() { place(pos(5, 10)); headingNow(180); S.obs = 0; S.range = 20; S.display = 'cdi'; } },
   { id: 'passage', label: 'Station passage',
     brief: 'You’re inbound on the 180 radial, a hair east of course, with 360 set: TO flag, needle nearly centered. Press Play and hold heading 360. The same small offset swings the needle harder as you close in, the flag drops in the cone of confusion, and TO flips to FROM as you pass the station.',
-    setup() { place(pos(178.5, 4)); headingNow(0); S.obs = 0; S.range = 5; S.windSpd = 0; S.speed = 4; S.tas = 100; } },
-  { id: 'intercept', label: 'Intercept and track',
-    brief: 'Intercept the 360 radial outbound and track it. You’re on a 60° intercept with a 20-knot wind from the west. Lead the turn to 360 so you roll out as the needle centers, then find the heading that keeps it there. Expect to hold a crab to the left, into the wind.',
-    setup() { place(pos(60, 8)); headingNow(300); S.obs = 0; S.range = 20; S.windDir = 270; S.windSpd = 20; S.speed = 10; S.tas = 100; } },
+    setup() { place(pos(178.5, 4)); headingNow(0); S.obs = 0; S.range = 5; } },
+  { id: 'intercept', label: 'Intercept a radial',
+    brief: 'Intercept the 360 radial outbound and track it. You’re on a 60° intercept. Press Play and lead the turn to 360 so you roll out as the needle centers. If you overshoot, use a smaller intercept angle to correct back to the course.',
+    setup() { place(pos(60, 8)); headingNow(300); S.obs = 0; S.range = 20; } },
   { id: 'quiz', label: 'Where am I? quiz',
     brief: 'The airplane is hidden somewhere within 20 NM of the station. Turn the OBS until the needle centers with a FROM flag, then enter the radial you’re on.',
-    setup() { S.range = 20; S.windSpd = 0; S.speed = 10; S.quiz = { answered: false, correct: 0, total: 0, truth: 0, dist: 0 }; newRound(); } }
+    setup() { S.range = 20; S.quiz = { answered: false, correct: 0, total: 0, truth: 0, dist: 0 }; newRound(); } }
 ];
 
 function place(p) { S.x = p.x; S.y = p.y; S.trail = []; }
@@ -421,8 +396,14 @@ function nav() {
   else if (Math.abs(Math.abs(d) - 90) < ABEAM_BAND) { flag = 'OFF'; reason = 'abeam'; }
   return { dist, r, d, side, dev, flag, reason };
 }
+function autoRange(dist) {
+  // Smallest range that keeps the airplane comfortably on the map. Fixed during the quiz so the scale doesn't give away the distance.
+  if (S.scenario === 'quiz') { S.range = 20; return; }
+  const want = RANGES.find(r => dist <= r * .85) || RANGES[RANGES.length - 1];
+  if (want > S.range || dist < want * .7 && want < S.range) S.range = want;
+}
 function step(dtReal) {
-  const dt = dtReal * S.speed; // simulated seconds
+  const dt = dtReal * S.speed * SIM_BASE; // simulated seconds
   const diff = norm180(S.tgtHdg - S.hdg), maxTurn = TURN_RATE * dt;
   S.hdg = Math.abs(diff) <= maxTurn ? norm360(S.tgtHdg) : norm360(S.hdg + Math.sign(diff) * maxTurn);
   const v = groundVec();
@@ -574,23 +555,31 @@ function draw(n) {
   else {
     const off = n.dist * g.k > g.R - 8;
     const [px, py] = toPx(g, S.x, S.y);
-    // Radial line
+    // Radial (outbound from the station) and bearing (from the airplane to the station) along the same line
     if (S.show.radial && n.dist > .05) {
       const endD = off ? (g.R - 8) / g.k : n.dist, e = pos(n.r, endD);
-      const [ex, ey] = toPx(g, e.x, e.y);
+      const [ex, ey] = toPx(g, e.x, e.y), lenPx = endD * g.k;
       ctx.setLineDash([6, 5]); ctx.strokeStyle = COL.radial; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(g.cx, g.cy); ctx.lineTo(ex, ey); ctx.stroke(); ctx.setLineDash([]);
-      const m = pos(n.r, endD * .5), mo = pos(n.r + 90, 14 / g.k);
-      const [mx, my] = toPx(g, m.x + mo.x, m.y + mo.y);
-      ctx.font = '600 12px ' + COL.cond;
-      if (endD * g.k > 60) haloText('R-' + fmt3(n.r), mx, my, COL.radial);
+      const chevron = (d, b, color) => {
+        const p = pos(n.r, d), [x, y] = toPx(g, p.x, p.y);
+        ctx.save(); ctx.translate(x, y); ctx.rotate(rad(b)); ctx.strokeStyle = color; ctx.lineWidth = 2.2; ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(-6, 5); ctx.lineTo(0, -2); ctx.lineTo(6, 5); ctx.stroke(); ctx.restore();
+      };
+      const label = (d, text, color) => {
+        const p = pos(n.r, d), o = pos(n.r + 90, 16 / g.k), [x, y] = toPx(g, p.x + o.x, p.y + o.y);
+        haloText(text, x, y, color);
+      };
+      ctx.font = '700 13px ' + COL.cond;
+      if (lenPx > 70) { chevron(endD * .28, n.r, COL.radial); label(endD * .28, 'Radial ' + fmt3(n.r), COL.radial); }
+      if (lenPx > 150) { chevron(endD * .72, n.r + 180, COL.plane); label(endD * .72, 'Bearing ' + fmt3(n.r + 180) + '° to station', COL.plane); }
     }
     if (off) {
       const e = pos(n.r, (g.R - 14) / g.k), [ex, ey] = toPx(g, e.x, e.y);
       ctx.save(); ctx.translate(ex, ey); ctx.rotate(rad(n.r)); ctx.fillStyle = COL.plane;
       ctx.beginPath(); ctx.moveTo(0, -8); ctx.lineTo(7, 5); ctx.lineTo(-7, 5); ctx.closePath(); ctx.fill(); ctx.restore();
       ctx.font = '600 12px ' + COL.sans;
-      haloText('Airplane off the map. Zoom out.', W - 10, H - 14, COL.plane, 'right');
+      haloText('Airplane is off the map', W - 10, H - 14, COL.plane, 'right');
     } else {
       // Track line, three minutes ahead
       const v = groundVec(), ahead = { x: S.x + v.x * 3 / 60, y: S.y + v.y * 3 / 60 };
@@ -600,17 +589,6 @@ function draw(n) {
       drawPlane(px, py, S.hdg);
       if (S.scenario !== 'quiz') { ctx.font = '500 12px ' + COL.sans; haloText('Click or drag to move the airplane', W - 10, H - 14, COL.muted, 'right'); }
     }
-  }
-
-  // Wind arrow
-  if (S.windSpd > 0) {
-    const ax = 30, ay = 46, a = cAng(S.windDir + 180), L = 17;
-    ctx.strokeStyle = COL.text; ctx.fillStyle = COL.text; ctx.lineWidth = 2;
-    const sx = ax - Math.cos(a) * L, sy = ay - Math.sin(a) * L, ex = ax + Math.cos(a) * L, ey = ay + Math.sin(a) * L;
-    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
-    ctx.save(); ctx.translate(ex, ey); ctx.rotate(a); ctx.beginPath(); ctx.moveTo(2, 0); ctx.lineTo(-7, -5); ctx.lineTo(-7, 5); ctx.closePath(); ctx.fill(); ctx.restore();
-    ctx.font = '600 12px ' + COL.cond;
-    haloText(`Wind ${fmt3(S.windDir)}° at ${S.windSpd} kt`, 10, 14, COL.text, 'left');
   }
 }
 
@@ -739,10 +717,6 @@ function togglePlay() { if (S.scenario === 'quiz') return; S.running = !S.runnin
 el('play').addEventListener('click', togglePlay);
 el('speedSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.speed = Number(b.dataset.v); syncControls(); });
 el('dispSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.display = b.dataset.v; syncControls(); });
-el('range').addEventListener('change', e => { S.range = Number(e.target.value); });
-el('tas').addEventListener('change', e => { S.tas = clamp(Number(e.target.value) || 100, 40, 250); e.target.value = S.tas; });
-el('windDir').addEventListener('change', e => { S.windDir = norm360(Number(e.target.value) || 0); e.target.value = S.windDir === 0 ? 360 : S.windDir; });
-el('windSpd').addEventListener('change', e => { S.windSpd = clamp(Number(e.target.value) || 0, 0, 60); e.target.value = S.windSpd; });
 [['tZones', 'zones'], ['tBand', 'band'], ['tRadial', 'radial'], ['tTrail', 'trail']].forEach(([id, k]) => el(id).addEventListener('change', e => { S.show[k] = e.target.checked; }));
 el('clearTrail').addEventListener('click', () => { S.trail = []; });
 document.querySelectorAll('[data-obs]').forEach(b => b.addEventListener('click', () => setObs(S.obs + Number(b.dataset.obs))));
@@ -766,10 +740,6 @@ function syncControls() {
   document.querySelectorAll('#dispSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === S.display)));
   el('play').textContent = S.running ? 'Pause' : 'Play';
   el('play').disabled = S.scenario === 'quiz';
-  el('range').value = String(S.range);
-  el('tas').value = S.tas;
-  el('windDir').value = S.windDir === 0 ? 360 : S.windDir;
-  el('windSpd').value = S.windSpd;
   el('cdi').toggleAttribute('hidden', S.display !== 'cdi'); el('hsi').toggleAttribute('hidden', S.display !== 'hsi');
   el('instTitle').textContent = S.display === 'cdi' ? 'Course deviation indicator' : 'Horizontal situation indicator';
   el('obsLab').textContent = S.display === 'cdi' ? 'OBS' : 'Course';
@@ -782,6 +752,7 @@ function frame(now) {
   const dt = Math.min(0.1, Math.max(0, (now - lastT) / 1000)); lastT = now; S.t += dt;
   if (S.running) step(dt);
   const n = nav();
+  if (!dragging) autoRange(n.dist);
   updateNeedle(n, dt);
   if (W > 0) draw(n);
   updateInstruments(n);
