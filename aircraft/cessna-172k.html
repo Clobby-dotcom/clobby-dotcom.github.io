@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="/site.css">
 <style>
-.pending{color:var(--muted)}
+td.txt,th.txt{text-align:left}
 </style>
 </head>
 <body>
@@ -34,6 +34,7 @@
       <li><a href="#avionics">Avionics</a></li>
       <li><a href="#weight-and-balance">Weight and balance</a></li>
       <li><a href="#procedures">Procedures and flows</a></li>
+      <li><a href="#sources">Sources</a></li>
     </ol>
   </nav>
   <article>
@@ -41,17 +42,159 @@
     <h1>Cessna 172K</h1>
     <p class="lede">Study reference only. The POH and the airplane's own records always win.</p>
     <h2 id="specs">Specs and limits</h2>
-    <p class="pending">Being added.</p>
+    <p>The 172K was built for the 1969 and 1970 model years. FAA Type Certificate Data Sheet (TCDS) 3A12 lists serial numbers 17257162 through 17258486 as 1969 models and 17258487 through 17259223 as 1970 models. Cessna sold it in two versions, the Model 172 and the Skyhawk, which share the same limits but differ in standard equipment and empty weight.</p>
+    <p>This airplane predates the standardized Pilot's Operating Handbook. It came with an Owner's Manual, organized into seven sections: operating checklist, description and operating details, emergency procedures, operating limitations, care of the airplane, operational data, and optional systems. When this page says "POH," it means the Owner's Manual and any supplements or placards in your airplane. The figures here come from TCDS 3A12 and the 1970 Owner's Manual. A 1969 airplane has its own manual, so check it against these numbers.</p>
+    <div class="callout">
+      <p>Many 172Ks have been modified since they left the factory. Engine conversions, long-range tanks, and other changes made by Supplemental Type Certificate (STC) can change horsepower, fuel, weights, and speeds. If your airplane's records, flight manual supplements, or placards differ from anything here, they win.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <caption>Engine, propeller, fuel, and oil (TCDS 3A12 section V; Owner's Manual specifications page, Section IV, and servicing requirements)</caption>
+        <tbody>
+          <tr><td>Engine</td><td>Lycoming O-320-E2D, carbureted, 150 hp at 2,700 RPM</td></tr>
+          <tr><td>Propeller (landplane)</td><td>McCauley 1C172/MTM fixed pitch, 76 in diameter. The TCDS also lists McCauley 1C160 models as alternatives.</td></tr>
+          <tr><td>Static RPM at full throttle</td><td>2,260 to 2,360 RPM with the original propeller and carb heat off</td></tr>
+          <tr><td>Fuel capacity, standard tanks</td><td>42 gal total, 38 gal usable (two 21 gal wing tanks)</td></tr>
+          <tr><td>Fuel capacity, optional long-range tanks</td><td>52 gal total, 48 gal usable</td></tr>
+          <tr><td>Approved fuel</td><td>80/87 minimum grade aviation gasoline</td></tr>
+          <tr><td>Oil capacity</td><td>8 qt. Don't operate on less than 6 qt. The manual suggests 7 qt for flights under 3 hours and 8 qt for longer ones.</td></tr>
+          <tr><td>Oil temperature</td><td>245°F maximum (red line)</td></tr>
+          <tr><td>Oil pressure</td><td>25 psi minimum at idle, 60 to 90 psi normal, 100 psi maximum</td></tr>
+          <tr><td>Tachometer</td><td>2,700 RPM red line. The green arc runs from 2,200 RPM up to 2,500 at sea level, 2,600 at 5,000 ft, and 2,700 at 10,000 ft.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>A tachometer placard required by the TCDS for the 172K with the 1C172/MTM propeller says to avoid continuous operation above 75 percent power in cruise and above 2,500 RPM in a full-throttle climb.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Weights, load factors, and other limits (TCDS 3A12; Owner's Manual Sections II and IV)</caption>
+        <tbody>
+          <tr><td>Maximum weight, normal category</td><td>2,300 lb</td></tr>
+          <tr><td>Maximum weight, utility category</td><td>2,000 lb</td></tr>
+          <tr><td>Maximum ramp weight</td><td>See POH</td></tr>
+          <tr><td>Maximum landing weight</td><td>See POH</td></tr>
+          <tr><td>Baggage</td><td>120 lb</td></tr>
+          <tr><td>Load factors, normal category</td><td>Flaps up +3.8 and −1.52. Flaps down +3.5.</td></tr>
+          <tr><td>Load factors, utility category</td><td>Flaps up +4.4 and −1.76. Flaps down +3.5. Rear seat and baggage area must be empty.</td></tr>
+          <tr><td>Crosswind</td><td>No maximum demonstrated crosswind is published. The manual says an average pilot can safely handle a direct crosswind of 15 MPH (13 knots, converted).</td></tr>
+          <tr><td>Wingspan and length</td><td>See POH</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>In the normal category, spins and other acrobatic maneuvers are prohibited. In the utility category, the manual allows chandelles, lazy eights, and steep turns at entry speeds up to 122 MPH, plus spins and stalls entered with a slow deceleration. Flight into known icing is prohibited. With standard equipment the airplane is approved for day and night VFR, and with the right optional equipment for IFR.</p>
+
     <h2 id="v-speeds">V-speeds</h2>
-    <p class="pending">Being added.</p>
+    <div class="callout">
+      <p>The 172K's manual and airspeed indicator use miles per hour. The knots in the table below are conversions (MPH × 0.869, rounded) except the four limit speeds, where TCDS 3A12 prints the knots itself. Fly the numbers on your airplane's indicator. If someone has replaced it with a knots indicator, the POH supplement or placard for that change applies.</p>
+    </div>
+    <p>The manual lists the airspeed limits and stall speeds as calibrated airspeed (CAS). It doesn't say whether the normal operating speeds, like climb and approach, are indicated or calibrated, except for the short-field approach, which it gives as indicated. The airspeed correction table in Section VI shows the indicator reading well below calibrated airspeed at low speeds. For example, 50 MPH indicated with flaps up is 58 MPH calibrated. So near the stall, the needle will read lower than the stall speeds listed here.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Speeds from the 1970 Owner's Manual and TCDS 3A12 (MPH as printed; knots converted unless noted)</caption>
+        <thead><tr><th class="txt">Speed</th><th>MPH</th><th>Knots</th><th class="txt">What it means</th></tr></thead>
+        <tbody>
+          <tr><td>V<sub>SO</sub></td><td>49 CAS</td><td>43</td><td class="txt">Stall, flaps 40°, power off, 2,300 lb</td></tr>
+          <tr><td>V<sub>S1</sub></td><td>57 CAS</td><td>50</td><td class="txt">Stall, flaps up, power off, 2,300 lb</td></tr>
+          <tr><td>Stall, flaps 10°</td><td>52 CAS</td><td>45</td><td class="txt">Power off, 2,300 lb, wings level</td></tr>
+          <tr><td>Rotation</td><td>60</td><td>52</td><td class="txt">Lift the nosewheel at this speed in a normal takeoff</td></tr>
+          <tr><td>V<sub>X</sub></td><td>68</td><td>59</td><td class="txt">Steep climb over an obstacle, flaps up</td></tr>
+          <tr><td>Obstacle climb, flaps 10°</td><td>65</td><td>56</td><td class="txt">When you take off with 10° and keep it until clear of the obstacle</td></tr>
+          <tr><td>V<sub>Y</sub></td><td>82 at sea level to 79 at 10,000 ft</td><td>71 to 69</td><td class="txt">Maximum rate of climb</td></tr>
+          <tr><td>Normal climb</td><td>80 to 90</td><td>70 to 78</td><td class="txt">Flaps up, full throttle, for better engine cooling</td></tr>
+          <tr><td>V<sub>A</sub></td><td>122 CAS</td><td>106 (TCDS)</td><td class="txt">Maneuvering speed. The manual lists one value only, with no reduced speeds for lighter weights.</td></tr>
+          <tr><td>V<sub>FE</sub></td><td>100 CAS</td><td>87 (TCDS)</td><td class="txt">Maximum with any flaps extended. No separate speeds by flap setting.</td></tr>
+          <tr><td>V<sub>NO</sub></td><td>140 CAS</td><td>122 (TCDS)</td><td class="txt">Maximum structural cruising speed. Top of the green arc.</td></tr>
+          <tr><td>V<sub>NE</sub></td><td>174 CAS</td><td>151 (TCDS)</td><td class="txt">Never exceed. Red line.</td></tr>
+          <tr><td>Glide after engine failure</td><td>80</td><td>70</td><td class="txt">Flaps up. The forced landing procedure then uses 70 to 80 flaps up and 65 to 75 with flaps down.</td></tr>
+          <tr><td>Approach, flaps up</td><td>70 to 80</td><td>61 to 70</td><td class="txt">Normal approach</td></tr>
+          <tr><td>Approach, flaps down</td><td>65 to 75</td><td>56 to 65</td><td class="txt">Normal approach</td></tr>
+          <tr><td>Short-field approach</td><td>69 IAS</td><td>60</td><td class="txt">Power off, flaps 40°</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The manual doesn't name a best glide speed in a performance chart. The 80 MPH figure is the glide it tells you to set up after an engine stoppage. The airspeed indicator markings in Section IV are a white arc from 52 to 100 MPH, a green arc from 59 to 140 MPH, a yellow arc from 140 to 174 MPH, and a red line at 174 MPH. The stall warning horn sounds 5 to 10 MPH before the stall.</p>
+
     <h2 id="systems">Systems</h2>
-    <p class="pending">Being added.</p>
+    <h3>Engine and induction</h3>
+    <p>The O-320-E2D is a four-cylinder, carbureted engine with a manual primer. Carburetor heat is a push-pull knob. Expect to use it. An unexplained RPM drop in cruise is the manual's sign of carb ice, and it calls for carb heat before any big power reduction. On the ground, keep carb heat off, because heated air bypasses the air filter. Some airplanes have an optional carburetor air temperature gauge with a yellow arc from −15°C to 5°C for the icing range.</p>
+    <h3>Fuel</h3>
+    <p>Two wing tanks feed the engine by gravity. There's no fuel pump. The selector has LEFT, RIGHT, BOTH, and OFF. Use BOTH for takeoff, climb, landing, and long slips or skids. LEFT or RIGHT is for cruise. Fuel passes through a strainer on its way to the carburetor, and each tank has a sump drain. On BOTH in cruise, the tanks can feed unevenly if you don't hold the wings level.</p>
+    <p>This model surprises students with a fuel vapor issue. The TCDS requires a placard near the selector on airplanes through serial 17258855, unless a Cessna fuel kit has been installed, telling you to switch to a single tank once you're cruising above 5,000 ft. The 1970 manual explains why. Volatile fuel, heat, and altitude can form vapor and cause rough running. If that happens on one tank, switch to the other. If it happens on BOTH, go to one tank for a minute and then to the other. Check your airplane's placard to see whether it applies.</p>
+    <h3>Electrical</h3>
+    <p>The 172K has a 14-volt system with an engine-driven alternator and a 12-volt battery on the firewall. The master switch is split. The BAT half controls everything, and the ALT half controls the alternator. An ammeter shows charge or discharge, not total load. A split bus cuts power to the avionics side while you're starting or using external power. Circuits are protected by push-to-reset breakers. The TCDS lists a few early 1969 serial numbers (17258105 through 17258112) as 28-volt airplanes, so check yours.</p>
+    <h3>Flaps</h3>
+    <p>The flaps are electric, with a switch and a position indicator on the panel. They travel from 0° to 40°. Section II of the manual says 30° and 40° are never recommended for takeoff, and to avoid slips with more than 30° of flaps, because the nose can pitch down in some combinations of airspeed, sideslip, and CG.</p>
+    <h3>Landing gear and brakes</h3>
+    <p>The gear is fixed tricycle with a steerable nosewheel and a shimmy damper. The brakes are hydraulic, and there's a parking brake handle on the panel. Normal tire pressures in the servicing table are 24 psi for the mains and 26 psi for the nose. Your airplane's tire sizes may differ, so check the servicing page in its manual.</p>
+    <h3>Pitot-static and gyros</h3>
+    <p>Airplanes with attitude and heading indicators run them on a vacuum system. The runup check expects 4.6 to 5.4 inches of mercury on the suction gauge. The turn coordinator or turn-and-bank indicator is electric. An alternate static source valve was optional. The manual says using it shifts airspeed by about 2 MPH and altitude by about 15 ft at most. Pitot heat was optional too.</p>
+
     <h2 id="avionics">Avionics</h2>
-    <p class="pending">Being added.</p>
+    <p>The Owner's Manual shows radios, a transponder, an autopilot, and the marker beacon lights as optional equipment. Its radio selector panel has positions for two COMs, two NAVs, an ADF, and DME, along with the speaker and phone switches.</p>
+    <p>Installed avionics vary by airplane. The panel in each fleet airplane will be added here by your instructor. Until then, use the supplements in that airplane's manual for any radio, GPS, or autopilot it carries.</p>
+
     <h2 id="weight-and-balance">Weight and balance</h2>
-    <p class="pending">Being added.</p>
+    <p>The datum is the lower front face of the firewall. Arms are measured in inches aft of it, so anything ahead of the firewall, like the engine oil, has a negative arm. The leveling reference is the upper doorsill.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>CG range, landplane (TCDS 3A12 section V, straight-line variation between points)</caption>
+        <thead><tr><th class="txt">Category</th><th>Weight</th><th>Forward limit</th><th>Aft limit</th></tr></thead>
+        <tbody>
+          <tr><td>Normal</td><td>2,300 lb</td><td>+38.5 in</td><td>+47.3 in</td></tr>
+          <tr><td>Normal</td><td>1,950 lb or less</td><td>+35.0 in</td><td>+47.3 in</td></tr>
+          <tr><td>Utility</td><td>2,000 lb</td><td>+35.5 in</td><td>+40.5 in</td></tr>
+          <tr><td>Utility</td><td>1,950 lb or less</td><td>+35.0 in</td><td>+40.5 in</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <caption>Station arms (TCDS 3A12 section V and Note 1)</caption>
+        <thead><tr><th class="txt">Item</th><th>Arm</th></tr></thead>
+        <tbody>
+          <tr><td>Front seats</td><td>+34 to +46 in, depending on seat position</td></tr>
+          <tr><td>Rear seats</td><td>+73 in</td></tr>
+          <tr><td>Optional child's seat</td><td>+93 in</td></tr>
+          <tr><td>Baggage, 120 lb maximum</td><td>+95 in</td></tr>
+          <tr><td>Fuel</td><td>+48 in</td></tr>
+          <tr><td>Engine oil</td><td>−14.0 in</td></tr>
+          <tr><td>Unusable fuel, 24 lb, included in empty weight</td><td>+46 in</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Because the front seats slide, their arm depends on where each person sits. The airplane's loading graph accounts for that. The Owner's Manual has you start from licensed empty weight, which leaves out the engine oil, so the oil gets its own line. It also uses moment divided by 1,000. The loading graph and CG moment envelope were supplied on a separate sheet kept with the airplane's papers, not in the manual itself.</p>
+    <p>The basic empty weight for each fleet airplane, and a calculator for it, will be added here. They come from that airplane's own weight and balance record. For how to work a loading problem, see <a href="/ground-school/weight-and-balance.html">Weight and balance</a>.</p>
+
     <h2 id="procedures">Procedures and flows</h2>
-    <p class="pending">Being added.</p>
+    <p>These are summaries for study. Use the checklist in your airplane, and the Owner's Manual sections cited, when you fly.</p>
+    <h3>Engine start (Section I and Section II)</h3>
+    <p>Set the fuel selector to BOTH and turn off radios and electrical equipment. Mixture rich, carb heat cold, prime as needed for the temperature, throttle open about 1/8 inch. A warm engine needs no prime. After the start, check that oil pressure comes up within 30 seconds, or about twice that in very cold weather. If it doesn't, shut down. The manual has separate cold-weather starting procedures in Section II.</p>
+    <h3>Runup (Section I and Section II)</h3>
+    <p>Run up at 1,700 RPM. The magneto drop should be no more than 125 RPM on either side, with no more than 50 RPM between them. Check suction at 4.6 to 5.4 inches of mercury on airplanes with vacuum gyros. To check the alternator before a night or instrument flight, add a brief electrical load, like the flaps or landing light, and the ammeter should stay within a needle width of zero. Early in the takeoff roll, confirm the engine is turning about 2,260 to 2,360 RPM at full throttle. Above 5,000 ft field elevation, lean for maximum RPM before takeoff.</p>
+    <h3>Takeoff and landing flaps (Section II)</h3>
+    <ul>
+      <li>Normal and obstacle takeoffs use flaps up.</li>
+      <li>10° shortens the ground roll by about 10 percent, but you lose that gain by the time you clear a 50 ft obstacle. Use it for soft or rough fields.</li>
+      <li>Normal landings can use any flap setting. Short-field landings use 40°.</li>
+      <li>On a go-around, add full power and bring the flaps to 20° right away. Retract the rest once you're clear of obstacles and accelerating.</li>
+    </ul>
+    <h3>Emergency memory items (Section III)</h3>
+    <ul>
+      <li>Engine failure in flight. Set up an 80 MPH flaps-up glide. If there's time, check fuel quantity, the fuel selector, mixture, primer locked, and the ignition switch.</li>
+      <li>Forced landing. Mixture to cutoff, fuel selector off, switches off except the master, then the master off and doors unlatched before final. Touch down slightly tail-low.</li>
+      <li>Engine fire in flight. Mixture to cutoff, fuel selector off, master off, cabin heat off, and a 120 MPH glide to a forced landing. Don't try a restart.</li>
+      <li>Electrical fire. Master off and vents closed. If you need electrical power, turn things back on one at a time to find the bad circuit.</li>
+      <li>Alternator failure, shown by a steady discharge on the ammeter. Turn off the alternator side of the master and nonessential equipment, and land as soon as practical.</li>
+      <li>Rough engine. Try carb heat. Check each magneto. Adjust the mixture.</li>
+      <li>Inadvertent icing. Pitot heat on if installed, turn back or change altitude, defrost on, carb heat as needed, keep flaps up, and land at the nearest airport.</li>
+    </ul>
+    <p>Spin recovery for the utility category is in Section IV. The manual's version is opposite rudder, then forward pressure on the control wheel, then a smooth pull-out once rotation stops.</p>
+
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li>FAA Type Certificate Data Sheet 3A12, Revision 84, July 29, 2015, section V (Models 172I and 172K) and "Data pertinent to all models." Copy opened from <a href="https://resources.univair.com/docs/tcds-for-cessna">Univair's TCDS library</a>. The official copy is on the <a href="https://drs.faa.gov">FAA Dynamic Regulatory System</a>. Used for the engine, propeller, fuel, oil, weights, CG range, station arms, airspeed limits in knots, serial numbers, and placards.</li>
+      <li>Cessna Skyhawk 1970 Owner's Manual (Model 172K), Sections I through VII and the servicing requirements page, opened on <a href="https://www.manualslib.com/manual/2001030/Cessna-Skyhawk-1970.html">ManualsLib</a>. Used for the specifications, speeds in MPH, systems descriptions, limitations, markings, and procedure summaries. It covers 1970 model airplanes. A 1969 172K has its own Owner's Manual.</li>
+    </ul>
   </article>
 </div>
 <footer class="site-foot">

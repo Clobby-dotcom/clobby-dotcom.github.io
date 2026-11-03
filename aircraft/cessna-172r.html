@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="/site.css">
 <style>
-.pending{color:var(--muted)}
+article td:last-child,article th:last-child{text-align:left}
 </style>
 </head>
 <body>
@@ -34,6 +34,7 @@
       <li><a href="#avionics">Avionics</a></li>
       <li><a href="#weight-and-balance">Weight and balance</a></li>
       <li><a href="#procedures">Procedures and flows</a></li>
+      <li><a href="#sources">Sources</a></li>
     </ol>
   </nav>
   <article>
@@ -41,17 +42,220 @@
     <h1>Cessna 172R</h1>
     <p class="lede">Study reference only. The POH and the airplane's own records always win.</p>
     <h2 id="specs">Specs and limits</h2>
-    <p class="pending">Being added.</p>
+    <div class="callout">
+      <p>The numbers on this page are for the standard 160 hp 172R, serial numbers 17280001 and on, with the conventional instrument panel. They come from FAA TCDS 3A12 and the 172R Pilot's Operating Handbook (original issue December 2, 1996, through Revision 9 of July 19, 2004).</p>
+      <p>Two kinds of 172R use different books. Airplanes converted to 180 hp with Cessna kit MK172-72-01 use POH 172R180PH, and airplanes with the Garmin G1000 use their own AFM. If your airplane is one of those, or its POH has a later revision, its POH and placards win over anything here.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <caption>Engine, fuel, and oil. POH Sections 1 and 2, checked against TCDS 3A12.</caption>
+        <tbody>
+          <tr><td>Engine</td><td>Lycoming IO-360-L2A, fuel injected, four cylinders, 360 cu in</td></tr>
+          <tr><td>Rated power</td><td>160 hp at 2,400 RPM</td></tr>
+          <tr><td>Maximum engine speed</td><td>2,400 RPM (tachometer red line)</td></tr>
+          <tr><td>Propeller</td><td>McCauley 1C235/LFA7570, two blades, fixed pitch, 75 in diameter (74 in minimum)</td></tr>
+          <tr><td>Static RPM at full throttle</td><td>2,065 to 2,165 RPM</td></tr>
+          <tr><td>Fuel capacity</td><td>56 gal total (two 28 gal wing tanks)</td></tr>
+          <tr><td>Usable fuel</td><td>53 gal (26.5 gal per tank)</td></tr>
+          <tr><td>Unusable fuel</td><td>3 gal (1.5 gal per tank)</td></tr>
+          <tr><td>Approved fuel</td><td>100LL (blue) or 100 (green) aviation gasoline</td></tr>
+          <tr><td>Oil capacity</td><td>8 qt sump, 9 qt total</td></tr>
+          <tr><td>Minimum oil to fly</td><td>See POH</td></tr>
+          <tr><td>Oil temperature</td><td>Green arc 100 to 245°F, red line 245°F</td></tr>
+          <tr><td>Oil pressure</td><td>20 psi minimum, 50 to 90 psi normal, 115 psi maximum</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <caption>Weights and loads. POH Section 2, checked against TCDS 3A12.</caption>
+        <thead><tr><th>Limit</th><th>Normal category</th><th>Utility category</th></tr></thead>
+        <tbody>
+          <tr><td>Maximum ramp weight</td><td>2,457 lb</td><td>2,107 lb</td></tr>
+          <tr><td>Maximum takeoff weight</td><td>2,450 lb</td><td>2,100 lb</td></tr>
+          <tr><td>Maximum landing weight</td><td>2,450 lb</td><td>2,100 lb</td></tr>
+          <tr><td>Baggage area 1 (station 82 to 108)</td><td>120 lb</td><td>None</td></tr>
+          <tr><td>Baggage area 2 (station 108 to 142)</td><td>50 lb</td><td>None</td></tr>
+          <tr><td>Both baggage areas combined</td><td>120 lb</td><td>None</td></tr>
+          <tr><td>Load factor, flaps up</td><td>+3.8g, −1.52g</td><td>+4.4g, −1.76g</td></tr>
+          <tr><td>Load factor, flaps down</td><td>+3.0g</td><td>+3.0g</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>In the utility category the rear seat must be empty and the baggage areas must be empty. Utility category allows spins and a few other maneuvers listed in POH Section 2. The airplane is not approved for aerobatics, and flight into known icing is prohibited.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Other limits and dimensions. POH Sections 1, 2, and 4.</caption>
+        <tbody>
+          <tr><td>Maximum demonstrated crosswind</td><td>15 knots</td></tr>
+          <tr><td>Wingspan</td><td>36 ft 1 in (with strobe lights)</td></tr>
+          <tr><td>Length</td><td>27 ft 2 in</td></tr>
+          <tr><td>Height</td><td>8 ft 11 in maximum</td></tr>
+          <tr><td>Wing area</td><td>174 sq ft</td></tr>
+          <tr><td>Approved takeoff flap range</td><td>0° to 10°</td></tr>
+          <tr><td>Approved landing flap range</td><td>0° to 30°</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Fuel limits that come up on checkrides</h3>
+    <ul>
+      <li>Take off and land with the fuel selector on BOTH.</li>
+      <li>Running on LEFT or RIGHT alone is for level flight only.</li>
+      <li>With one tank dry, a slip or skid can last no more than 30 seconds.</li>
+      <li>With a quarter tank or less, don't fly uncoordinated for long on a single tank.</li>
+      <li>Fuel left in a tank once its gauge reads zero can't be used safely in flight.</li>
+    </ul>
+
     <h2 id="v-speeds">V-speeds</h2>
-    <p class="pending">Being added.</p>
+    <p>Limit speeds are from POH Section 2 and match TCDS 3A12. Stall speeds are from POH Section 5 at 2,450 lb with power off. Other speeds are from POH Sections 3 and 4. The POH says Section 4 speeds are based on 2,450 lb and may be used at lower weights.</p>
+    <p>Learn these in KIAS, because that's what your airspeed indicator shows. KCAS corrects for instrument and position error. In this airplane the difference is large near the stall: the 30° flap stall is 33 KIAS but 47 KCAS. The POH notes that its KIAS stall values are approximate.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>172R V-speeds, 160 hp, KIAS unless noted</caption>
+        <thead><tr><th>Speed</th><th>KIAS</th><th>What it means</th></tr></thead>
+        <tbody>
+          <tr><td>V<sub>SO</sub></td><td>33</td><td>Stall, flaps 30°, wings level, 2,450 lb (47 KCAS). Bottom of the white arc.</td></tr>
+          <tr><td>V<sub>S1</sub></td><td>44</td><td>Stall, flaps up, forward CG, wings level, 2,450 lb (52 KCAS). Bottom of the green arc.</td></tr>
+          <tr><td>Rotation</td><td>55</td><td>Normal takeoff: lift the nose wheel at 55 KIAS.</td></tr>
+          <tr><td>V<sub>X</sub></td><td>60</td><td>Best angle of climb at sea level. 65 KIAS at 10,000 ft.</td></tr>
+          <tr><td>V<sub>Y</sub></td><td>79</td><td>Best rate of climb at sea level. 71 KIAS at 10,000 ft.</td></tr>
+          <tr><td>Normal climb</td><td>70 to 85</td><td>Normal climb-out after takeoff is 70 to 80. En route climb is 75 to 85 at sea level and 70 to 80 at 10,000 ft.</td></tr>
+          <tr><td>Short field takeoff</td><td>57</td><td>Speed at 50 ft with 10° flaps. Hold it until obstacles are cleared.</td></tr>
+          <tr><td>V<sub>A</sub> at 2,450 lb</td><td>99</td><td>Maneuvering speed. No full or abrupt control inputs above it.</td></tr>
+          <tr><td>V<sub>A</sub> at 2,000 lb</td><td>92</td><td>Maneuvering speed at lighter weight.</td></tr>
+          <tr><td>V<sub>A</sub> at 1,600 lb</td><td>82</td><td>Maneuvering speed at lighter weight.</td></tr>
+          <tr><td>V<sub>FE</sub>, flaps 10°</td><td>110</td><td>Highest speed with 10° of flaps.</td></tr>
+          <tr><td>V<sub>FE</sub>, flaps 10° to 30°</td><td>85</td><td>Highest speed with more than 10° of flaps. Top of the white arc.</td></tr>
+          <tr><td>V<sub>NO</sub></td><td>129</td><td>Maximum structural cruising speed. Top of the green arc. Above it, smooth air only.</td></tr>
+          <tr><td>V<sub>NE</sub></td><td>163</td><td>Never exceed. Red line. Also the maximum speed with a window open.</td></tr>
+          <tr><td>Best glide</td><td>65</td><td>Maximum glide, flaps up.</td></tr>
+          <tr><td>Normal approach, flaps up</td><td>65 to 75</td><td></td></tr>
+          <tr><td>Normal approach, flaps 30°</td><td>60 to 70</td><td></td></tr>
+          <tr><td>Short field approach, flaps 30°</td><td>62</td><td>Hold it until the flare.</td></tr>
+          <tr><td>Balked landing</td><td>55</td><td>Full power, flaps 20°.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The airspeed indicator arcs are white 33 to 85, green 44 to 129, and yellow 129 to 163, with the red line at 163 KIAS. The utility category maneuvering speed is 92 KIAS at 2,100 lb. The POH lists 92 KIAS twice, once at 2,000 lb (Sections 2 and 4) and once at 2,100 lb (Section 3), so check how your airplane's POH reads.</p>
+
     <h2 id="systems">Systems</h2>
-    <p class="pending">Being added.</p>
+    <p>From POH Section 7 unless noted.</p>
+    <dl class="terms">
+      <dt>Engine and induction</dt>
+      <dd>The IO-360-L2A is fuel injected, so there is no carburetor and no carburetor heat. Air comes in through a filter at the front of the lower cowling. If the filter gets blocked, a spring-loaded alternate air door in the air box opens by itself and pulls unfiltered air from inside the cowling. The POH says to expect about 10 percent less power at full throttle on alternate air. Ignition is two magnetos, two spark plugs per cylinder, with an OFF, R, L, BOTH, START key switch.</dd>
+      <dt>Fuel system</dt>
+      <dd>Two vented integral tanks, one in each wing. The selector has LEFT, RIGHT, and BOTH, and there is a separate fuel shutoff valve that you push in for ON and pull out for OFF. The system includes a fuel strainer, an engine-driven fuel pump, a fuel/air control unit, a distribution valve, and an injection nozzle at each cylinder. An electric auxiliary fuel pump is used for priming before start and as a backup if the engine-driven pump fails. Sample fuel from the drains before each flight and after each fueling. The preflight checklist shows where each drain is.</dd>
+      <dt>Electrical</dt>
+      <dd>28-volt DC system with a belt-driven 60-amp alternator and a 24-volt battery on the left forward side of the firewall. Power goes through a split primary bus with an essential bus between the halves. An avionics master switch powers the avionics buses. The annunciator panel shows warnings for low fuel quantity, low oil pressure, low vacuum, and low voltage.</dd>
+      <dt>Flaps</dt>
+      <dd>Electric, single-slot flaps. The flap lever has stops at 10°, 20°, and 30°, and a pointer next to it shows flap position. Flaps are protected by a circuit breaker labeled FLAP.</dd>
+      <dt>Brakes</dt>
+      <dd>A single-disc hydraulic brake on each main wheel, worked by the tops of the rudder pedals. The pilot's and copilot's pedals are interconnected. The parking brake handle is under the left side of the panel: hold the pedals, pull the handle aft, and turn it 90° down.</dd>
+      <dt>Landing gear</dt>
+      <dd>Tricycle gear. The main gear legs are tubular spring steel, and the nose wheel is steerable. Wheel fairings are optional.</dd>
+      <dt>Pitot-static</dt>
+      <dd>The pitot tube is under the left wing and the static port is on the lower left side of the forward fuselage. Some airplanes have pitot heat. An alternate static source valve below the throttle switches the instruments to cabin air if the outside port is blocked. Cabin air pressure changes the readings a little, and POH Section 5 has the correction table.</dd>
+      <dt>Vacuum and gyros</dt>
+      <dd>The attitude indicator and heading indicator are vacuum driven. This 172R has two engine-driven vacuum pumps with check valves, so the gyros keep working if one pump fails. A low-vacuum switch on each pump feeds the annunciator. Set the heading indicator to the magnetic compass before takeoff and recheck it in flight.</dd>
+      <dt>Stall warning</dt>
+      <dd>A pneumatic horn fed by an inlet in the left wing's leading edge. It sounds 5 to 10 knots above the stall.</dd>
+    </dl>
+    <h3>Things that surprise students</h3>
+    <ul>
+      <li>There's no primer knob. You prime with the auxiliary fuel pump and the mixture, and a warm engine skips priming. The POH has a separate note for starting a flooded engine.</li>
+      <li>The fuel shutoff valve is separate from the selector. Make sure it's pushed in before you start.</li>
+      <li>The static RPM range at full throttle is 2,065 to 2,165, well below the 2,400 RPM red line. That's normal for this fixed-pitch propeller.</li>
+      <li>The stall speeds in KIAS look very low, 33 KIAS with full flaps. The KCAS is 47, so most of that gap is airspeed indicator error near the stall.</li>
+      <li>The POH copy used here includes a temporary revision with a different starting procedure for airplanes that haven't had Service Bulletin SB04-24-01 done. Ask your instructor which one applies to your airplane.</li>
+    </ul>
+
     <h2 id="avionics">Avionics</h2>
-    <p class="pending">Being added.</p>
+    <p>The POH lists this as the 172R's standard avionics:</p>
+    <ul>
+      <li>KX-155A nav/com with a KI 208 or KI 209A indicator</li>
+      <li>KT-76C transponder</li>
+      <li>KMA-26 audio panel</li>
+      <li>Emergency locator transmitter</li>
+      <li>A clock, outside air temperature, and voltmeter display in the upper left panel</li>
+    </ul>
+    <p>The POH describes conventional round-gauge flight instruments in a basic T: the gyros in the center, the airspeed indicator on the left, and the altimeter on the right. The tachometer and navigation instruments sit to the right. Fuel quantity, oil temperature and pressure, the vacuum gauge and ammeter, and the EGT and fuel flow gauge sit to the left. An annunciator panel above the altimeter shows warnings for fuel quantity, oil pressure, low vacuum, and low voltage.</p>
+    <p>Some 172Rs were built with the Garmin G1000 instead. Those airplanes use a separate AFM (part number 172RPHAUS, or 172RPHBUS with the GFC 700 autopilot), and the numbers on this page may not match them.</p>
+    <p>Installed avionics vary by airplane, and your instructor will add what's in each fleet airplane. Use the POH supplements in Section 9 for the equipment actually installed.</p>
+
     <h2 id="weight-and-balance">Weight and balance</h2>
-    <p class="pending">Being added.</p>
+    <p>CG limits are from TCDS 3A12 for airplanes operated with POH 172RPHUS. Station arms are from POH Section 6, Figure 6-3.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Datum and CG range. TCDS 3A12.</caption>
+        <tbody>
+          <tr><td>Datum</td><td>Lower part of the front face of the firewall</td></tr>
+          <tr><td>Normal category, forward limit</td><td>35.0 in at 1,950 lb or less, moving in a straight line to 40.0 in at 2,450 lb</td></tr>
+          <tr><td>Normal category, aft limit</td><td>47.3 in at all weights</td></tr>
+          <tr><td>Utility category, forward limit</td><td>35.0 in at 1,950 lb or less, moving in a straight line to 36.5 in at 2,100 lb</td></tr>
+          <tr><td>Utility category, aft limit</td><td>40.5 in at all weights</td></tr>
+          <tr><td>Mean aerodynamic chord</td><td>58.8 in, leading edge at 25.9 in</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <caption>Station arms. POH Figure 6-3, oil from TCDS 3A12.</caption>
+        <thead><tr><th>Item</th><th>Arm (in)</th></tr></thead>
+        <tbody>
+          <tr><td>Pilot and front passenger</td><td>37 (range 34 to 46 with seat position)</td></tr>
+          <tr><td>Rear passengers</td><td>73</td></tr>
+          <tr><td>Usable fuel</td><td>48.0</td></tr>
+          <tr><td>Baggage area 1</td><td>95</td></tr>
+          <tr><td>Baggage area 2</td><td>123</td></tr>
+          <tr><td>Engine oil</td><td>−13.1 (ahead of the datum)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The airplane's empty weight already includes full oil and the 3 gallons of unusable fuel, so don't add them again. Fuel weighs 6 lb per gallon. Use the forms and envelope chart in POH Section 6, not the sample loading problem's numbers.</p>
+    <div class="callout">
+      <p>Every 172R has its own basic empty weight and moment, and they change whenever equipment is added or removed. Those come from that airplane's current weight and balance record. The empty weights for each fleet airplane and a loading calculator will be added here.</p>
+    </div>
+    <p>For the method, see <a href="/ground-school/weight-and-balance.html">Weight and balance</a>.</p>
+
     <h2 id="procedures">Procedures and flows</h2>
-    <p class="pending">Being added.</p>
+    <p>These are summaries to help you study. In the airplane, use the airplane's own checklist and POH Sections 3 and 4.</p>
+    <h3>Engine start</h3>
+    <p>Throttle open about a quarter inch, mixture at idle cutoff, area clear, master and beacon on. If the engine is cold, prime by turning on the auxiliary fuel pump, moving the mixture to full rich until fuel flow is steady for a few seconds, then back to idle cutoff and pump off. Crank, and advance the mixture smoothly once it fires. Check oil pressure right away. Skip priming on a warm engine. Airplanes without SB04-24-01 have a slightly different start flow in the POH temporary revision. See POH Section 4, Starting Engine.</p>
+    <h3>Runup items specific to the 172R</h3>
+    <ul>
+      <li>Run up at 1,800 RPM.</li>
+      <li>Magneto check: no more than 150 RPM drop on either magneto, and no more than 50 RPM difference between them.</li>
+      <li>Check the vacuum gauge, engine instruments, and ammeter, and make sure no annunciators are lit.</li>
+      <li>Fuel selector on BOTH, mixture rich, flaps set 0° to 10° for takeoff.</li>
+    </ul>
+    <p>See POH Section 4, Before Takeoff.</p>
+    <h3>Takeoff and landing flaps</h3>
+    <ul>
+      <li>Normal takeoff uses 0° to 10° of flaps. Lift the nose wheel at 55 KIAS and climb at 70 to 80 KIAS.</li>
+      <li>Short field takeoff uses 10° of flaps, brakes held during full power, 57 KIAS until clear of obstacles, then flaps up slowly after 60 KIAS.</li>
+      <li>Above 3,000 ft, lean the mixture for maximum RPM before takeoff.</li>
+      <li>Normal landing flaps are as desired. 10° is allowed below 110 KIAS and 10° to 30° below 85 KIAS.</li>
+      <li>Short field landing uses full 30° flaps at 62 KIAS, power to idle after clearing the obstacle, then heavy braking.</li>
+      <li>For a go-around, go to full power and bring the flaps up to 20° right away, then climb at 55 KIAS. Bring the flaps to 10° until obstacles are cleared, and fully up once you're at a safe altitude and 60 KIAS.</li>
+    </ul>
+    <p>See POH Section 4, Takeoff and Landing.</p>
+    <h3>Emergency memory items</h3>
+    <p>The POH prints its immediate-action items in bold. In summary:</p>
+    <ul>
+      <li>Engine failure on the takeoff roll: throttle to idle and brake.</li>
+      <li>Engine failure right after takeoff: pitch for 65 KIAS with flaps up or 60 KIAS with flaps down, and land more or less straight ahead. Then shut off fuel, ignition, and master if time allows.</li>
+      <li>Engine failure in flight: pitch for 65 KIAS, best glide. Check fuel shutoff ON and selector BOTH, turn on the auxiliary pump, mixture rich, and check the ignition switch. A windmilling propeller usually restarts on its own.</li>
+      <li>Fire during start: keep cranking so the engine pulls the fire in. If it doesn't start, keep cranking with full throttle and mixture at idle cutoff, fuel shutoff off and auxiliary pump off.</li>
+      <li>Engine fire in flight: mixture to idle cutoff, fuel shutoff off, auxiliary pump off, master off. Then cabin heat and air off, 100 KIAS, and a forced landing.</li>
+      <li>Electrical fire in flight: master off, vents and cabin heat closed, use the extinguisher. Ventilate the cabin once the fire is out.</li>
+    </ul>
+    <p>See POH Section 3 for the full procedures, including the electrical, vacuum, icing, and static source failures.</p>
+
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li>FAA Type Certificate Data Sheet 3A12, Revision 84 (July 29, 2015), Section XI, Model 172R. Copy read from <a href="https://resources.univair.com/docs/tcds-for-cessna">Univair's TCDS library</a>. The current revision is on the <a href="https://drs.faa.gov/">FAA Dynamic Regulatory System</a>.</li>
+      <li>Cessna Model 172R Pilot's Operating Handbook and FAA Approved Airplane Flight Manual, original issue December 2, 1996, log of effective pages through Revision 9 (July 19, 2004), Sections 1 through 7. Copy read on <a href="https://www.manualslib.com/manual/1384562/Cessna-172r.html">ManualsLib</a>.</li>
+    </ul>
   </article>
 </div>
 <footer class="site-foot">
