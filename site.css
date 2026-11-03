@@ -1,0 +1,38 @@
+/* Shared header, footer, and base styles for every page. Tool-specific styles stay inline in each page. */
+:root{
+  --bg:#F2F4F5; --surface:#FFFFFF; --surface-2:#E8ECEE; --text:#1C2227; --muted:#58626A; --line:#D2D8DC;
+  --accent:#7B1E2E; --accent-ink:#FFFFFF; --accent-soft:#F4E4E7;
+  --chart:#2B55A3; --chart-faint:rgba(43,85,163,.16); --ok:#17733F; --focus:#2B55A3;
+  --sans:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
+  --cond:"Barlow Semi Condensed","Arial Narrow","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#14171A; --surface:#1D2125; --surface-2:#272C31; --text:#E5E8EA; --muted:#9BA5AC; --line:#353B41;
+    --accent:#CF6B7B; --accent-ink:#1A0B0E; --accent-soft:#3A2329;
+    --chart:#82A8E8; --chart-faint:rgba(130,168,232,.16); --ok:#5CCB86; --focus:#82A8E8;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#14171A; --surface:#1D2125; --surface-2:#272C31; --text:#E5E8EA; --muted:#9BA5AC; --line:#353B41;
+  --accent:#CF6B7B; --accent-ink:#1A0B0E; --accent-soft:#3A2329;
+  --chart:#82A8E8; --chart-faint:rgba(130,168,232,.16); --ok:#5CCB86; --focus:#82A8E8;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--chart)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.site-head{border-bottom:1px solid var(--line);background:var(--surface)}
+.site-head-in{max-width:1200px;margin:0 auto;padding:0 16px;min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px 24px;flex-wrap:wrap}
+.wordmark{font:700 1.3rem/1 var(--cond);color:var(--text);text-decoration:none;letter-spacing:-.01em;padding:14px 0}
+.site-nav{display:flex;gap:4px 20px;flex-wrap:wrap}
+.site-nav a{font:600 1rem/1 var(--cond);color:var(--muted);text-decoration:none;padding:16px 0 14px;border-bottom:3px solid transparent}
+.site-nav a:hover{color:var(--text)}
+.site-nav a[aria-current="page"]{color:var(--text);border-bottom-color:var(--accent)}
+@media (max-width:520px){.site-nav a{padding:6px 0 10px}}
+
+.site-foot{max-width:1200px;margin:0 auto;padding:20px 16px 40px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:8px 24px;flex-wrap:wrap}
+.site-foot p{margin:0;max-width:70ch}

@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
 <style>
 :root{
   --bg:#F2F4F5; --surface:#FFFFFF; --surface-2:#E8ECEE; --text:#1C2227; --muted:#58626A; --line:#D2D8DC;
@@ -49,8 +50,6 @@ body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 var(--san
 h1{font:700 clamp(1.9rem,3.6vw,2.5rem)/1.05 var(--cond);margin:0;letter-spacing:-.01em}
 h2{font:700 1.2rem/1.2 var(--cond);margin:0 0 6px}
 h3{font:700 1.05rem/1.2 var(--cond);margin:0 0 8px}
-.home{display:inline-block;margin-bottom:10px;color:var(--muted);font:600 .95rem/1 var(--cond);text-decoration:none}
-.home:hover{color:var(--accent)}
 .lede{margin:6px 0 18px;color:var(--muted);max-width:62ch}
 
 button{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-height:38px;cursor:pointer}
@@ -124,8 +123,16 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
 </style>
 </head>
 <body>
+<header class="site-head">
+  <div class="site-head-in">
+    <a class="wordmark" href="./">Ground School</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="vor-trainer.html" aria-current="page">VOR trainer</a>
+      <a href="weight-and-balance.html">Weight and balance</a>
+    </nav>
+  </div>
+</header>
 <div class="app">
-  <a class="home" href="./">← All study tools</a>
   <h1>VOR trainer</h1>
   <p class="lede">Put the airplane anywhere, turn the OBS, and watch the needle. Your position and the OBS move it. Your heading never changes what it tells you.</p>
 

@@ -3,58 +3,125 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Flight study tools</title>
-<meta name="description" content="Interactive study tools for flight students.">
+<title>Ground School</title>
+<meta name="description" content="Interactive study tools for flight students: a VOR trainer and a weight and balance walkthrough.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
 <style>
-:root{
-  --bg:#F2F4F5; --surface:#FFFFFF; --text:#1C2227; --muted:#58626A; --line:#D2D8DC;
-  --accent:#7B1E2E; --accent-soft:#F4E4E7; --focus:#2B55A3;
-  --sans:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
-  --cond:"Barlow Semi Condensed","Arial Narrow","Segoe UI",system-ui,sans-serif;
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    color-scheme:dark;
-    --bg:#14171A; --surface:#1D2125; --text:#E5E8EA; --muted:#9BA5AC; --line:#353B41;
-    --accent:#CF6B7B; --accent-soft:#3A2329; --focus:#82A8E8;
-  }
-}
-*,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
-.app{max-width:900px;margin:0 auto;padding:40px 16px 56px}
-h1{font:700 clamp(2rem,5vw,2.8rem)/1.05 var(--cond);margin:0;letter-spacing:-.01em}
-h2{font:700 1.3rem/1.2 var(--cond);margin:0 0 6px}
-.lede{margin:10px 0 32px;color:var(--muted);max-width:60ch}
-.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin:0;padding:0;list-style:none}
-.tool{display:block;height:100%;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:18px 18px 16px;color:inherit;text-decoration:none}
-.tool:hover{border-color:var(--accent)}
-.tool:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.tool p{margin:0 0 12px;color:var(--muted)}
-.go{font:600 .95rem/1 var(--cond);color:var(--accent)}
-footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;max-width:70ch}
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero-in{position:relative;max-width:1200px;margin:0 auto;padding:clamp(56px,10vw,120px) 16px clamp(48px,8vw,96px)}
+.hero h1{position:relative;z-index:1;margin:0;font:700 clamp(3.6rem,13vw,9rem)/.88 var(--cond);letter-spacing:-.025em}
+.hero p{position:relative;z-index:1;margin:22px 0 0;max-width:34ch;font-size:clamp(1.1rem,2.2vw,1.35rem);line-height:1.45;color:var(--muted)}
+.rose{position:absolute;top:50%;right:-120px;width:min(620px,95vw);transform:translateY(-50%);color:var(--chart);pointer-events:none}
+.rose .faint{stroke:var(--chart-faint)}
+.rose .course{stroke:var(--accent)}
+@media (max-width:760px){.rose{right:-62%;opacity:.35}}
+
+.tools{max-width:1200px;margin:0 auto;padding:0 16px}
+.tools ul{list-style:none;margin:0;padding:0}
+.tool{display:grid;grid-template-columns:112px minmax(0,1fr);gap:24px;align-items:start;padding:36px 0;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
+.tool:hover h2{color:var(--accent)}
+.tool svg{width:112px;height:112px;display:block}
+.tool h2{margin:0 0 6px;font:700 clamp(1.7rem,3.5vw,2.2rem)/1.05 var(--cond)}
+.tool p{margin:0;max-width:62ch;color:var(--muted)}
+.tool .open{display:inline-block;margin-top:12px;font:600 1rem/1 var(--cond);color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+@media (max-width:520px){.tool{grid-template-columns:64px minmax(0,1fr);gap:16px}.tool svg{width:64px;height:64px}}
+
+.i-face{fill:#141617}.i-ring{fill:#2A2E32}.i-mark{fill:#F1F1F1}.i-mark-s{stroke:#F1F1F1}
+.env{fill:var(--chart-faint);stroke:var(--chart)}
+.env-pt{fill:var(--accent)}
+.env-ax{stroke:var(--muted)}
 </style>
 </head>
 <body>
-<main class="app">
-  <h1>Flight study tools</h1>
-  <p class="lede">Interactive tools for practicing what you'll see in the airplane. Use them on a laptop, tablet, or phone.</p>
+<header class="site-head">
+  <div class="site-head-in">
+    <a class="wordmark" href="./" aria-current="page">Ground School</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="vor-trainer.html">VOR trainer</a>
+      <a href="weight-and-balance.html">Weight and balance</a>
+    </nav>
+  </div>
+</header>
 
-  <ul class="tools">
-    <li>
-      <a class="tool" href="vor-trainer.html">
-        <h2>VOR trainer</h2>
-        <p>Move the airplane, turn the OBS, and watch the CDI or HSI. Covers reverse sensing, station passage, and intercepting a radial, and ends with a "Where am I?" quiz.</p>
-        <span class="go">Open the trainer →</span>
-      </a>
-    </li>
-  </ul>
+<main>
+  <section class="hero">
+    <svg class="rose" id="rose" viewBox="-300 -300 600 600" aria-hidden="true"></svg>
+    <div class="hero-in">
+      <h1>Ground<br>School</h1>
+      <p>Study tools I build for my students. Use them before a lesson, after one, or any time something didn't click in the airplane.</p>
+    </div>
+  </section>
 
-  <footer>
-    These tools are for study only. For flight, always use the aircraft's POH and current FAA publications.
-  </footer>
+  <section class="tools" aria-label="Study tools">
+    <ul>
+      <li>
+        <a class="tool" href="vor-trainer.html">
+          <svg viewBox="0 0 112 112" aria-hidden="true">
+            <rect width="112" height="112" rx="14" class="i-ring"/>
+            <circle cx="56" cy="56" r="48" class="i-face"/>
+            <g class="i-mark">
+              <circle cx="26" cy="56" r="2.4"/><circle cx="34" cy="56" r="2.4"/><circle cx="42" cy="56" r="2.4"/>
+              <circle cx="70" cy="56" r="2.4"/><circle cx="78" cy="56" r="2.4"/><circle cx="86" cy="56" r="2.4"/>
+            </g>
+            <circle cx="56" cy="56" r="5" fill="none" class="i-mark-s" stroke-width="1.5"/>
+            <rect x="61.5" y="22" width="3" height="68" rx="1.5" class="i-mark"/>
+            <path d="M56 12 L61 20 L51 20 Z" class="i-mark"/>
+          </svg>
+          <div>
+            <h2>VOR trainer</h2>
+            <p>Put the airplane anywhere, turn the OBS, and watch the needle on a CDI or an HSI. Work through reverse sensing, station passage, and intercepting a radial in a crosswind, then try the "Where am I?" quiz.</p>
+            <span class="open">Open the VOR trainer</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="tool" href="weight-and-balance.html">
+          <svg viewBox="0 0 112 112" aria-hidden="true">
+            <path d="M14 10 V98 H104" fill="none" class="env-ax" stroke-width="1.5"/>
+            <path d="M30 88 L30 62 L56 22 L92 22 L92 88 Z" class="env" stroke-width="2"/>
+            <path d="M70 40 L67 52" stroke="currentColor" class="env-ax" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <circle cx="70" cy="40" r="5" class="env-pt"/>
+            <circle cx="67" cy="52" r="4" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          </svg>
+          <div>
+            <h2>Weight and balance</h2>
+            <p>What datum, arm, moment, and CG actually mean, and a step-by-step walkthrough of a loading problem: total the moments, find the CG, check it against the envelope, and see where it ends up after the fuel burns off.</p>
+            <span class="open">Read the walkthrough</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </section>
 </main>
+
+<footer class="site-foot">
+  <p>For study only. In the airplane, use that aircraft's POH and its current weight and balance record.</p>
+  <p>Made by Colby Penn</p>
+</footer>
+
+<script>
+// Draws the compass rose behind the title: 5° ticks, numbers every 30°, a selected course line.
+(function(){
+  const svg = document.getElementById('rose'), R = 270, ns = 'http://www.w3.org/2000/svg';
+  let s = `<circle r="${R}" fill="none" stroke="currentColor" stroke-width="1.5"/>`;
+  s += `<circle r="180" fill="none" class="faint" stroke-width="1"/><circle r="90" fill="none" class="faint" stroke-width="1"/>`;
+  for (let b = 0; b < 360; b += 5) {
+    const a = b * Math.PI / 180, len = b % 30 === 0 ? 22 : b % 10 === 0 ? 14 : 8;
+    const x1 = Math.sin(a) * R, y1 = -Math.cos(a) * R, x2 = Math.sin(a) * (R - len), y2 = -Math.cos(a) * (R - len);
+    s += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="currentColor" stroke-width="${b % 30 === 0 ? 2 : 1.2}"/>`;
+  }
+  for (let b = 0; b < 360; b += 30) {
+    const t = String(b === 0 ? 360 : b).padStart(3, '0');
+    s += `<text x="0" y="${-(R - 42)}" transform="rotate(${b})" text-anchor="middle" dominant-baseline="central" font-family="Barlow Semi Condensed, sans-serif" font-weight="600" font-size="20" fill="currentColor">${t}</text>`;
+  }
+  // Selected course 060, through the station
+  s += `<g transform="rotate(60)"><line x1="0" y1="${R - 30}" x2="0" y2="${-(R - 64)}" class="course" stroke-width="3"/><path d="M0 ${-(R - 58)} l-9 16 h18 z" fill="var(--accent)"/></g>`;
+  s += `<path d="M10 0 L5 8.7 L-5 8.7 L-10 0 L-5 -8.7 L5 -8.7 Z" fill="var(--bg)" stroke="currentColor" stroke-width="2"/><circle r="2.5" fill="currentColor"/>`;
+  svg.innerHTML = s;
+})();
+</script>
 </body>
 </html>
