@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flight study tools</title>
+<meta name="description" content="Interactive study tools for flight students.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F2F4F5; --surface:#FFFFFF; --text:#1C2227; --muted:#58626A; --line:#D2D8DC;
+  --accent:#7B1E2E; --accent-soft:#F4E4E7; --focus:#2B55A3;
+  --sans:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
+  --cond:"Barlow Semi Condensed","Arial Narrow","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --bg:#14171A; --surface:#1D2125; --text:#E5E8EA; --muted:#9BA5AC; --line:#353B41;
+    --accent:#CF6B7B; --accent-soft:#3A2329; --focus:#82A8E8;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+.app{max-width:900px;margin:0 auto;padding:40px 16px 56px}
+h1{font:700 clamp(2rem,5vw,2.8rem)/1.05 var(--cond);margin:0;letter-spacing:-.01em}
+h2{font:700 1.3rem/1.2 var(--cond);margin:0 0 6px}
+.lede{margin:10px 0 32px;color:var(--muted);max-width:60ch}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin:0;padding:0;list-style:none}
+.tool{display:block;height:100%;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:18px 18px 16px;color:inherit;text-decoration:none}
+.tool:hover{border-color:var(--accent)}
+.tool:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.tool p{margin:0 0 12px;color:var(--muted)}
+.go{font:600 .95rem/1 var(--cond);color:var(--accent)}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;max-width:70ch}
+</style>
+</head>
+<body>
+<main class="app">
+  <h1>Flight study tools</h1>
+  <p class="lede">Interactive tools for practicing what you'll see in the airplane. Use them on a laptop, tablet, or phone.</p>
+
+  <ul class="tools">
+    <li>
+      <a class="tool" href="vor-trainer.html">
+        <h2>VOR trainer</h2>
+        <p>Move the airplane, turn the OBS, and watch the CDI or HSI. Covers reverse sensing, station passage, and intercepting a radial, and ends with a "Where am I?" quiz.</p>
+        <span class="go">Open the trainer →</span>
+      </a>
+    </li>
+  </ul>
+
+  <footer>
+    These tools are for study only. For flight, always use the aircraft's POH and current FAA publications.
+  </footer>
+</main>
+</body>
+</html>

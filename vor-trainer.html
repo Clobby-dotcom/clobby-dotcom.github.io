@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VOR trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F2F4F5; --surface:#FFFFFF; --surface-2:#E8ECEE; --text:#1C2227; --muted:#58626A; --line:#D2D8DC;
+  --accent:#7B1E2E; --accent-ink:#FFFFFF; --accent-soft:#F4E4E7;
+  --map-bg:#E3EBD5; --map-rose:#2B55A3; --map-faint:rgba(43,85,163,.20);
+  --course:#17824A; --band:rgba(23,130,74,.15); --zone-from:rgba(23,130,74,.07); --zone-to:rgba(123,30,46,.07);
+  --plane:#7B1E2E; --trail:rgba(123,30,46,.55); --radial:#2B55A3;
+  --ok:#17733F; --bad:#A3242F; --focus:#2B55A3;
+  --inst-bezel:#2A2E32; --inst-face:#141617; --inst-mark:#F1F1F1; --inst-dim:#8F969C; --inst-knob:#41474D;
+  --inst-green:#3BCB6E; --inst-red:#D8312E; --inst-window:#000000;
+  --sans:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
+  --cond:"Barlow Semi Condensed","Arial Narrow","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#14171A; --surface:#1D2125; --surface-2:#272C31; --text:#E5E8EA; --muted:#9BA5AC; --line:#353B41;
+    --accent:#CF6B7B; --accent-ink:#1A0B0E; --accent-soft:#3A2329;
+    --map-bg:#18221E; --map-rose:#82A8E8; --map-faint:rgba(130,168,232,.18);
+    --course:#4CD483; --band:rgba(76,212,131,.15); --zone-from:rgba(76,212,131,.07); --zone-to:rgba(207,107,123,.10);
+    --plane:#F0909D; --trail:rgba(240,144,157,.6); --radial:#82A8E8;
+    --ok:#5CCB86; --bad:#F27E8A; --focus:#82A8E8;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#14171A; --surface:#1D2125; --surface-2:#272C31; --text:#E5E8EA; --muted:#9BA5AC; --line:#353B41;
+  --accent:#CF6B7B; --accent-ink:#1A0B0E; --accent-soft:#3A2329;
+  --map-bg:#18221E; --map-rose:#82A8E8; --map-faint:rgba(130,168,232,.18);
+  --course:#4CD483; --band:rgba(76,212,131,.15); --zone-from:rgba(76,212,131,.07); --zone-to:rgba(207,107,123,.10);
+  --plane:#F0909D; --trail:rgba(240,144,157,.6); --radial:#82A8E8;
+  --ok:#5CCB86; --bad:#F27E8A; --focus:#82A8E8;
+}
+*,*::before,*::after{box-sizing:border-box}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+.app{max-width:1200px;margin:0 auto;padding:22px clamp(12px,3vw,32px) 48px}
+h1{font:700 clamp(1.9rem,3.6vw,2.5rem)/1.05 var(--cond);margin:0;letter-spacing:-.01em}
+h2{font:700 1.2rem/1.2 var(--cond);margin:0 0 6px}
+h3{font:700 1.05rem/1.2 var(--cond);margin:0 0 8px}
+.home{display:inline-block;margin-bottom:10px;color:var(--muted);font:600 .95rem/1 var(--cond);text-decoration:none}
+.home:hover{color:var(--accent)}
+.lede{margin:6px 0 18px;color:var(--muted);max-width:62ch}
+
+button{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-height:38px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+input[type=number],select{font:500 1rem var(--sans);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 8px;min-height:36px}
+input[type=number]{width:4.6em;font-variant-numeric:tabular-nums}
+
+.scenarios{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.scenarios button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.brief{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.brief p{margin:0;max-width:78ch}
+.brief-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.quiz{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
+.quiz label{display:inline-flex;align-items:center;gap:8px;font-weight:500}
+.quiz-score{color:var(--muted);font-variant-numeric:tabular-nums}
+.feedback{margin-top:10px !important;font-weight:500}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
+
+.main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,.9fr);gap:20px;align-items:start}
+@media (max-width:880px){.main{grid-template-columns:1fr}}
+
+.map-wrap{position:relative;aspect-ratio:1/1;width:100%;border-radius:12px;overflow:hidden;background:var(--map-bg);border:1px solid var(--line);touch-action:none;cursor:crosshair}
+.map-wrap.locked{cursor:default}
+.map-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.panel + .panel{margin-top:14px}
+.sim{margin-top:14px;display:grid;gap:12px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.field{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:.95rem}
+.field b{color:var(--text);font-weight:500}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--line);min-height:36px;padding:8px 11px}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.check{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:.95rem}
+.check input{width:17px;height:17px;accent-color:var(--accent)}
+
+.inst-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
+.inst-svg{width:100%;max-width:330px;display:block;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.inst-svg text{font-family:var(--cond);font-weight:600}
+.i-bezel{fill:var(--inst-bezel)} .i-face{fill:var(--inst-face)} .i-mark{fill:var(--inst-mark)} .i-mark-s{stroke:var(--inst-mark)}
+.i-dim{fill:var(--inst-dim)} .i-dim-s{stroke:var(--inst-dim)} .i-green{fill:var(--inst-green)} .i-red{fill:var(--inst-red)}
+.i-window{fill:var(--inst-window)} .i-knob{fill:var(--inst-knob);stroke:#000;stroke-width:1.5}
+.knob{cursor:grab;outline:none}
+.knob:active{cursor:grabbing}
+.knob:focus-visible .i-knob{stroke:var(--focus);stroke-width:3}
+
+.dial-row{display:grid;grid-template-columns:5.2em 4.2em 1fr;align-items:center;gap:10px;margin-top:12px}
+.dial-row .lab{color:var(--muted);font-weight:500}
+.big{font:700 1.55rem/1 var(--cond);font-variant-numeric:tabular-nums}
+.steps{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap}
+.steps button{min-width:44px;padding:8px 9px}
+.sub{color:var(--muted);font-size:.88rem;min-height:1.3em;margin-top:2px;text-align:right}
+.keys{color:var(--muted);font-size:.88rem;margin:12px 0 0}
+
+dl.readouts{display:grid;grid-template-columns:1fr auto;gap:7px 14px;margin:0}
+dl.readouts dt{color:var(--muted)}
+dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+
+.notes{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}
+@media (max-width:880px){.notes{grid-template-columns:1fr}}
+.notes ul{margin:0;padding-left:1.1em;max-width:70ch}
+.notes li{margin-bottom:6px}
+.notes p{margin:0 0 8px;max-width:70ch}
+</style>
+</head>
+<body>
+<div class="app">
+  <a class="home" href="./">← All study tools</a>
+  <h1>VOR trainer</h1>
+  <p class="lede">Put the airplane anywhere, turn the OBS, and watch the needle. Your position and the OBS move it. Your heading never changes what it tells you.</p>
+
+  <div class="scenarios" id="scenarios" role="group" aria-label="Scenarios"></div>
+
+  <section class="brief" aria-live="polite">
+    <div class="brief-head">
+      <h2 id="briefTitle">Free practice</h2>
+      <button id="restart" type="button">Restart scenario</button>
+    </div>
+    <p id="briefText"></p>
+    <div class="quiz" id="quizBox" hidden>
+      <label for="quizInput">Your radial <input id="quizInput" type="number" min="1" max="360" inputmode="numeric"></label>
+      <button id="quizCheck" class="primary" type="button">Check answer</button>
+      <button id="quizNext" class="primary" type="button" hidden>Next position</button>
+      <span class="quiz-score" id="quizScore"></span>
+    </div>
+    <p class="feedback" id="quizFeedback" hidden></p>
+  </section>
+
+  <div class="main">
+    <div>
+      <div class="map-wrap" id="mapWrap">
+        <canvas id="map" role="img" aria-label="Map of the VOR station, the selected course, and the airplane"></canvas>
+      </div>
+      <div class="panel sim">
+        <div class="row">
+          <button id="play" class="primary" type="button" style="min-width:86px">Play</button>
+          <span class="field">Sim speed
+            <span class="seg" id="speedSeg" role="group" aria-label="Simulation speed">
+              <button type="button" data-v="1">1×</button><button type="button" data-v="4">4×</button><button type="button" data-v="10">10×</button><button type="button" data-v="30">30×</button>
+            </span>
+          </span>
+          <label class="field" for="range">Map range
+            <select id="range"><option value="5">5 NM</option><option value="10">10 NM</option><option value="20">20 NM</option><option value="40">40 NM</option></select>
+          </label>
+        </div>
+        <div class="row">
+          <label class="field" for="tas">True airspeed <input id="tas" type="number" min="40" max="250" step="5"> kt</label>
+          <span class="field">Wind from <input id="windDir" type="number" min="0" max="360" step="10" aria-label="Wind direction in degrees">° at <input id="windSpd" type="number" min="0" max="60" step="5" aria-label="Wind speed in knots"> kt</span>
+        </div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="tZones" checked> TO and FROM sides</label>
+          <label class="check"><input type="checkbox" id="tBand" checked> Full-scale band</label>
+          <label class="check"><input type="checkbox" id="tRadial" checked> Radial line</label>
+          <label class="check"><input type="checkbox" id="tTrail" checked> Trail</label>
+          <button id="clearTrail" type="button">Clear trail</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="inst-head">
+          <h3 id="instTitle" style="margin:0">Course deviation indicator</h3>
+          <span class="seg" id="dispSeg" role="group" aria-label="Instrument">
+            <button type="button" data-v="cdi">CDI</button><button type="button" data-v="hsi">HSI</button>
+          </span>
+        </div>
+
+        <svg id="cdi" class="inst-svg" viewBox="0 0 300 300" role="img" aria-label="VOR course deviation indicator">
+          <defs><clipPath id="cdiClip"><circle cx="150" cy="150" r="92"/></clipPath></defs>
+          <rect x="2" y="2" width="296" height="296" rx="22" class="i-bezel"/>
+          <circle cx="150" cy="150" r="134" class="i-face"/>
+          <g id="cdiCard"></g>
+          <path d="M141 9 L159 9 L150 25 Z" class="i-mark"/>
+          <path d="M144 290 L156 290 L150 277 Z" class="i-dim"/>
+          <g id="cdiDots"></g>
+          <rect x="172" y="100" width="48" height="22" rx="3" class="i-window i-dim-s" stroke-width="1"/>
+          <g id="cdiTo"><path d="M180 117 L188 105 L196 117 Z" class="i-mark"/><text x="207" y="111.5" text-anchor="middle" dominant-baseline="central" font-size="13" class="i-mark">TO</text></g>
+          <g id="cdiFr"><path d="M180 105 L196 105 L188 117 Z" class="i-mark"/><text x="207" y="111.5" text-anchor="middle" dominant-baseline="central" font-size="13" class="i-mark">FR</text></g>
+          <g id="cdiNav"><rect x="80" y="176" width="48" height="22" rx="3" class="i-red"/><text x="104" y="187.5" text-anchor="middle" dominant-baseline="central" font-size="13" class="i-mark">NAV</text></g>
+          <g clip-path="url(#cdiClip)"><g id="cdiNeedle"><rect x="148.5" y="56" width="3" height="188" rx="1.5" class="i-mark"/></g></g>
+          <text x="34" y="234" text-anchor="middle" font-size="12" class="i-dim">OBS</text>
+          <g class="knob" id="cdiKnob" tabindex="0" role="slider" aria-label="OBS knob" aria-valuemin="1" aria-valuemax="360">
+            <circle cx="34" cy="266" r="27" fill="transparent"/>
+            <circle cx="34" cy="266" r="21" class="i-knob"/>
+            <g id="cdiKnurl"></g>
+          </g>
+        </svg>
+
+        <svg id="hsi" class="inst-svg" viewBox="0 0 300 300" role="img" aria-label="Horizontal situation indicator" hidden>
+          <rect x="2" y="2" width="296" height="296" rx="22" class="i-bezel"/>
+          <circle cx="150" cy="150" r="134" class="i-face"/>
+          <g id="hsiCard"></g>
+          <g id="hsiCourse">
+            <g id="hsiDots"></g>
+            <path d="M150 50 L161 68 L153.5 68 L153.5 97 L146.5 97 L146.5 68 L139 68 Z" class="i-green"/>
+            <rect x="146.5" y="203" width="7" height="45" class="i-green"/>
+            <g id="hsiBar"><rect x="147" y="102" width="6" height="96" rx="1" class="i-green"/></g>
+            <path id="hsiTo" d="M150 106 L159 120 L141 120 Z" class="i-mark" stroke="#000" stroke-width="1.2"/>
+            <path id="hsiFr" d="M150 194 L159 180 L141 180 Z" class="i-mark" stroke="#000" stroke-width="1.2"/>
+          </g>
+          <path d="M150 138 L152.2 146 L167 150 L167 153.5 L152.2 152.5 L151.5 160 L156.5 163 L156.5 165.5 L150 164.3 L143.5 165.5 L143.5 163 L148.5 160 L147.8 152.5 L133 153.5 L133 150 L147.8 146 Z" class="i-mark" stroke="#000" stroke-width="1"/>
+          <rect x="123" y="3" width="54" height="21" rx="4" class="i-window i-dim-s" stroke-width="1"/>
+          <text id="hsiHdg" x="150" y="14" text-anchor="middle" dominant-baseline="central" font-size="15" class="i-mark">360°</text>
+          <path d="M144 25 L156 25 L150 32 Z" class="i-mark"/>
+          <g id="hsiNav"><rect x="182" y="160" width="44" height="20" rx="3" class="i-red"/><text x="204" y="170.5" text-anchor="middle" dominant-baseline="central" font-size="12" class="i-mark">NAV</text></g>
+          <text x="34" y="234" text-anchor="middle" font-size="12" class="i-dim">CRS</text>
+          <g class="knob" id="hsiKnob" tabindex="0" role="slider" aria-label="Course knob" aria-valuemin="1" aria-valuemax="360">
+            <circle cx="34" cy="266" r="27" fill="transparent"/>
+            <circle cx="34" cy="266" r="21" class="i-knob"/>
+            <g id="hsiKnurl"></g>
+          </g>
+        </svg>
+
+        <div class="dial-row">
+          <span class="lab" id="obsLab">OBS</span>
+          <span class="big" id="obsVal">360°</span>
+          <div class="steps">
+            <button type="button" data-obs="-10" aria-label="OBS minus 10 degrees">−10</button>
+            <button type="button" data-obs="-1" aria-label="OBS minus 1 degree">−1</button>
+            <button type="button" data-obs="1" aria-label="OBS plus 1 degree">+1</button>
+            <button type="button" data-obs="10" aria-label="OBS plus 10 degrees">+10</button>
+          </div>
+        </div>
+        <div class="dial-row">
+          <span class="lab">Heading</span>
+          <span class="big" id="hdgVal">360°</span>
+          <div class="steps">
+            <button type="button" data-hdg="-10" aria-label="Turn left 10 degrees">−10</button>
+            <button type="button" data-hdg="-1" aria-label="Turn left 1 degree">−1</button>
+            <button type="button" data-hdg="1" aria-label="Turn right 1 degree">+1</button>
+            <button type="button" data-hdg="10" aria-label="Turn right 10 degrees">+10</button>
+          </div>
+        </div>
+        <div class="sub" id="hdgTgt"></div>
+        <p class="keys">Keyboard: ← and → turn the airplane, [ and ] turn the OBS (hold Shift for bigger steps), space plays or pauses. You can also drag or scroll on the knob.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Where the airplane is</h3>
+        <dl class="readouts" id="readouts">
+          <dt>Radial (from the station)</dt><dd id="rRadial">—</dd>
+          <dt>Bearing to the station</dt><dd id="rBearing">—</dd>
+          <dt>Distance</dt><dd id="rDist">—</dd>
+          <dt>Track and groundspeed</dt><dd id="rTrack">—</dd>
+          <dt>Needle</dt><dd id="rNeedle">—</dd>
+          <dt>Flag</dt><dd id="rFlag">—</dd>
+        </dl>
+        <p class="muted" id="readHidden" hidden style="margin:0">Hidden until you answer. Use the instrument.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="notes">
+    <div>
+      <h2>How the simulation works</h2>
+      <ul>
+        <li>The needle shows angular distance from the selected course, not miles. Full scale is 10° either side, 2° per dot on a five-dot CDI (PHAK Ch. 16; IFH Ch. 9). That’s why the same offset in miles swings the needle harder near the station.</li>
+        <li>The TO/FROM flag depends only on which side you’re on of the line through the station perpendicular to the selected course. Heading never changes the CDI (PHAK Ch. 16).</li>
+        <li>Flying roughly opposite the selected course on a CDI gives reverse sensing. An HSI turns the course with the airplane, so the picture stays right side up (IFH Ch. 9).</li>
+      </ul>
+      <p style="margin-top:14px"><strong>Simplifications.</strong> These are choices made for the simulation, not FAA figures:</p>
+      <ul>
+        <li>Cone of confusion is a fixed 0.75 NM radius. The real size depends on altitude and the station.</li>
+        <li>The flag drops within 2° of abeam the station. Real receivers vary.</li>
+        <li>No altitude, terrain, line-of-sight, or service volume limits (see AIM 1-1-8 for service volumes).</li>
+        <li>Flat map, magnetic north up, no magnetic variation, no station or receiver error.</li>
+        <li>The HSI is drawn with two dots each side, 5° per dot, full scale 10°. Check the G3X Touch Pilot’s Guide for exactly how the 100i displays it.</li>
+        <li>Wind is steady, and turns are standard rate (3° per second).</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Sources</h2>
+      <ul>
+        <li>FAA-H-8083-25C, Pilot’s Handbook of Aeronautical Knowledge, Chapter 16, Navigation (VOR)</li>
+        <li>FAA-H-8083-15B, Instrument Flying Handbook, Chapter 9, Navigation Systems</li>
+        <li>Aeronautical Information Manual, 1-1-3 (VHF Omni-directional Range) and 1-1-8 (NAVAID Service Volumes)</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+const el = id => document.getElementById(id);
+const norm360 = a => ((a % 360) + 360) % 360;
+const norm180 = a => { a = norm360(a); return a > 180 ? a - 360 : a; };
+const rad = d => d * Math.PI / 180;
+const deg = r => r * 180 / Math.PI;
+const radialOf = (x, y) => norm360(deg(Math.atan2(x, y)));
+const fmt3 = a => { let v = Math.round(norm360(a)) % 360; if (v === 0) v = 360; return String(v).padStart(3, '0'); };
+const pos = (b, d) => ({ x: d * Math.sin(rad(b)), y: d * Math.cos(rad(b)) });
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+const CONE_NM = 0.75, ABEAM_BAND = 2, FULL_SCALE = 10, TURN_RATE = 3;
+
+const S = {
+  x: 0, y: -12, hdg: 45, tgtHdg: 45, obs: 45, tas: 100,
+  windDir: 270, windSpd: 0, running: false, speed: 10, range: 20, display: 'cdi',
+  show: { zones: true, band: true, radial: true, trail: true },
+  trail: [], scenario: 'free', quiz: null, needleDisp: 0, t: 0
+};
+
+/* ---------- Scenarios ---------- */
+const SCENARIOS = [
+  { id: 'free', label: 'Free practice',
+    brief: 'Click or drag anywhere on the map to put the airplane there, then press Play to fly it. Spin the heading all the way around and watch the needle: it doesn’t move. Only your position and the OBS move it.',
+    setup() { place(pos(225, 12)); headingNow(45); S.obs = 45; S.range = 20; S.windDir = 270; S.windSpd = 0; S.speed = 10; S.tas = 100; } },
+  { id: 'reverse', label: 'Reverse sensing',
+    brief: 'You’re north of the station, heading 180 toward it, but the OBS is set to 360. The flag reads FROM and the needle is left. Press Play and turn toward the needle. It runs away from you: that’s reverse sensing. Fix it by setting the OBS to 180 so the course agrees with your heading, or switch to the HSI and compare.',
+    setup() { place(pos(5, 10)); headingNow(180); S.obs = 0; S.range = 20; S.windSpd = 0; S.speed = 10; S.tas = 100; S.display = 'cdi'; } },
+  { id: 'passage', label: 'Station passage',
+    brief: 'You’re inbound on the 180 radial, a hair east of course, with 360 set: TO flag, needle nearly centered. Press Play and hold heading 360. The same small offset swings the needle harder as you close in, the flag drops in the cone of confusion, and TO flips to FROM as you pass the station.',
+    setup() { place(pos(178.5, 4)); headingNow(0); S.obs = 0; S.range = 5; S.windSpd = 0; S.speed = 4; S.tas = 100; } },
+  { id: 'intercept', label: 'Intercept and track',
+    brief: 'Intercept the 360 radial outbound and track it. You’re on a 60° intercept with a 20-knot wind from the west. Lead the turn to 360 so you roll out as the needle centers, then find the heading that keeps it there. Expect to hold a crab to the left, into the wind.',
+    setup() { place(pos(60, 8)); headingNow(300); S.obs = 0; S.range = 20; S.windDir = 270; S.windSpd = 20; S.speed = 10; S.tas = 100; } },
+  { id: 'quiz', label: 'Where am I? quiz',
+    brief: 'The airplane is hidden somewhere within 20 NM of the station. Turn the OBS until the needle centers with a FROM flag, then enter the radial you’re on.',
+    setup() { S.range = 20; S.windSpd = 0; S.speed = 10; S.quiz = { answered: false, correct: 0, total: 0, truth: 0, dist: 0 }; newRound(); } }
+];
+
+function place(p) { S.x = p.x; S.y = p.y; S.trail = []; }
+function headingNow(h) { S.hdg = S.tgtHdg = norm360(h); }
+function setObs(v) { S.obs = norm360(Math.round(v)); }
+function turnBy(d) {
+  if (S.running) S.tgtHdg = norm360(Math.round(S.tgtHdg) + d);
+  else headingNow(Math.round(S.hdg) + d);
+}
+const isHidden = () => S.scenario === 'quiz' && S.quiz && !S.quiz.answered;
+
+function applyScenario(id) {
+  S.scenario = id; S.running = false; S.quiz = null;
+  const sc = SCENARIOS.find(s => s.id === id);
+  sc.setup();
+  el('briefTitle').textContent = id === 'quiz' ? 'Where am I?' : sc.label;
+  el('briefText').textContent = sc.brief;
+  el('quizBox').hidden = id !== 'quiz';
+  if (id !== 'quiz') { el('quizFeedback').hidden = true; }
+  else { el('quizScore').textContent = ''; }
+  syncControls();
+}
+
+/* ---------- Quiz ---------- */
+function newRound() {
+  const q = S.quiz; q.answered = false;
+  const b = Math.random() * 360, d = 4 + Math.random() * 13;
+  place(pos(b, d)); q.truth = radialOf(S.x, S.y); q.dist = d;
+  headingNow(Math.floor(Math.random() * 36) * 10);
+  setObs(Math.floor(Math.random() * 36) * 10);
+  el('quizInput').value = '';
+  el('quizFeedback').hidden = true;
+  el('quizCheck').hidden = false; el('quizNext').hidden = true;
+  syncControls();
+}
+function feedback(msg, cls) { const f = el('quizFeedback'); f.textContent = msg; f.className = 'feedback ' + (cls || ''); f.hidden = false; }
+function checkAnswer() {
+  const q = S.quiz; if (!q || q.answered) return;
+  const raw = el('quizInput').value.trim(); const a = Number(raw);
+  if (!raw || !Number.isFinite(a) || a < 0 || a > 360) { feedback('Enter a radial from 001 to 360.', ''); return; }
+  q.total++; q.answered = true;
+  const err = Math.abs(norm180(a - q.truth)), recip = Math.abs(norm180(a - q.truth - 180));
+  if (err <= 3) { q.correct++; feedback(`Correct. You’re on the ${fmt3(q.truth)} radial, ${q.dist.toFixed(1)} NM from the station.`, 'ok'); }
+  else if (recip <= 3) { feedback(`${fmt3(a)} is the bearing to the station. The needle centers there too, but with a TO flag. You’re on the ${fmt3(q.truth)} radial.`, 'bad'); }
+  else { feedback(`Not quite. You’re on the ${fmt3(q.truth)} radial. Center the needle, check that the flag reads FROM, then read the course under the top index.`, 'bad'); }
+  el('quizScore').textContent = `${q.correct} of ${q.total} correct`;
+  el('quizCheck').hidden = true; el('quizNext').hidden = false; el('quizNext').focus();
+  syncControls();
+}
+
+/* ---------- Navigation math ---------- */
+function groundVec() {
+  const ax = Math.sin(rad(S.hdg)) * S.tas, ay = Math.cos(rad(S.hdg)) * S.tas;
+  const wTo = rad(S.windDir + 180);
+  return { x: ax + Math.sin(wTo) * S.windSpd, y: ay + Math.cos(wTo) * S.windSpd };
+}
+function nav() {
+  const dist = Math.hypot(S.x, S.y);
+  const r = radialOf(S.x, S.y);
+  const d = norm180(r - S.obs);
+  const side = Math.abs(d) <= 90 ? 'FROM' : 'TO';
+  const dev = side === 'FROM' ? -d : norm180(d - 180); // negative = needle left
+  let flag = side, reason = '';
+  if (dist < CONE_NM) { flag = 'OFF'; reason = 'cone'; }
+  else if (Math.abs(Math.abs(d) - 90) < ABEAM_BAND) { flag = 'OFF'; reason = 'abeam'; }
+  return { dist, r, d, side, dev, flag, reason };
+}
+function step(dtReal) {
+  const dt = dtReal * S.speed; // simulated seconds
+  const diff = norm180(S.tgtHdg - S.hdg), maxTurn = TURN_RATE * dt;
+  S.hdg = Math.abs(diff) <= maxTurn ? norm360(S.tgtHdg) : norm360(S.hdg + Math.sign(diff) * maxTurn);
+  const v = groundVec();
+  S.x += v.x * dt / 3600; S.y += v.y * dt / 3600;
+  const last = S.trail[S.trail.length - 1];
+  if (!last || Math.hypot(S.x - last.x, S.y - last.y) > S.range / 250) {
+    S.trail.push({ x: S.x, y: S.y });
+    if (S.trail.length > 4000) S.trail.splice(0, 500);
+  }
+}
+function updateNeedle(n, dtReal) {
+  let target = clamp(n.dev, -FULL_SCALE, FULL_SCALE);
+  if (n.reason === 'cone') target = FULL_SCALE * Math.sin(S.t * 1.9) * Math.cos(S.t * 0.7);
+  S.needleDisp += (target - S.needleDisp) * Math.min(1, dtReal * 8);
+}
+
+/* ---------- Map ---------- */
+const canvas = el('map'), ctx = canvas.getContext('2d');
+let W = 0, H = 0, DPR = 1;
+function resize() {
+  const r = canvas.getBoundingClientRect();
+  DPR = Math.min(window.devicePixelRatio || 1, 2); W = r.width; H = r.height;
+  canvas.width = Math.max(1, Math.round(W * DPR)); canvas.height = Math.max(1, Math.round(H * DPR));
+}
+if ('ResizeObserver' in window) new ResizeObserver(resize).observe(canvas); else window.addEventListener('resize', resize);
+resize();
+
+const COL = {};
+function readColors() {
+  const cs = getComputedStyle(document.documentElement);
+  ['map-bg','map-rose','map-faint','course','band','zone-from','zone-to','plane','trail','radial','text','muted','cond','sans'].forEach(k => COL[k] = cs.getPropertyValue('--' + k).trim());
+}
+readColors();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
+new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+function geom() { const cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 - 30; return { cx, cy, R, k: R / S.range }; }
+const toPx = (g, x, y) => [g.cx + x * g.k, g.cy - y * g.k];
+const cAng = b => rad(b - 90); // compass bearing to canvas angle
+
+function haloText(t, x, y, color, align) {
+  ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+  ctx.lineWidth = 4; ctx.strokeStyle = COL['map-bg']; ctx.lineJoin = 'round';
+  ctx.strokeText(t, x, y); ctx.fillStyle = color; ctx.fillText(t, x, y);
+}
+function drawPlane(x, y, h) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rad(h)); ctx.scale(1.15, 1.15);
+  ctx.beginPath();
+  ctx.moveTo(0, -12); ctx.lineTo(1.8, -8); ctx.lineTo(1.8, -3); ctx.lineTo(12, 0); ctx.lineTo(12, 2.5);
+  ctx.lineTo(1.8, 1.5); ctx.lineTo(1.2, 8); ctx.lineTo(5, 10.5); ctx.lineTo(5, 12.5); ctx.lineTo(0, 11.5);
+  ctx.lineTo(-5, 12.5); ctx.lineTo(-5, 10.5); ctx.lineTo(-1.2, 8); ctx.lineTo(-1.8, 1.5); ctx.lineTo(-12, 2.5);
+  ctx.lineTo(-12, 0); ctx.lineTo(-1.8, -3); ctx.lineTo(-1.8, -8); ctx.closePath();
+  ctx.lineWidth = 2.5; ctx.strokeStyle = COL['map-bg']; ctx.stroke();
+  ctx.fillStyle = COL.plane; ctx.fill(); ctx.restore();
+}
+
+function draw(n) {
+  const g = geom(), hide = isHidden(), big = Math.hypot(W, H);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = COL['map-bg']; ctx.fillRect(0, 0, W, H);
+
+  // TO / FROM sides
+  if (S.show.zones) {
+    ctx.save(); ctx.translate(g.cx, g.cy); ctx.rotate(rad(S.obs));
+    ctx.fillStyle = COL['zone-from']; ctx.fillRect(-big, -big, 2 * big, big);
+    ctx.fillStyle = COL['zone-to']; ctx.fillRect(-big, 0, 2 * big, big);
+    ctx.strokeStyle = COL.muted; ctx.globalAlpha = .55; ctx.setLineDash([4, 6]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-big, 0); ctx.lineTo(big, 0); ctx.stroke();
+    ctx.restore(); ctx.setLineDash([]);
+  }
+  // Full-scale band, 10 degrees either side of the course line
+  if (S.show.band) {
+    ctx.fillStyle = COL.band;
+    [S.obs, S.obs + 180].forEach(b => {
+      ctx.beginPath(); ctx.moveTo(g.cx, g.cy);
+      ctx.arc(g.cx, g.cy, big, cAng(b - FULL_SCALE), cAng(b + FULL_SCALE)); ctx.closePath(); ctx.fill();
+    });
+  }
+  // Range rings and spokes
+  ctx.strokeStyle = COL['map-faint']; ctx.lineWidth = 1;
+  const ring = S.range / 4;
+  for (let i = 1; i <= 3; i++) { ctx.beginPath(); ctx.arc(g.cx, g.cy, i * ring * g.k, 0, Math.PI * 2); ctx.stroke(); }
+  for (let b = 0; b < 360; b += 30) {
+    const a = cAng(b); ctx.beginPath(); ctx.moveTo(g.cx, g.cy); ctx.lineTo(g.cx + Math.cos(a) * g.R, g.cy + Math.sin(a) * g.R); ctx.stroke();
+  }
+  // Compass rose at the edge
+  ctx.strokeStyle = COL['map-rose'];
+  for (let b = 0; b < 360; b += 5) {
+    const len = b % 30 === 0 ? 11 : b % 10 === 0 ? 7 : 4, a = cAng(b);
+    ctx.lineWidth = b % 30 === 0 ? 1.6 : 1;
+    ctx.beginPath(); ctx.moveTo(g.cx + Math.cos(a) * g.R, g.cy + Math.sin(a) * g.R);
+    ctx.lineTo(g.cx + Math.cos(a) * (g.R - len), g.cy + Math.sin(a) * (g.R - len)); ctx.stroke();
+  }
+  ctx.lineWidth = 1.3; ctx.beginPath(); ctx.arc(g.cx, g.cy, g.R, 0, Math.PI * 2); ctx.stroke();
+  ctx.font = '600 12px ' + COL.cond;
+  ctx.fillStyle = COL['map-rose']; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let b = 0; b < 360; b += 30) { const a = cAng(b); ctx.fillText(fmt3(b), g.cx + Math.cos(a) * (g.R + 15), g.cy + Math.sin(a) * (g.R + 15)); }
+
+  // Zone labels
+  if (S.show.zones) {
+    ctx.font = '600 13px ' + COL.cond;
+    const f = pos(S.obs, S.range * .55), fo = pos(S.obs + 90, S.range * .2);
+    const t = pos(S.obs + 180, S.range * .55);
+    let [x1, y1] = toPx(g, f.x + fo.x, f.y + fo.y); haloText('FROM side', x1, y1, COL.muted);
+    let [x2, y2] = toPx(g, t.x + fo.x, t.y + fo.y); haloText('TO side', x2, y2, COL.muted);
+  }
+
+  // Cone of confusion
+  const coneR = CONE_NM * g.k;
+  if (coneR > 4) { ctx.setLineDash([2, 3]); ctx.strokeStyle = COL.muted; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(g.cx, g.cy, coneR, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
+
+  // Selected course line
+  {
+    const a = cAng(S.obs), ux = Math.cos(a), uy = Math.sin(a), L = g.R;
+    ctx.strokeStyle = COL.course; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(g.cx - ux * L, g.cy - uy * L); ctx.lineTo(g.cx + ux * L, g.cy + uy * L); ctx.stroke();
+    ctx.lineWidth = 1.8;
+    for (let s = -L + 34; s < L - 20; s += 52) {
+      if (Math.abs(s) < 16) continue;
+      ctx.save(); ctx.translate(g.cx + ux * s, g.cy + uy * s); ctx.rotate(a);
+      ctx.beginPath(); ctx.moveTo(-5, -5); ctx.lineTo(1, 0); ctx.lineTo(-5, 5); ctx.stroke(); ctx.restore();
+    }
+    ctx.font = '700 13px ' + COL.cond;
+    const lp = pos(S.obs, S.range * .8), lo = pos(S.obs - 90, S.range * .06);
+    const [lx, ly] = toPx(g, lp.x + lo.x, lp.y + lo.y);
+    haloText('Course ' + fmt3(S.obs), lx, ly, COL.course);
+  }
+
+  // Trail
+  if (S.show.trail && !hide && S.trail.length > 1) {
+    ctx.strokeStyle = COL.trail; ctx.lineWidth = 2; ctx.beginPath(); let pen = false;
+    for (const p of S.trail) {
+      if (!p) { pen = false; continue; }
+      const [x, y] = toPx(g, p.x, p.y);
+      if (!pen) { ctx.moveTo(x, y); pen = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // Station symbol
+  ctx.save(); ctx.translate(g.cx, g.cy); ctx.lineWidth = 1.8; ctx.strokeStyle = COL['map-rose']; ctx.fillStyle = COL['map-bg'];
+  ctx.beginPath(); for (let i = 0; i < 6; i++) { const t = Math.PI / 3 * i; i ? ctx.lineTo(Math.cos(t) * 8, Math.sin(t) * 8) : ctx.moveTo(8, 0); } ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = COL['map-rose']; ctx.beginPath(); ctx.arc(0, 0, 2.2, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+
+  ctx.font = '500 12px ' + COL.sans;
+  haloText(`Rings every ${ring % 1 ? ring.toFixed(2) : ring} NM`, 10, H - 14, COL.muted, 'left');
+
+  if (hide) { haloText('Airplane hidden', W - 10, H - 14, COL.muted, 'right'); }
+  else {
+    const off = n.dist * g.k > g.R - 8;
+    const [px, py] = toPx(g, S.x, S.y);
+    // Radial line
+    if (S.show.radial && n.dist > .05) {
+      const endD = off ? (g.R - 8) / g.k : n.dist, e = pos(n.r, endD);
+      const [ex, ey] = toPx(g, e.x, e.y);
+      ctx.setLineDash([6, 5]); ctx.strokeStyle = COL.radial; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(g.cx, g.cy); ctx.lineTo(ex, ey); ctx.stroke(); ctx.setLineDash([]);
+      const m = pos(n.r, endD * .5), mo = pos(n.r + 90, 14 / g.k);
+      const [mx, my] = toPx(g, m.x + mo.x, m.y + mo.y);
+      ctx.font = '600 12px ' + COL.cond;
+      if (endD * g.k > 60) haloText('R-' + fmt3(n.r), mx, my, COL.radial);
+    }
+    if (off) {
+      const e = pos(n.r, (g.R - 14) / g.k), [ex, ey] = toPx(g, e.x, e.y);
+      ctx.save(); ctx.translate(ex, ey); ctx.rotate(rad(n.r)); ctx.fillStyle = COL.plane;
+      ctx.beginPath(); ctx.moveTo(0, -8); ctx.lineTo(7, 5); ctx.lineTo(-7, 5); ctx.closePath(); ctx.fill(); ctx.restore();
+      ctx.font = '600 12px ' + COL.sans;
+      haloText('Airplane off the map. Zoom out.', W - 10, H - 14, COL.plane, 'right');
+    } else {
+      // Track line, three minutes ahead
+      const v = groundVec(), ahead = { x: S.x + v.x * 3 / 60, y: S.y + v.y * 3 / 60 };
+      const [tx, ty] = toPx(g, ahead.x, ahead.y);
+      ctx.strokeStyle = COL.plane; ctx.globalAlpha = .45; ctx.lineWidth = 1.5; ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(tx, ty); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      drawPlane(px, py, S.hdg);
+      if (S.scenario !== 'quiz') { ctx.font = '500 12px ' + COL.sans; haloText('Click or drag to move the airplane', W - 10, H - 14, COL.muted, 'right'); }
+    }
+  }
+
+  // Wind arrow
+  if (S.windSpd > 0) {
+    const ax = 30, ay = 46, a = cAng(S.windDir + 180), L = 17;
+    ctx.strokeStyle = COL.text; ctx.fillStyle = COL.text; ctx.lineWidth = 2;
+    const sx = ax - Math.cos(a) * L, sy = ay - Math.sin(a) * L, ex = ax + Math.cos(a) * L, ey = ay + Math.sin(a) * L;
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+    ctx.save(); ctx.translate(ex, ey); ctx.rotate(a); ctx.beginPath(); ctx.moveTo(2, 0); ctx.lineTo(-7, -5); ctx.lineTo(-7, 5); ctx.closePath(); ctx.fill(); ctx.restore();
+    ctx.font = '600 12px ' + COL.cond;
+    haloText(`Wind ${fmt3(S.windDir)}° at ${S.windSpd} kt`, 10, 14, COL.text, 'left');
+  }
+}
+
+let dragging = false;
+canvas.addEventListener('pointerdown', e => {
+  if (S.scenario === 'quiz') return;
+  dragging = true; canvas.setPointerCapture(e.pointerId); S.trail.push(null); moveToPointer(e);
+});
+canvas.addEventListener('pointermove', e => { if (dragging) moveToPointer(e); });
+const endDrag = () => { if (dragging) { dragging = false; S.trail.push(null); } };
+canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
+function moveToPointer(e) {
+  const r = canvas.getBoundingClientRect(), g = geom();
+  S.x = (e.clientX - r.left - g.cx) / g.k; S.y = -(e.clientY - r.top - g.cy) / g.k;
+}
+
+/* ---------- Instruments ---------- */
+function polar(r, b) { const a = rad(b); return [150 + r * Math.sin(a), 150 - r * Math.cos(a)]; }
+function cardMarkup(rOut, rLong, rShort, rLabel, size) {
+  let s = '';
+  for (let b = 0; b < 360; b += 5) {
+    const [x1, y1] = polar(rOut, b), [x2, y2] = polar(b % 10 === 0 ? rLong : rShort, b);
+    s += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="i-mark-s" stroke-width="${b % 30 === 0 ? 2.2 : 1.2}"/>`;
+  }
+  const names = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' };
+  for (let b = 0; b < 360; b += 30) {
+    const t = names[b] !== undefined ? names[b] : String(b / 10);
+    s += `<text x="150" y="${150 - rLabel}" transform="rotate(${b} 150 150)" text-anchor="middle" dominant-baseline="central" font-size="${size}" class="i-mark">${t}</text>`;
+  }
+  return s;
+}
+function knurl() {
+  let s = '';
+  for (let i = 0; i < 16; i++) { const a = rad(i * 22.5); s += `<line x1="${(34 + Math.sin(a) * 13).toFixed(1)}" y1="${(266 - Math.cos(a) * 13).toFixed(1)}" x2="${(34 + Math.sin(a) * 19).toFixed(1)}" y2="${(266 - Math.cos(a) * 19).toFixed(1)}" class="i-dim-s" stroke-width="1.6"/>`; }
+  return s + '<circle cx="34" cy="248.5" r="2.2" class="i-mark"/>';
+}
+el('cdiCard').innerHTML = cardMarkup(124, 111, 117, 101, 17);
+el('hsiCard').innerHTML = cardMarkup(120, 108, 113, 95, 16);
+el('cdiKnurl').innerHTML = knurl(); el('hsiKnurl').innerHTML = knurl();
+{
+  let d = '<circle cx="150" cy="150" r="8" fill="none" class="i-mark-s" stroke-width="1.8"/>';
+  for (let i = 1; i <= 5; i++) for (const sgn of [-1, 1]) d += `<circle cx="${150 + sgn * i * 16}" cy="150" r="3.4" class="i-mark"/>`;
+  el('cdiDots').innerHTML = d;
+  let h = '';
+  for (let i = 1; i <= 2; i++) for (const sgn of [-1, 1]) h += `<circle cx="${150 + sgn * i * 32}" cy="150" r="4.2" fill="none" class="i-mark-s" stroke-width="1.8"/>`;
+  el('hsiDots').innerHTML = h;
+}
+
+function bindKnob(k) {
+  let sx = null, sy = 0, start = 0;
+  k.addEventListener('pointerdown', e => { e.preventDefault(); k.setPointerCapture(e.pointerId); sx = e.clientX; sy = e.clientY; start = S.obs; k.focus({ preventScroll: true }); });
+  k.addEventListener('pointermove', e => { if (sx === null) return; setObs(start + Math.round(((e.clientX - sx) - (e.clientY - sy)) / 3)); });
+  const up = () => { sx = null; };
+  k.addEventListener('pointerup', up); k.addEventListener('pointercancel', up);
+  k.addEventListener('wheel', e => { e.preventDefault(); setObs(S.obs + (e.deltaY < 0 ? 1 : -1) * (e.shiftKey ? 10 : 1)); }, { passive: false });
+  k.addEventListener('keydown', e => {
+    const m = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 10, PageDown: -10 }[e.key];
+    if (m) { e.preventDefault(); e.stopPropagation(); setObs(S.obs + m * (e.shiftKey ? 10 : 1)); }
+  });
+}
+bindKnob(el('cdiKnob')); bindKnob(el('hsiKnob'));
+
+function updateInstruments(n) {
+  const nd = S.needleDisp, off = n.flag === 'OFF';
+  if (S.display === 'cdi') {
+    el('cdiCard').setAttribute('transform', `rotate(${(-S.obs).toFixed(2)} 150 150)`);
+    el('cdiNeedle').setAttribute('transform', `translate(${(nd / FULL_SCALE * 80).toFixed(2)} 0)`);
+    el('cdiTo').style.display = n.flag === 'TO' ? '' : 'none';
+    el('cdiFr').style.display = n.flag === 'FROM' ? '' : 'none';
+    el('cdiNav').style.display = off ? '' : 'none';
+    el('cdiKnurl').setAttribute('transform', `rotate(${S.obs * 3} 34 266)`);
+    el('cdiKnob').setAttribute('aria-valuenow', Number(fmt3(S.obs)));
+  } else {
+    el('hsiCard').setAttribute('transform', `rotate(${(-S.hdg).toFixed(2)} 150 150)`);
+    el('hsiCourse').setAttribute('transform', `rotate(${(S.obs - S.hdg).toFixed(2)} 150 150)`);
+    el('hsiBar').setAttribute('transform', `translate(${(nd / FULL_SCALE * 64).toFixed(2)} 0)`);
+    el('hsiTo').style.display = n.flag === 'TO' ? '' : 'none';
+    el('hsiFr').style.display = n.flag === 'FROM' ? '' : 'none';
+    el('hsiNav').style.display = off ? '' : 'none';
+    el('hsiHdg').textContent = fmt3(S.hdg) + '°';
+    el('hsiKnurl').setAttribute('transform', `rotate(${S.obs * 3} 34 266)`);
+    el('hsiKnob').setAttribute('aria-valuenow', Number(fmt3(S.obs)));
+  }
+}
+
+function needleText(n) {
+  if (n.flag === 'OFF') return 'Flagged';
+  const perDot = S.display === 'cdi' ? 2 : 5, side = n.dev < 0 ? 'left' : 'right';
+  if (Math.abs(n.dev) >= FULL_SCALE) return 'Full scale ' + side;
+  const v = Math.round(Math.abs(n.dev) / perDot * 2) / 2;
+  if (v === 0) return 'Centered';
+  const whole = Math.floor(v), half = v % 1 ? '½' : '';
+  const num = (whole ? whole : '') + half;
+  return `${num} dot${v > 1 ? 's' : ''} ${side}`;
+}
+let lastRead = 0;
+function updateReadouts(n, now) {
+  if (now - lastRead < 90) return; lastRead = now;
+  el('obsVal').textContent = fmt3(S.obs) + '°';
+  el('hdgVal').textContent = fmt3(S.hdg) + '°';
+  el('hdgTgt').textContent = Math.abs(norm180(S.tgtHdg - S.hdg)) > .5 ? `Turning to ${fmt3(S.tgtHdg)}°` : '';
+  const hide = isHidden();
+  el('readouts').hidden = hide; el('readHidden').hidden = !hide;
+  if (hide) return;
+  const v = groundVec();
+  el('rRadial').textContent = fmt3(n.r) + '°';
+  el('rBearing').textContent = fmt3(n.r + 180) + '°';
+  el('rDist').textContent = n.dist.toFixed(1) + ' NM';
+  el('rTrack').textContent = `${fmt3(radialOf(v.x, v.y))}° at ${Math.round(Math.hypot(v.x, v.y))} kt`;
+  el('rNeedle').textContent = needleText(n);
+  el('rFlag').textContent = n.flag === 'OFF' ? (n.reason === 'cone' ? 'Flag, over the station' : 'Flag, abeam the station') : n.flag;
+}
+
+/* ---------- Controls ---------- */
+const scWrap = el('scenarios');
+SCENARIOS.forEach(s => {
+  const b = document.createElement('button'); b.type = 'button'; b.textContent = s.label; b.dataset.id = s.id;
+  b.addEventListener('click', () => applyScenario(s.id)); scWrap.appendChild(b);
+});
+el('restart').addEventListener('click', () => applyScenario(S.scenario));
+el('quizCheck').addEventListener('click', checkAnswer);
+el('quizNext').addEventListener('click', () => { newRound(); el('quizInput').focus(); });
+el('quizInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (S.quiz && S.quiz.answered) newRound(); else checkAnswer(); } });
+
+function togglePlay() { if (S.scenario === 'quiz') return; S.running = !S.running; if (S.running) S.trail.push({ x: S.x, y: S.y }); syncControls(); }
+el('play').addEventListener('click', togglePlay);
+el('speedSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.speed = Number(b.dataset.v); syncControls(); });
+el('dispSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.display = b.dataset.v; syncControls(); });
+el('range').addEventListener('change', e => { S.range = Number(e.target.value); });
+el('tas').addEventListener('change', e => { S.tas = clamp(Number(e.target.value) || 100, 40, 250); e.target.value = S.tas; });
+el('windDir').addEventListener('change', e => { S.windDir = norm360(Number(e.target.value) || 0); e.target.value = S.windDir === 0 ? 360 : S.windDir; });
+el('windSpd').addEventListener('change', e => { S.windSpd = clamp(Number(e.target.value) || 0, 0, 60); e.target.value = S.windSpd; });
+[['tZones', 'zones'], ['tBand', 'band'], ['tRadial', 'radial'], ['tTrail', 'trail']].forEach(([id, k]) => el(id).addEventListener('change', e => { S.show[k] = e.target.checked; }));
+el('clearTrail').addEventListener('click', () => { S.trail = []; });
+document.querySelectorAll('[data-obs]').forEach(b => b.addEventListener('click', () => setObs(S.obs + Number(b.dataset.obs))));
+document.querySelectorAll('[data-hdg]').forEach(b => b.addEventListener('click', () => turnBy(Number(b.dataset.hdg))));
+
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+  if (e.target.closest && e.target.closest('[role="slider"]')) return;
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); turnBy((e.key === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 10 : 5)); }
+  else if (e.key === '[') setObs(S.obs - 1);
+  else if (e.key === ']') setObs(S.obs + 1);
+  else if (e.key === '{') setObs(S.obs - 10);
+  else if (e.key === '}') setObs(S.obs + 10);
+  else if (e.key === ' ' && (tag === 'body' || e.target === canvas)) { e.preventDefault(); togglePlay(); }
+});
+
+function syncControls() {
+  document.querySelectorAll('#scenarios button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === S.scenario)));
+  document.querySelectorAll('#speedSeg button').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.v) === S.speed)));
+  document.querySelectorAll('#dispSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === S.display)));
+  el('play').textContent = S.running ? 'Pause' : 'Play';
+  el('play').disabled = S.scenario === 'quiz';
+  el('range').value = String(S.range);
+  el('tas').value = S.tas;
+  el('windDir').value = S.windDir === 0 ? 360 : S.windDir;
+  el('windSpd').value = S.windSpd;
+  el('cdi').toggleAttribute('hidden', S.display !== 'cdi'); el('hsi').toggleAttribute('hidden', S.display !== 'hsi');
+  el('instTitle').textContent = S.display === 'cdi' ? 'Course deviation indicator' : 'Horizontal situation indicator';
+  el('obsLab').textContent = S.display === 'cdi' ? 'OBS' : 'Course';
+  el('mapWrap').classList.toggle('locked', S.scenario === 'quiz');
+}
+
+/* ---------- Loop ---------- */
+let lastT = performance.now();
+function frame(now) {
+  const dt = Math.min(0.1, Math.max(0, (now - lastT) / 1000)); lastT = now; S.t += dt;
+  if (S.running) step(dt);
+  const n = nav();
+  updateNeedle(n, dt);
+  if (W > 0) draw(n);
+  updateInstruments(n);
+  updateReadouts(n, now);
+  requestAnimationFrame(frame);
+}
+applyScenario('free');
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
