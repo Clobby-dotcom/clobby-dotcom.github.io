@@ -101,3 +101,21 @@ ol.steps h3{margin:4px 0 6px}
 .next-prev a:hover{color:var(--accent)}
 .next-prev small{display:block;font:500 .9rem/1.2 var(--sans);color:var(--muted)}
 .next-prev .next{text-align:right;margin-left:auto}
+
+/* Jump-to bar: a sticky "On this page" dropdown under the header, used instead of the contents sidebar */
+.jump{position:sticky;top:0;z-index:9;background:var(--surface);border-bottom:1px solid var(--line)}
+.jump-in{max-width:1200px;margin:0 auto;padding:0 16px}
+.jump-menu{position:relative;display:inline-block}
+.jump-menu summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;gap:10px;padding:13px 0 12px;font:600 1rem/1.2 var(--cond)}
+.jump-menu summary::-webkit-details-marker{display:none}
+.jump-menu summary::after{content:"";align-self:center;width:0;height:0;border:4px solid transparent;border-top:5px solid currentColor;border-bottom:0}
+.jump-menu[open] summary::after{border-top:0;border-bottom:5px solid currentColor}
+.jump-label{color:var(--muted)}
+.jump-current{color:var(--text)}
+.jump-menu summary:hover .jump-current{color:var(--accent)}
+.jump-menu ol{position:absolute;top:100%;left:-14px;min-width:280px;max-height:70vh;overflow-y:auto;margin:0;padding:6px 0;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:0 0 8px 8px;box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.jump-menu ol a{display:block;padding:9px 14px;color:var(--text);text-decoration:none;font:600 1rem/1.25 var(--cond);white-space:nowrap}
+.jump-menu ol a:hover,.jump-menu ol a[aria-current]{background:var(--surface-2);color:var(--accent)}
+@media (max-width:520px){.jump-menu ol{left:-16px;min-width:0;width:100vw}}
+.page-single{grid-template-columns:minmax(0,1fr)}
+.page-single article h2{scroll-margin-top:64px}

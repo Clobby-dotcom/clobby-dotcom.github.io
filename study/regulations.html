@@ -47,10 +47,11 @@ dl.terms dt .reg{margin-left:8px}
     </nav>
   </div>
 </header>
-<div class="page">
-  <nav class="toc" aria-label="On this page">
-    <h2>On this page</h2>
-    <ol>
+<div class="jump">
+  <div class="jump-in">
+    <details class="jump-menu">
+      <summary><span class="jump-label">On this page</span><span class="jump-current">Jump to a section</span></summary>
+      <ol>
       <li><a href="#acting-as-pic">Acting as pilot in command</a></li>
       <li><a href="#privileges">Private pilot privileges</a></li>
       <li><a href="#airworthiness">Documents and airworthiness</a></li>
@@ -63,8 +64,11 @@ dl.terms dt .reg{margin-left:8px}
       <li><a href="#ntsb">Accidents and incidents</a></li>
       <li><a href="#test-yourself">Test yourself</a></li>
       <li><a href="#sources">Sources</a></li>
-    </ol>
-  </nav>
+      </ol>
+    </details>
+  </div>
+</div>
+<div class="page page-single">
   <article>
     <p class="crumb"><a href="../study/index.html">Study</a></p>
     <h1>Regulations</h1>
@@ -160,7 +164,7 @@ dl.terms dt .reg{margin-left:8px}
     <h2 id="inspections">Inspections</h2>
     <p>A common way to remember them is AV1ATE. All are found in the airplane's maintenance records.</p>
     <div class="table-wrap">
-      <table>
+      <table class="wx">
         <thead><tr><th>Inspection</th><th>How often</th><th>Notes</th></tr></thead>
         <tbody>
           <tr><td>A: Annual <span class="reg">91.409</span></td><td>Every 12 calendar months</td><td>Required for every airplane.</td></tr>
@@ -415,5 +419,6 @@ dl.terms dt .reg{margin-left:8px}
   <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
   <p>Made by Colby Penn</p>
 </footer>
+<script src="../jump.js"></script>
 </body>
 </html>
