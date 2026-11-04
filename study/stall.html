@@ -13,8 +13,8 @@
 .sim{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:calc(100vh - 57px);min-height:600px}
 .stage{position:relative;overflow:hidden;background:var(--bg)}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.hint{position:absolute;left:16px;bottom:14px;margin:0;font-size:.9rem;color:var(--muted);pointer-events:none;max-width:calc(100% - 32px)}
-.legend{position:absolute;left:16px;top:14px;margin:0;padding:0;list-style:none;font:500 .9rem/1.3 var(--cond);color:var(--muted);pointer-events:none}
+.hint{position:absolute;left:12px;bottom:12px;margin:0;font-size:.9rem;color:var(--muted);pointer-events:none;max-width:calc(100% - 24px);background:var(--bg);padding:4px 8px;border-radius:6px}
+.legend{position:absolute;left:12px;top:12px;margin:0;padding:6px 8px;border-radius:6px;background:var(--bg);list-style:none;font:500 .9rem/1.3 var(--cond);color:var(--muted);pointer-events:none}
 .legend li{display:flex;align-items:center;gap:8px}
 .legend i{display:inline-block;width:18px;height:3px;border-radius:2px}
 
@@ -182,7 +182,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     const ar = (Math.cos(r) - Math.cos(r - 2 * TH_TE)), ai = (-Math.sin(r) - Math.sin(r - 2 * TH_TE));
     const px = R0 * (ar * Math.cos(TH_TE) - ai * Math.sin(TH_TE)), py = R0 * (ar * Math.sin(TH_TE) + ai * Math.cos(TH_TE));
     GAM = 2 * Math.PI * -py;
-    buildWake(); computeStreams();
+    buildWake();
   }
   // Velocity at a point in the wind frame (wind along +x, y up); returns [vx, vy]
   function potential(wx, wy) {
@@ -253,76 +253,61 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     xmin = -ox / scale - .5; xmax = (W - ox) / scale + .5; ymin = -(H - oy) / scale; ymax = oy / scale;
     tctx.setTransform(dpr, 0, 0, dpr, 0, 0); octx.setTransform(dpr, 0, 0, dpr, 0, 0);
     tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H);
-    seed(); computeStreams();
+    seed();
   }
   const sx = x => ox + x * scale, sy = y => oy - y * scale;
 
-  // ---------- Smoke streams: steady streamlines with pulses timed by the real flow ----------
-  let streams = [];
-  const NLANE = 30, DS = .03;
-  function computeStreams() {
-    streams = [];
-    if (!W) return;
+  // ---------- Smoke: one kind of particle for all the air ----------
+  // Puffs are released in pulses from a rake of nozzles on the left and move at the local
+  // airspeed, so the pulses spread out where the air is faster. A puff that drifts into
+  // separated air is carried by the turbulent wake instead and turns orange.
+  const NLANE = 30, EMIT = .03, PULSE_S = .34, PULSE_ON = .55;
+  let lanes = [], parts = [], emitClock = 0, simClock = 0;
+  const maxParts = () => W < 600 ? 2400 : 4800;
+  function seed() {
+    parts = [];
     const half = Math.max(-ymin, ymax) * .95;
-    for (let i = 0; i < NLANE; i++) {
-      const u = (i + .5) / NLANE * 2 - 1;
-      let x = xmin, y = Math.sign(u) * Math.pow(Math.abs(u), 1.5) * half + .15, t = 0;
-      const P = [x, y], T = [0], S = [1];
-      for (let k = 0; k < 1100; k++) {
-        const a = potential(x, y); if (!a) break;
-        const s1 = Math.hypot(a[0], a[1]) || 1e-6;
-        const b = potential(x + a[0] / s1 * DS / 2, y + a[1] / s1 * DS / 2); if (!b) break;
-        const s2 = Math.hypot(b[0], b[1]);
-        if (s2 < .03) break;                         // stopped at the stagnation point
-        x += b[0] / s2 * DS; y += b[1] / s2 * DS; t += DS / s2;
-        P.push(x, y); T.push(t); S.push(s2);
-        if (inWake(x, y) || x > xmax) break;         // smoke that reaches separated air turns turbulent
+    lanes = Array.from({ length: NLANE }, (_, i) => { const u = (i + .5) / NLANE * 2 - 1; return Math.sign(u) * Math.pow(Math.abs(u), 1.5) * half + .15; });
+    for (let k = 0; k < 220; k++) step(1 / 30, false);       // fill the tunnel before the first frame
+  }
+  const BUCKETS = 8, segs = Array.from({ length: BUCKETS + 1 }, () => []);
+  function step(dt, draw) {
+    simClock += dt; emitClock += dt;
+    while (emitClock > EMIT) {
+      emitClock -= EMIT;
+      if (simClock % PULSE_S < PULSE_S * PULSE_ON && parts.length < maxParts())
+        for (const y of lanes) parts.push({ x: xmin, y: y + (Math.random() - .5) * .015, age: 0, sep: false });
+    }
+    const h = dt * 1.6;
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i], pot = potential(p.x, p.y);
+      let dead = !pot, v;
+      if (!dead) {
+        if (inWake(p.x, p.y)) { v = wakeVelocity(p.x, p.y, pot); p.sep = true; }
+        else {
+          v = potential(p.x + pot[0] * h / 2, p.y + pot[1] * h / 2) || pot;      // midpoint step around the nose
+          if (p.sep) v = [v[0] + (Math.random() - .5) * .1, v[1] + (Math.random() - .5) * .1];
+        }
+        const nx = p.x + v[0] * h, ny = p.y + v[1] * h;
+        if (draw) {
+          const b = p.sep ? BUCKETS : Math.min(BUCKETS - 1, Math.max(0, Math.floor((Math.hypot(v[0], v[1]) - .45) / 1.1 * BUCKETS)));
+          segs[b].push(sx(p.x), sy(p.y), sx(nx), sy(ny));
+        }
+        p.x = nx; p.y = ny; p.age += dt;
+        dead = nx > xmax || ny < ymin - 1 || ny > ymax + 1 || p.age > (p.sep ? 9 : 20);
       }
-      streams.push({ P, T, S });
+      if (dead) { parts[i] = parts[parts.length - 1]; parts.pop(); }
     }
+    if (!draw) return;
+    tctx.lineWidth = 1.8; tctx.lineCap = 'round';
+    segs.forEach((list, b) => {
+      if (!list.length) return;
+      tctx.strokeStyle = b === BUCKETS ? 'hsl(26,82%,56%)' : `hsl(208,72%,${36 + b * 6.5}%)`;
+      tctx.beginPath();
+      for (let k = 0; k < list.length; k += 4) { tctx.moveTo(list[k], list[k + 1]); tctx.lineTo(list[k + 2], list[k + 3]); }
+      tctx.stroke(); list.length = 0;
+    });
   }
-  function at(st, time) {                            // position and speed along a stream at a travel time
-    const T = st.T; let lo = 0, hi = T.length - 1;
-    if (time <= 0) return [st.P[0], st.P[1], st.S[0]];
-    if (time >= T[hi]) return null;
-    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (T[m] <= time) lo = m; else hi = m; }
-    const f = (time - T[lo]) / (T[hi] - T[lo]);
-    return [st.P[2 * lo] + (st.P[2 * hi] - st.P[2 * lo]) * f, st.P[2 * lo + 1] + (st.P[2 * hi + 1] - st.P[2 * lo + 1]) * f, st.S[lo]];
-  }
-  const PERIOD = .42, PULSE = .17;
-  function drawStreams(clock) {
-    octx.lineWidth = 1; octx.strokeStyle = 'rgba(127,182,240,.16)';
-    for (const st of streams) {
-      octx.beginPath();
-      for (let i = 0; i < st.P.length; i += 2) i ? octx.lineTo(sx(st.P[i]), sy(st.P[i + 1])) : octx.moveTo(sx(st.P[i]), sy(st.P[i + 1]));
-      octx.stroke();
-    }
-    octx.lineWidth = 2.6; octx.lineCap = 'round';
-    const base = clock % PERIOD;
-    for (const st of streams) {
-      const end = st.T[st.T.length - 1];
-      for (let head = base; head - PULSE < end; head += PERIOD) {
-        const h = at(st, head) || at(st, end - 1e-6), tail = at(st, head - PULSE);
-        if (!h || !tail) continue;
-        octx.strokeStyle = `hsl(208,72%,${Math.min(90, 34 + h[2] * 30)}%)`;
-        octx.beginPath(); octx.moveTo(sx(tail[0]), sy(tail[1]));
-        for (let tt = head - PULSE * .66; tt < head; tt += PULSE / 3) { const m = at(st, tt); if (m) octx.lineTo(sx(m[0]), sy(m[1])); }
-        octx.lineTo(sx(h[0]), sy(h[1])); octx.stroke();
-      }
-    }
-  }
-
-  // ---------- Turbulent smoke in the separated region ----------
-  let wp = [];
-  function spawnWake(p) {
-    for (let k = 0; k < 30; k++) {
-      const x = wake.S[0] + Math.random() * (wake.T[0] - wake.S[0] + wake.Lw * .45);
-      const y = wake.T[1] - .2 + Math.random() * (wake.S[1] + 2.4 * depth + .4 - wake.T[1]);
-      if (inWake(x, y)) { p.x = x; p.y = y; p.age = 0; p.out = 0; return; }
-    }
-    p.x = wake.S[0] + .05; p.y = wake.S[1] + .05; p.age = 0; p.out = 0;
-  }
-  function seed() { wp = []; }
 
   // ---------- Controls ----------
   const $ = id => document.getElementById(id);
@@ -368,7 +353,6 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   }
   function drawOverlay(t) {
     octx.clearRect(0, 0, W, H);
-    drawStreams(t / 1000 * 1.6);
     const stalled = alpha > CRIT + .5;
     const jx = stalled && !reduce ? (Math.random() - .5) * 2.2 : 0, jy = stalled && !reduce ? (Math.random() - .5) * 2.2 : 0;
     octx.save(); octx.translate(jx, jy);
@@ -427,24 +411,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       const w = vortices[i]; w.x += (.42 + .1 * Math.random()) * dt * 1.6; w.y += (Math.random() - .5) * .3 * dt; w.g *= Math.pow(.6, dt);
       if (!wake || w.x > wake.T[0] + wake.Lw + .6) vortices.splice(i, 1);
     }
-    // Fade the old smoke, then advance every particle (midpoint step)
+    // Fade the old smoke, then move every puff
     tctx.globalAlpha = .12; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1;
-    tctx.lineWidth = 1.8; tctx.lineCap = 'round';
-    const want = wake ? Math.round((W < 600 ? 260 : 520) * (.25 + depth)) : 0;
-    while (wp.length < want) { const p = {}; spawnWake(p); wp.push(p); }
-    if (wp.length > want) wp.length = want;
-    const h = dt * 1.6;
-    for (const p of wp) {
-      const pot = potential(p.x, p.y);
-      if (!pot) { spawnWake(p); continue; }
-      const inside = inWake(p.x, p.y), v = inside ? wakeVelocity(p.x, p.y, pot) : pot;
-      const nx = p.x + v[0] * h, ny = p.y + v[1] * h;
-      p.age += dt; if (!inside) p.out += dt;
-      tctx.strokeStyle = `hsla(${20 + Math.random() * 16},82%,${50 + Math.random() * 14}%,${inside ? .9 : Math.max(0, .9 - p.out * 1.5)})`;
-      tctx.beginPath(); tctx.moveTo(sx(p.x), sy(p.y)); tctx.lineTo(sx(nx), sy(ny)); tctx.stroke();
-      p.x = nx; p.y = ny;
-      if (p.out > .6 || p.age > 6 || p.x > xmax) spawnWake(p);
-    }
+    step(dt, true);
     drawOverlay(now);
     requestAnimationFrame(frame);
   }
