@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stall simulator</title>
+<meta name="description" content="A wing section in a simulated wind tunnel. Raise the angle of attack and watch the airflow separate as the wing stalls.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../site.css">
+<style>
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:calc(100vh - 57px);min-height:600px}
+.stage{position:relative;overflow:hidden;background:var(--bg)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hint{position:absolute;left:16px;bottom:14px;margin:0;font-size:.9rem;color:var(--muted);pointer-events:none;max-width:calc(100% - 32px)}
+.legend{position:absolute;left:16px;top:14px;margin:0;padding:0;list-style:none;font:500 .9rem/1.3 var(--cond);color:var(--muted);pointer-events:none}
+.legend li{display:flex;align-items:center;gap:8px}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px}
+
+.panel{border-left:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:24px 20px 32px}
+.panel h1{font:700 2.6rem/.95 var(--cond);margin:0;letter-spacing:-.02em}
+.panel .lede{color:var(--muted);margin:10px 0 0;font-size:1rem}
+.panel h2{font:700 1.1rem/1.2 var(--cond);margin:26px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
+.panel p,.panel li{font-size:.97rem}
+.panel ul{padding-left:1.1em;margin:8px 0 0}
+.panel li{margin-bottom:6px}
+.btn{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:9px 12px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;font:600 1rem/1.2 var(--cond);margin-bottom:6px}
+.ctl output{font:700 1.6rem/1 var(--cond)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.readout{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:14px 0 0;font-size:.97rem}
+.readout dt{font:600 .95rem/1.3 var(--cond);color:var(--muted)}
+.readout dd{margin:0;font:600 1rem/1.3 var(--cond)}
+.warn{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font:700 .95rem/1 var(--cond);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.warn i{width:10px;height:10px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line)}
+.warn.on{color:#1a0b0e;background:#e8b04a;border-color:#e8b04a}
+.warn.on i{background:#1a0b0e;border-color:#1a0b0e}
+.chart{margin-top:6px}
+.chart svg{display:block;width:100%;height:auto}
+.chart text{font:500 11px "Barlow Semi Condensed",sans-serif;fill:var(--muted)}
+.small{font-size:.88rem;color:var(--muted);margin:10px 0 0}
+@media (max-width:900px){
+  .sim{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
+  .stage{height:58vh;min-height:340px}
+  .panel{border-left:0;border-top:1px solid var(--line);overflow:visible}
+}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="site-head-in">
+    <a class="wordmark" href="../index.html">Ground School</a>
+    <nav class="site-nav" aria-label="Main">
+      <div class="nav-drop">
+        <a href="../aircraft/index.html">Aircraft</a>
+        <ul class="nav-menu">
+          <li><a href="../aircraft/piper-pilot-100i.html">Piper Pilot 100i</a></li>
+          <li><a href="../aircraft/cessna-172r.html">Cessna 172R</a></li>
+          <li><a href="../aircraft/cessna-172k.html">Cessna 172K</a></li>
+        </ul>
+      </div>
+      <div class="nav-drop">
+        <a href="../study/index.html" aria-current="page">Study</a>
+        <ul class="nav-menu">
+          <li><a href="../study/regulations.html">Regulations</a></li>
+          <li><a href="../study/left-turning-tendencies.html">Left-turning tendencies</a></li>
+          <li><a href="../study/stall.html" aria-current="page">Stall simulator</a></li>
+          <li><a href="../study/engine.html">Engine</a></li>
+        </ul>
+      </div>
+      <a href="../vor-trainer.html">VOR trainer</a>
+      <a href="../weight-and-balance.html">Weight and balance</a>
+    </nav>
+  </div>
+</header>
+
+<main class="sim">
+  <div class="stage" id="stage">
+    <canvas id="trails" aria-hidden="true"></canvas>
+    <canvas id="overlay" role="img" aria-label="A wing section in a wind tunnel. Air flows from left to right over the airfoil."></canvas>
+    <ul class="legend">
+      <li><i style="background:#7fb6f0"></i>Smooth airflow (brighter is faster)</li>
+      <li><i style="background:#e8873a"></i>Separated, turbulent airflow</li>
+    </ul>
+    <p class="hint">Air flows from left to right. Raise the angle of attack and watch the top of the wing.</p>
+  </div>
+
+  <aside class="panel" aria-label="Stall simulator controls">
+    <p class="crumb"><a href="../study/index.html">Study</a></p>
+    <h1>Stall simulator</h1>
+    <p class="lede">A wing section in a wind tunnel, seen from the side. Raise the angle of attack and watch the smooth airflow over the top break down as the wing reaches its critical angle of attack.</p>
+
+    <h2>Angle of attack</h2>
+    <div class="ctl">
+      <label for="aoa">Between the chord line and the relative wind <output id="aoaOut">4.0°</output></label>
+      <input type="range" id="aoa" min="-4" max="24" step="0.5" value="4">
+    </div>
+    <div class="row">
+      <button class="btn" id="raise" type="button">Slowly raise to a stall</button>
+      <button class="btn" id="recover" type="button">Recover</button>
+    </div>
+    <span class="warn" id="warn"><i></i>Stall warning</span>
+    <dl class="readout">
+      <dt>Airflow</dt><dd id="flow">Smooth over the whole wing</dd>
+      <dt>Lift</dt><dd id="lift">Increasing with angle of attack</dd>
+    </dl>
+
+    <h2>Lift coefficient</h2>
+    <div class="chart" id="chart"></div>
+    <p class="small">Lift rises steadily with angle of attack until the critical angle of attack. Past it, the airflow separates, lift falls off, and drag climbs fast. This simulated wing stalls at 16°.</p>
+
+    <h2>What to take away</h2>
+    <ul>
+      <li>A wing stalls when it exceeds its critical angle of attack. That angle doesn't change with weight, airspeed, or attitude, so you can stall at any airspeed, in any attitude, at any power setting.</li>
+      <li>The stall speeds in the POH are just the airspeeds where a wing reaches that angle in particular conditions. Heavier weight, a steeper bank, or more G load raises the stall speed.</li>
+      <li>Separation starts at the trailing edge and creeps forward. You often feel it first as buffet, and the stall warning comes on a few knots before the stall.</li>
+      <li>To recover, reduce the angle of attack first: lower the nose (or release back pressure) until the stall warning stops. Then level the wings, add power as needed, and return to your flight path.</li>
+      <li>Trainer wings are designed so the root stalls before the tips, which keeps the ailerons working as the stall develops.</li>
+    </ul>
+    <p class="small">The airflow is computed for an idealized airfoil, with separation added to match how a real wing stalls. The angles are typical of a light-airplane wing, not a specific airplane. Real critical angles of attack are usually somewhere around 15° to 20°.</p>
+    <h2>Sources</h2>
+    <ul>
+      <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 5, Aerodynamics of Flight</li>
+      <li>FAA-H-8083-3C, Airplane Flying Handbook (slow flight, stalls, and stall recovery)</li>
+      <li>AC 120-109A, Stall Prevention and Recovery Training</li>
+    </ul>
+  </aside>
+</main>
+
+<footer class="site-foot">
+  <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
+  <p>Made by Colby Penn</p>
+</footer>
+
+<script>
+// Airflow around a Joukowski airfoil (potential flow with the Kutta condition), plus a
+// separation model: past about 9° the flow over the top starts leaving the surface at the
+// trailing edge, the separation point creeps forward, and eddies shed into a turbulent wake.
+(function () {
+  const stage = document.getElementById('stage');
+  const trails = document.getElementById('trails'), tctx = trails.getContext('2d');
+  const overlay = document.getElementById('overlay'), octx = overlay.getContext('2d');
+  const css = getComputedStyle(document.documentElement);
+  const BG = css.getPropertyValue('--bg').trim() || '#14171A';
+  const TEXT = css.getPropertyValue('--text').trim() || '#E5E8EA';
+  const MUTED = css.getPropertyValue('--muted').trim() || '#9BA5AC';
+  const ACCENT = css.getPropertyValue('--accent').trim() || '#CF6B7B';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Airfoil ----------
+  const C = 1, MUX = -0.09, MUY = 0.085, R0 = Math.hypot(C - MUX, MUY), TH_TE = Math.atan2(-MUY, C - MUX);
+  const foil = [];                                   // airfoil outline in the airfoil frame
+  for (let i = 0; i < 240; i++) {
+    const th = TH_TE + i / 240 * Math.PI * 2;
+    const zx = MUX + R0 * Math.cos(th), zy = MUY + R0 * Math.sin(th);
+    const d = zx * zx + zy * zy;
+    foil.push([zx + C * C * zx / d, zy - C * C * zy / d]);
+  }
+  let iLE = 0; foil.forEach((p, i) => { if (p[0] < foil[iLE][0]) iLE = i; });
+  const LE = foil[iLE], TE = foil[0], CHORD = TE[0] - LE[0];
+  const upper = foil.slice(0, iLE + 1);              // trailing edge over the top to the leading edge
+
+  // ---------- Aerodynamic model ----------
+  const CRIT = 16;
+  function CL(a) {
+    if (a <= 10) return 0.25 + 0.08 * a;
+    if (a <= CRIT) { const x = a - 10; return 1.05 + 0.08 * x + 0.010833 * x * x - 0.001944 * x * x * x; }
+    return 1.5 - 0.35 * (1 - Math.exp(-(a - CRIT) / 1.5)) - 0.02 * (a - CRIT);
+  }
+  function CD(a) { const cl = CL(a); return 0.012 + 0.04 * cl * cl + (a > 14 ? 0.012 * (a - 14) * (a - 14) : 0); }
+  const sepFrac = a => a < 9 ? 0 : a < CRIT ? .4 * Math.pow((a - 9) / (CRIT - 9), 1.6) : Math.min(.9, .4 + .5 * (a - CRIT) / 6);
+  const depthOf = a => Math.min(1, Math.max(0, (a - 9) / 11));
+
+  // ---------- Flow field ----------
+  let alpha = 4, ca = 1, sa = 0, GAM = 0;
+  function setAlpha(a) {
+    alpha = a; const r = a * Math.PI / 180; ca = Math.cos(r); sa = Math.sin(r);
+    // Kutta condition: zero velocity at the trailing edge fixes the circulation
+    const ar = (Math.cos(r) - Math.cos(r - 2 * TH_TE)), ai = (-Math.sin(r) - Math.sin(r - 2 * TH_TE));
+    const px = R0 * (ar * Math.cos(TH_TE) - ai * Math.sin(TH_TE)), py = R0 * (ar * Math.sin(TH_TE) + ai * Math.cos(TH_TE));
+    GAM = 2 * Math.PI * -py;
+    buildWake(); computeStreams();
+  }
+  // Velocity at a point in the wind frame (wind along +x, y up); returns [vx, vy]
+  function potential(wx, wy) {
+    const zx = wx * ca - wy * sa, zy = wx * sa + wy * ca;          // into the airfoil frame
+    let wr = zx * zx - zy * zy - 4 * C * C, wi = 2 * zx * zy;
+    const m = Math.hypot(wr, wi);
+    let sr = Math.sqrt((m + wr) / 2), si = Math.sign(wi || 1) * Math.sqrt(Math.max(0, (m - wr) / 2));
+    let ax = (zx + sr) / 2, ay = (zy + si) / 2, bx = (zx - sr) / 2, by = (zy - si) / 2;
+    const da = Math.hypot(ax - MUX, ay - MUY), db = Math.hypot(bx - MUX, by - MUY);
+    const ex = da >= db ? ax : bx, ey = da >= db ? ay : by;
+    const qx = ex - MUX, qy = ey - MUY;
+    if (Math.hypot(qx, qy) < R0 * 1.0005) return null;              // inside the airfoil
+    const q2r = qx * qx - qy * qy, q2i = 2 * qx * qy, q2m = q2r * q2r + q2i * q2i;
+    // e^{-ia} - R0^2 e^{ia} / q^2 + i GAM / (2 pi q)
+    let dr = ca - R0 * R0 * (ca * q2r + sa * q2i) / q2m;
+    let di = -sa - R0 * R0 * (sa * q2r - ca * q2i) / q2m;
+    const qm = qx * qx + qy * qy;
+    dr += GAM / (2 * Math.PI) * (qy / qm); di += GAM / (2 * Math.PI) * (qx / qm);
+    // dz/dzeta = 1 - c^2 / zeta^2
+    const z2r = ex * ex - ey * ey, z2i = 2 * ex * ey, z2m = z2r * z2r + z2i * z2i;
+    const jr = 1 - C * C * z2r / z2m, ji = C * C * z2i / z2m;
+    const jm = jr * jr + ji * ji;
+    const Wr = (dr * jr + di * ji) / jm, Wi = (di * jr - dr * ji) / jm;
+    let u = Wr, v = -Wi;
+    const sp = Math.hypot(u, v); if (sp > 3) { u *= 3 / sp; v *= 3 / sp; }
+    return [u * ca + v * sa, -u * sa + v * ca];                      // back to the wind frame
+  }
+
+  // ---------- Separated wake ----------
+  let wake = null, depth = 0;
+  const vortices = [];
+  const toWind = p => [p[0] * ca + p[1] * sa, -p[0] * sa + p[1] * ca];
+  function buildWake() {
+    const s = sepFrac(alpha); depth = depthOf(alpha);
+    if (s <= 0) { wake = null; return; }
+    const n = Math.max(2, Math.round(s * (upper.length - 1)));
+    const surf = upper.slice(0, n + 1).map(toWind).reverse();      // separation point to trailing edge
+    const S = surf[0], T = surf[surf.length - 1];
+    const Lw = 2.2 + 3.2 * depth, Ht = .18 + 2.3 * Math.pow(depth, 1.25);
+    wake = { S, T, Lw, poly: [...surf, [T[0] + Lw, T[1] - .25 * depth], [T[0] + Lw, S[1] + Ht], [S[0] + .02, S[1] + .02]] };
+  }
+  function inWake(x, y) {
+    if (!wake) return false;
+    const P = wake.poly; let inside = false;
+    for (let i = 0, j = P.length - 1; i < P.length; j = i++) {
+      const [xi, yi] = P[i], [xj, yj] = P[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function wakeVelocity(x, y, pot) {
+    let vx = .3 * pot[0] + .12, vy = .3 * pot[1];
+    for (const w of vortices) {
+      const dx = x - w.x, dy = y - w.y, r2 = dx * dx + dy * dy + .06;
+      vx += -w.g * dy / (2 * Math.PI * r2); vy += w.g * dx / (2 * Math.PI * r2);
+    }
+    return [vx + (Math.random() - .5) * .12 * depth, vy + (Math.random() - .5) * .12 * depth];
+  }
+
+  // ---------- View ----------
+  let W = 0, H = 0, dpr = 1, scale = 1, ox = 0, oy = 0, xmin = -6, xmax = 6, ymin = -3, ymax = 3;
+  function resize() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = stage.clientWidth; H = stage.clientHeight;
+    [trails, overlay].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
+    scale = Math.min(W * (W < 600 ? .56 : .42), H * .9) / CHORD;
+    ox = W * (W < 600 ? .5 : .46); oy = H * .53;
+    xmin = -ox / scale - .5; xmax = (W - ox) / scale + .5; ymin = -(H - oy) / scale; ymax = oy / scale;
+    tctx.setTransform(dpr, 0, 0, dpr, 0, 0); octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H);
+    seed(); computeStreams();
+  }
+  const sx = x => ox + x * scale, sy = y => oy - y * scale;
+
+  // ---------- Smoke streams: steady streamlines with pulses timed by the real flow ----------
+  let streams = [];
+  const NLANE = 30, DS = .03;
+  function computeStreams() {
+    streams = [];
+    if (!W) return;
+    const half = Math.max(-ymin, ymax) * .95;
+    for (let i = 0; i < NLANE; i++) {
+      const u = (i + .5) / NLANE * 2 - 1;
+      let x = xmin, y = Math.sign(u) * Math.pow(Math.abs(u), 1.5) * half + .15, t = 0;
+      const P = [x, y], T = [0], S = [1];
+      for (let k = 0; k < 1100; k++) {
+        const a = potential(x, y); if (!a) break;
+        const s1 = Math.hypot(a[0], a[1]) || 1e-6;
+        const b = potential(x + a[0] / s1 * DS / 2, y + a[1] / s1 * DS / 2); if (!b) break;
+        const s2 = Math.hypot(b[0], b[1]);
+        if (s2 < .03) break;                         // stopped at the stagnation point
+        x += b[0] / s2 * DS; y += b[1] / s2 * DS; t += DS / s2;
+        P.push(x, y); T.push(t); S.push(s2);
+        if (inWake(x, y) || x > xmax) break;         // smoke that reaches separated air turns turbulent
+      }
+      streams.push({ P, T, S });
+    }
+  }
+  function at(st, time) {                            // position and speed along a stream at a travel time
+    const T = st.T; let lo = 0, hi = T.length - 1;
+    if (time <= 0) return [st.P[0], st.P[1], st.S[0]];
+    if (time >= T[hi]) return null;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (T[m] <= time) lo = m; else hi = m; }
+    const f = (time - T[lo]) / (T[hi] - T[lo]);
+    return [st.P[2 * lo] + (st.P[2 * hi] - st.P[2 * lo]) * f, st.P[2 * lo + 1] + (st.P[2 * hi + 1] - st.P[2 * lo + 1]) * f, st.S[lo]];
+  }
+  const PERIOD = .42, PULSE = .17;
+  function drawStreams(clock) {
+    octx.lineWidth = 1; octx.strokeStyle = 'rgba(127,182,240,.16)';
+    for (const st of streams) {
+      octx.beginPath();
+      for (let i = 0; i < st.P.length; i += 2) i ? octx.lineTo(sx(st.P[i]), sy(st.P[i + 1])) : octx.moveTo(sx(st.P[i]), sy(st.P[i + 1]));
+      octx.stroke();
+    }
+    octx.lineWidth = 2.6; octx.lineCap = 'round';
+    const base = clock % PERIOD;
+    for (const st of streams) {
+      const end = st.T[st.T.length - 1];
+      for (let head = base; head - PULSE < end; head += PERIOD) {
+        const h = at(st, head) || at(st, end - 1e-6), tail = at(st, head - PULSE);
+        if (!h || !tail) continue;
+        octx.strokeStyle = `hsl(208,72%,${Math.min(90, 34 + h[2] * 30)}%)`;
+        octx.beginPath(); octx.moveTo(sx(tail[0]), sy(tail[1]));
+        for (let tt = head - PULSE * .66; tt < head; tt += PULSE / 3) { const m = at(st, tt); if (m) octx.lineTo(sx(m[0]), sy(m[1])); }
+        octx.lineTo(sx(h[0]), sy(h[1])); octx.stroke();
+      }
+    }
+  }
+
+  // ---------- Turbulent smoke in the separated region ----------
+  let wp = [];
+  function spawnWake(p) {
+    for (let k = 0; k < 30; k++) {
+      const x = wake.S[0] + Math.random() * (wake.T[0] - wake.S[0] + wake.Lw * .45);
+      const y = wake.T[1] - .2 + Math.random() * (wake.S[1] + 2.4 * depth + .4 - wake.T[1]);
+      if (inWake(x, y)) { p.x = x; p.y = y; p.age = 0; p.out = 0; return; }
+    }
+    p.x = wake.S[0] + .05; p.y = wake.S[1] + .05; p.age = 0; p.out = 0;
+  }
+  function seed() { wp = []; }
+
+  // ---------- Controls ----------
+  const $ = id => document.getElementById(id);
+  const slider = $('aoa');
+  let target = null, rate = 0;
+  slider.addEventListener('input', () => { target = null; setAlpha(+slider.value); updateReadouts(); });
+  $('raise').onclick = () => { if (alpha >= 19) setAlpha(4); target = 20; rate = 1.1; };
+  $('recover').onclick = () => { target = 4; rate = 7; };
+
+  // Lift coefficient chart
+  const cx = a => 34 + (a + 4) / 28 * 256, cy = c => 150 - (c + .2) / 1.9 * 136;
+  let path = ''; for (let a = -4; a <= 24; a += .25) path += (path ? 'L' : 'M') + cx(a).toFixed(1) + ' ' + cy(CL(a)).toFixed(1);
+  $('chart').innerHTML = `<svg viewBox="0 0 300 172" role="img" aria-label="Lift coefficient against angle of attack">
+    <rect x="${cx(CRIT)}" y="12" width="${cx(24) - cx(CRIT)}" height="138" fill="${ACCENT}" opacity=".1"/>
+    <line x1="34" y1="${cy(0)}" x2="290" y2="${cy(0)}" stroke="${MUTED}" stroke-width=".8"/>
+    <line x1="34" y1="12" x2="34" y2="150" stroke="${MUTED}" stroke-width=".8"/>
+    <line x1="${cx(CRIT)}" y1="12" x2="${cx(CRIT)}" y2="150" stroke="${ACCENT}" stroke-dasharray="4 3"/>
+    ${[0, 8, 16, 24].map(a => `<text x="${cx(a)}" y="164" text-anchor="middle">${a}°</text>`).join('')}
+    ${[0, .5, 1, 1.5].map(c => `<text x="28" y="${cy(c) + 4}" text-anchor="end">${c}</text>`).join('')}
+    <text x="${cx(CRIT) + 4}" y="24">Critical angle</text><text x="${cx(CRIT) + 4}" y="36">of attack</text>
+    <path d="${path}" fill="none" stroke="#7fb6f0" stroke-width="2.2"/>
+    <circle id="dot" r="5" fill="${TEXT}"/>
+  </svg>`;
+  const dot = document.getElementById('dot');
+
+  function updateReadouts() {
+    $('aoaOut').textContent = alpha.toFixed(1) + '°';
+    slider.value = alpha;
+    dot.setAttribute('cx', cx(alpha)); dot.setAttribute('cy', cy(CL(alpha)));
+    $('warn').classList.toggle('on', alpha >= 13);
+    $('flow').textContent = alpha < 9 ? 'Smooth over the whole wing' : alpha < CRIT - .5 ? 'Starting to separate near the trailing edge'
+      : alpha <= CRIT + .5 ? 'At the critical angle of attack' : 'Separated over most of the top: the wing is stalled';
+    $('lift').textContent = alpha < CRIT - 2 ? 'Increasing with angle of attack' : alpha <= CRIT + .5 ? 'At its maximum'
+      : 'Dropping off sharply while drag climbs';
+  }
+
+  // ---------- Drawing ----------
+  function arrow(ctx, x1, y1, x2, y2, color, w) {
+    const a = Math.atan2(y2 - y1, x2 - x1), h = 9 + w;
+    ctx.strokeStyle = ctx.fillStyle = color; ctx.lineWidth = w;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - Math.cos(a) * h * .6, y2 - Math.sin(a) * h * .6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - h * Math.cos(a - .4), y2 - h * Math.sin(a - .4)); ctx.lineTo(x2 - h * Math.cos(a + .4), y2 - h * Math.sin(a + .4)); ctx.closePath(); ctx.fill();
+  }
+  function drawOverlay(t) {
+    octx.clearRect(0, 0, W, H);
+    drawStreams(t / 1000 * 1.6);
+    const stalled = alpha > CRIT + .5;
+    const jx = stalled && !reduce ? (Math.random() - .5) * 2.2 : 0, jy = stalled && !reduce ? (Math.random() - .5) * 2.2 : 0;
+    octx.save(); octx.translate(jx, jy);
+    // Airfoil
+    octx.beginPath();
+    foil.forEach((p, i) => { const w = toWind(p); i ? octx.lineTo(sx(w[0]), sy(w[1])) : octx.moveTo(sx(w[0]), sy(w[1])); });
+    octx.closePath(); octx.fillStyle = '#c9ced3'; octx.fill(); octx.strokeStyle = '#eef1f3'; octx.lineWidth = 1.2; octx.stroke();
+    // Chord line, extended forward to show the angle
+    const le = toWind(LE), te = toWind(TE), ext = toWind([LE[0] - CHORD * .45, LE[1]]);
+    octx.setLineDash([6, 5]); octx.strokeStyle = TEXT; octx.lineWidth = 1.2;
+    octx.beginPath(); octx.moveTo(sx(ext[0]), sy(ext[1])); octx.lineTo(sx(te[0]), sy(te[1])); octx.stroke();
+    octx.setLineDash([]);
+    // Relative wind reference and the angle between them
+    const rx = sx(le[0]), ry = sy(le[1]), R = CHORD * .38 * scale;
+    octx.strokeStyle = MUTED; octx.lineWidth = 1;
+    octx.beginPath(); octx.moveTo(rx - R * 1.2, ry); octx.lineTo(rx, ry); octx.stroke();
+    if (Math.abs(alpha) >= .5) {
+      octx.strokeStyle = ACCENT; octx.lineWidth = 2;
+      octx.beginPath(); octx.arc(rx, ry, R, Math.PI, Math.PI + alpha * Math.PI / 180, alpha < 0); octx.stroke();
+    }
+    octx.font = '600 14px "Barlow Semi Condensed", sans-serif'; octx.fillStyle = TEXT;
+    octx.textAlign = 'center';
+    octx.fillText(`${alpha.toFixed(1)}°`, rx - R * .78, ry - R * Math.sin(Math.max(.12, alpha * Math.PI / 180) / 2) - 10);
+    octx.fillStyle = MUTED; octx.font = '500 13px "Barlow Semi Condensed", sans-serif'; octx.textAlign = 'left';
+    octx.fillText('Chord line', sx(te[0]) + 10, sy(te[1]) + 16);
+    octx.restore();
+    // Relative wind arrow
+    arrow(octx, 18, H * .2, 18 + Math.min(130, W * .16), H * .2, MUTED, 2);
+    octx.fillStyle = MUTED; octx.textAlign = 'left'; octx.font = '600 13px "Barlow Semi Condensed", sans-serif';
+    octx.fillText('Relative wind', 18, H * .2 - 10);
+    // Lift (perpendicular to the relative wind) and drag (along it), from the quarter chord
+    const qc = toWind([LE[0] + CHORD * .25, .1]), qx = sx(qc[0]) + jx, qy = sy(qc[1]) + jy;
+    const Lpx = CL(alpha) * scale * 1.1, Dpx = CD(alpha) * scale * 2.6;
+    if (CL(alpha) > .03) { arrow(octx, qx, qy, qx, qy - Lpx, '#7fb6f0', 3); octx.fillStyle = '#7fb6f0'; octx.font = '700 14px "Barlow Semi Condensed", sans-serif'; octx.fillText('Lift', qx + 8, qy - Lpx + 6); }
+    arrow(octx, qx, qy, qx + Math.max(10, Dpx), qy, '#e8873a', 3);
+    octx.fillStyle = '#e8873a'; octx.font = '700 14px "Barlow Semi Condensed", sans-serif'; octx.fillText('Drag', qx + Math.max(10, Dpx) + 6, qy + 5);
+  }
+
+  // ---------- Loop ----------
+  setAlpha(4); updateReadouts();
+  new ResizeObserver(resize).observe(stage); resize();
+  let last = performance.now(), shed = 0;
+  function frame(now) {
+    const dt = Math.min(.033, (now - last) / 1000); last = now;
+    if (target !== null) {
+      const step = Math.sign(target - alpha) * Math.min(Math.abs(target - alpha), rate * dt);
+      setAlpha(alpha + step); if (Math.abs(target - alpha) < 1e-3) target = null;
+      updateReadouts();
+    }
+    // Shed eddies from the separation point and carry them downstream
+    if (wake && depth > 0) {
+      shed -= dt;
+      if (shed <= 0) { shed = .09 / (.3 + depth); vortices.push({ x: wake.S[0] + .1, y: wake.S[1] + .08, g: -(.5 + Math.random()) * (.6 + 1.6 * depth) * (Math.random() < .15 ? -1 : 1) }); }
+    }
+    for (let i = vortices.length - 1; i >= 0; i--) {
+      const w = vortices[i]; w.x += (.42 + .1 * Math.random()) * dt * 1.6; w.y += (Math.random() - .5) * .3 * dt; w.g *= Math.pow(.6, dt);
+      if (!wake || w.x > wake.T[0] + wake.Lw + .6) vortices.splice(i, 1);
+    }
+    // Fade the old smoke, then advance every particle (midpoint step)
+    tctx.globalAlpha = .12; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1;
+    tctx.lineWidth = 1.8; tctx.lineCap = 'round';
+    const want = wake ? Math.round((W < 600 ? 260 : 520) * (.25 + depth)) : 0;
+    while (wp.length < want) { const p = {}; spawnWake(p); wp.push(p); }
+    if (wp.length > want) wp.length = want;
+    const h = dt * 1.6;
+    for (const p of wp) {
+      const pot = potential(p.x, p.y);
+      if (!pot) { spawnWake(p); continue; }
+      const inside = inWake(p.x, p.y), v = inside ? wakeVelocity(p.x, p.y, pot) : pot;
+      const nx = p.x + v[0] * h, ny = p.y + v[1] * h;
+      p.age += dt; if (!inside) p.out += dt;
+      tctx.strokeStyle = `hsla(${20 + Math.random() * 16},82%,${50 + Math.random() * 14}%,${inside ? .9 : Math.max(0, .9 - p.out * 1.5)})`;
+      tctx.beginPath(); tctx.moveTo(sx(p.x), sy(p.y)); tctx.lineTo(sx(nx), sy(ny)); tctx.stroke();
+      p.x = nx; p.y = ny;
+      if (p.out > .6 || p.age > 6 || p.x > xmax) spawnWake(p);
+    }
+    drawOverlay(now);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
