@@ -258,7 +258,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   let alpha = 4, ca = 1, sa = 0, depth = 0, tSep = 1, hTE = .06, sepColor = 0, Lwake = 4;
   let TEw = [0, 0], TEtop = [0, 0], shear = null;
   const toWind = p => [p[0] * ca + p[1] * sa, -p[0] * sa + p[1] * ca];
-  const bubbleH = t => hTE * Math.pow(Math.max(0, (t - tSep) / Math.max(1e-6, 1 - tSep)), .7);
+  // Separated region height: thin where the layer peels off, thickening toward the trailing edge
+  const bubbleH = t => hTE * Math.pow(Math.max(0, (t - tSep) / Math.max(1e-6, 1 - tSep)), 1.25);
   function setAlpha(a) {
     alpha = a; const r = a * Math.PI / 180; ca = Math.cos(r); sa = Math.sin(r);
     const GAM = 4 * Math.PI * R0 * Math.sin(r - TH_TE);                   // Kutta condition
@@ -346,7 +347,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       us = ut * ca + un * sa; vs = -ut * sa + un * ca;                 // along the chord, and normal to it
       wv = gauss((n - 1) / .55) * (.3 + depth); cell = true;
       // The outer flow has to climb over the separated region, so lift it along the layer's slope
-      const dhdx = Math.min(1.5, hTE * .7 * Math.pow(Math.max(.02, tau), -.3) / L);
+      const dhdx = hTE * 1.25 * Math.pow(tau, .25) / L;
       kick = .55 * dhdx * (1 - smooth(1, 2.8, n)) * (1 - s) * Math.hypot(u, v);
     }
     // Boundary layer: the air right next to the surface moves slower, more so toward the back
@@ -416,7 +417,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     }
     // Turbulent mixing keeps the dead-air region over the wing as full of air as anywhere else
     if (tSep < .98) {
-      const Lb = (1 - tSep) * CHORD, want = Math.round(.9 * parts.length / ((xmax - xmin) * (ymax - ymin)) * .55 * Lb * hTE);
+      const Lb = (1 - tSep) * CHORD, want = Math.round(.9 * parts.length / ((xmax - xmin) * (ymax - ymin)) * .45 * Lb * hTE);
       for (let k = 0; k < Math.min(12, want - inCell); k++) {
         const t = tSep + Math.random() * (1 - tSep), zx = LE[0] + t * CHORD, zy = upperY(zx) + (.1 + .65 * Math.random()) * bubbleH(t);
         const w = toWind([zx, zy]); parts.push({ x: w[0], y: w[1], c: .5 * sepColor, jx: 0, jy: 0, age: 0, sepAge: 0 });
@@ -521,6 +522,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+  if (location.search.includes('debug')) window.__sim = { step, setAlpha, updateReadouts, drawOverlay, fade: () => { tctx.globalAlpha = .45; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1; }, get parts() { return parts; } };
 })();
 </script>
 </body>
