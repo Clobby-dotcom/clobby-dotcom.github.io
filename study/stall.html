@@ -136,9 +136,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 </footer>
 
 <script>
-// Airflow around a Joukowski airfoil (potential flow with the Kutta condition), plus a
-// separation model: past about 9° the flow over the top starts leaving the surface at the
-// trailing edge, the separation point creeps forward, and eddies shed into a turbulent wake.
+// Airflow around a Joukowski airfoil: potential flow with the Kutta condition for the
+// outer flow, a boundary layer that slows the air next to the surface, and a separation
+// model in which a shear layer leaves the upper surface, rolls up into vortices, and the
+// air under it recirculates. Everything blends smoothly, so the air never flips from
+// laminar to turbulent in one step.
 (function () {
   const stage = document.getElementById('stage');
   const trails = document.getElementById('trails'), tctx = trails.getContext('2d');
@@ -149,99 +151,213 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   const MUTED = css.getPropertyValue('--muted').trim() || '#9BA5AC';
   const ACCENT = css.getPropertyValue('--accent').trim() || '#CF6B7B';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
 
-  // ---------- Airfoil ----------
+  // ---------- Airfoil (airfoil frame: chord roughly along x, up is +y) ----------
   const C = 1, MUX = -0.09, MUY = 0.085, R0 = Math.hypot(C - MUX, MUY), TH_TE = Math.atan2(-MUY, C - MUX);
-  const foil = [];                                   // airfoil outline in the airfoil frame
+  const foil = [];
   for (let i = 0; i < 240; i++) {
-    const th = TH_TE + i / 240 * Math.PI * 2;
-    const zx = MUX + R0 * Math.cos(th), zy = MUY + R0 * Math.sin(th);
-    const d = zx * zx + zy * zy;
+    const th = TH_TE + i / 240 * TAU;
+    const zx = MUX + R0 * Math.cos(th), zy = MUY + R0 * Math.sin(th), d = zx * zx + zy * zy;
     foil.push([zx + C * C * zx / d, zy - C * C * zy / d]);
   }
   let iLE = 0; foil.forEach((p, i) => { if (p[0] < foil[iLE][0]) iLE = i; });
-  const LE = foil[iLE], TE = foil[0], CHORD = TE[0] - LE[0];
-  const upper = foil.slice(0, iLE + 1);              // trailing edge over the top to the leading edge
+  const LE = foil[iLE], TE = foil[0], CHORD = TE[0] - LE[0], NF = foil.length;
+  // Upper-surface point and outward normal at chord fraction t (0 at the leading edge, 1 at the trailing edge)
+  function upper(t) {
+    const x = LE[0] + t * CHORD; let i = 1;
+    while (i < iLE - 1 && foil[i][0] > x) i++;
+    const a = foil[i - 1], b = foil[i + 1], tx = b[0] - a[0], ty = b[1] - a[1], m = Math.hypot(tx, ty);
+    return { p: foil[i], n: [ty / m, -tx / m] };
+  }
+  // Height of the upper surface at each chordwise station, to tell air over the wing from air under it
+  const UY = new Float32Array(512);
+  for (let q = 0; q < 512; q++) {
+    const x = LE[0] + q / 511 * CHORD; let i = 0;
+    while (i < iLE - 1 && foil[i + 1][0] > x) i++;
+    const a = foil[i], b = foil[i + 1], f = Math.min(1, Math.max(0, (a[0] - x) / Math.max(1e-9, a[0] - b[0])));
+    UY[q] = a[1] + (b[1] - a[1]) * f;
+  }
+  const upperY = x => UY[Math.max(0, Math.min(511, Math.round((x - LE[0]) / CHORD * 511)))];
 
   // ---------- Aerodynamic model ----------
   const CRIT = 16;
+  const gauss = x => Math.exp(-x * x);
+  const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
   function CL(a) {
     if (a <= 10) return 0.25 + 0.08 * a;
     if (a <= CRIT) { const x = a - 10; return 1.05 + 0.08 * x + 0.010833 * x * x - 0.001944 * x * x * x; }
     return 1.5 - 0.35 * (1 - Math.exp(-(a - CRIT) / 1.5)) - 0.02 * (a - CRIT);
   }
   function CD(a) { const cl = CL(a); return 0.012 + 0.04 * cl * cl + (a > 14 ? 0.012 * (a - 14) * (a - 14) : 0); }
-  const sepFrac = a => a < 9 ? 0 : a < CRIT ? .4 * Math.pow((a - 9) / (CRIT - 9), 1.6) : Math.min(.9, .4 + .5 * (a - CRIT) / 6);
-  const depthOf = a => Math.min(1, Math.max(0, (a - 9) / 11));
+  const depthOf = a => smooth(9, 19, a);                                   // how developed the separation is
+  const tSepOf = a => 1 - 0.8 * Math.pow(smooth(9, 21, a), 1.3);          // separation point along the upper surface
+  const hTEOf = a => 0.06 + 1.6 * Math.pow(depthOf(a), 1.15);             // separated layer height at the trailing edge
+  const colorOf = a => smooth(8.5, 12, a);                                 // how turbulent the separated air looks
 
-  // ---------- Flow field ----------
-  let alpha = 4, ca = 1, sa = 0, GAM = 0;
+  // ---------- Velocity grids in the airfoil frame ----------
+  // Each cell keeps the parts of the complex velocity that don't depend on angle of attack,
+  // so a new angle is three multiply-adds per cell. The fine grid also holds the signed
+  // distance to the surface and the nearest surface point, for the boundary layer.
+  function makeGrid(x0, x1, y0, y1, dx, withDist) {
+    const nx = Math.round((x1 - x0) / dx) + 1, ny = Math.round((y1 - y0) / dx) + 1, n = nx * ny;
+    const g = { x0, y0, dx, nx, ny, u: new Float32Array(n), v: new Float32Array(n), inside: new Uint8Array(n) };
+    ['Ar', 'Ai', 'Br', 'Bi', 'Cr', 'Ci'].forEach(k => g[k] = new Float32Array(n));
+    if (withDist) { g.dist = new Float32Array(n); g.du = new Float32Array(n); }
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+      const k = i + j * nx, zx = x0 + i * dx, zy = y0 + j * dx;
+      // zeta = (z + sqrt(z^2 - 4c^2)) / 2, taking the root outside the circle
+      const wr = zx * zx - zy * zy - 4 * C * C, wi = 2 * zx * zy, m = Math.hypot(wr, wi);
+      const sr = Math.sqrt((m + wr) / 2), si = Math.sign(wi || 1) * Math.sqrt(Math.max(0, (m - wr) / 2));
+      const ax = (zx + sr) / 2, ay = (zy + si) / 2, bx = (zx - sr) / 2, by = (zy - si) / 2;
+      const useA = Math.hypot(ax - MUX, ay - MUY) >= Math.hypot(bx - MUX, by - MUY);
+      let qx = (useA ? ax : bx) - MUX, qy = (useA ? ay : by) - MUY, qm = Math.hypot(qx, qy);
+      if (qm < R0 * 1.001) { g.inside[k] = 1; const f = R0 * 1.001 / qm; qx *= f; qy *= f; qm = R0 * 1.001; }
+      const ex = MUX + qx, ey = MUY + qy;
+      const z2r = ex * ex - ey * ey, z2i = 2 * ex * ey, z2m = z2r * z2r + z2i * z2i;
+      const dr = 1 - C * C * z2r / z2m, di = C * C * z2i / z2m, dm = dr * dr + di * di;
+      const Jr = dr / dm, Ji = -di / dm;                                   // J = 1 / (1 - c^2 / zeta^2)
+      const q2r = qx * qx - qy * qy, q2i = 2 * qx * qy, q2m = q2r * q2r + q2i * q2i;
+      const ir = q2r / q2m, ii = -q2i / q2m;                               // 1 / q^2
+      g.Ar[k] = Jr; g.Ai[k] = Ji;
+      g.Br[k] = -R0 * R0 * (Jr * ir - Ji * ii); g.Bi[k] = -R0 * R0 * (Jr * ii + Ji * ir);
+      const hr = qy / (qm * qm), hi = qx / (qm * qm);                      // i / q
+      g.Cr[k] = (Jr * hr - Ji * hi) / TAU; g.Ci[k] = (Jr * hi + Ji * hr) / TAU;
+      if (withDist) {
+        let best = 1e9, bi = 0;
+        for (let f = 0; f < NF; f++) { const d = (foil[f][0] - zx) ** 2 + (foil[f][1] - zy) ** 2; if (d < best) { best = d; bi = f; } }
+        g.dist[k] = Math.sqrt(best) * (g.inside[k] ? -1 : 1);
+        g.du[k] = zx >= LE[0] && zx <= TE[0] ? zy - upperY(zx) : zy;
+      }
+    }
+    return g;
+  }
+  const fine = makeGrid(-3.2, 3.2, -2.4, 2.4, 0.02, true);
+  const coarse = makeGrid(-9, 9, -7, 7, 0.1, false);
+  function setGrid(g, ca, sa, GAM) {
+    const { Ar, Ai, Br, Bi, Cr, Ci, u, v } = g;
+    for (let k = 0; k < u.length; k++) {
+      let r = ca * Ar[k] + sa * Ai[k] + ca * Br[k] - sa * Bi[k] + GAM * Cr[k];
+      let i = ca * Ai[k] - sa * Ar[k] + ca * Bi[k] + sa * Br[k] + GAM * Ci[k];
+      const sp = Math.hypot(r, i); if (sp > 3) { r *= 3 / sp; i *= 3 / sp; }
+      u[k] = r; v[k] = -i;
+    }
+  }
+  const S = [0, 0];
+  function sampleGrid(g, zx, zy) {
+    const fx = (zx - g.x0) / g.dx, fy = (zy - g.y0) / g.dx, i = Math.floor(fx), j = Math.floor(fy);
+    if (i < 0 || j < 0 || i >= g.nx - 1 || j >= g.ny - 1) return false;
+    const tx = fx - i, ty = fy - j, k = i + j * g.nx, nx = g.nx;
+    const w00 = (1 - tx) * (1 - ty), w10 = tx * (1 - ty), w01 = (1 - tx) * ty, w11 = tx * ty;
+    S[0] = g.u[k] * w00 + g.u[k + 1] * w10 + g.u[k + nx] * w01 + g.u[k + nx + 1] * w11;
+    S[1] = g.v[k] * w00 + g.v[k + 1] * w10 + g.v[k + nx] * w01 + g.v[k + nx + 1] * w11;
+    return true;
+  }
+
+  // ---------- Angle of attack and everything derived from it ----------
+  let alpha = 4, ca = 1, sa = 0, depth = 0, tSep = 1, hTE = .06, sepColor = 0, Lwake = 4;
+  let TEw = [0, 0], TEtop = [0, 0], shear = null;
+  const toWind = p => [p[0] * ca + p[1] * sa, -p[0] * sa + p[1] * ca];
+  const bubbleH = t => hTE * Math.pow(Math.max(0, (t - tSep) / Math.max(1e-6, 1 - tSep)), .7);
   function setAlpha(a) {
     alpha = a; const r = a * Math.PI / 180; ca = Math.cos(r); sa = Math.sin(r);
-    // Kutta condition: zero velocity at the trailing edge fixes the circulation
-    const ar = (Math.cos(r) - Math.cos(r - 2 * TH_TE)), ai = (-Math.sin(r) - Math.sin(r - 2 * TH_TE));
-    const px = R0 * (ar * Math.cos(TH_TE) - ai * Math.sin(TH_TE)), py = R0 * (ar * Math.sin(TH_TE) + ai * Math.cos(TH_TE));
-    GAM = 2 * Math.PI * -py;
-    buildWake();
+    const GAM = 4 * Math.PI * R0 * Math.sin(r - TH_TE);                   // Kutta condition
+    setGrid(fine, ca, sa, GAM); setGrid(coarse, ca, sa, GAM);
+    depth = depthOf(a); tSep = tSepOf(a); hTE = hTEOf(a); sepColor = colorOf(a); Lwake = 4 + 6 * depth;
+    TEw = toWind(TE);
+    const te = upper(.995); TEtop = toWind([te.p[0] + te.n[0] * hTE, te.p[1] + te.n[1] * hTE]);
+    // The shear layer: the path the shed vortices ride, from the separation point downstream
+    const pts = [];
+    if (tSep < .995) for (let k = 0; k <= 12; k++) {
+      const t = tSep + (0.995 - tSep) * k / 12, s = upper(t), h = bubbleH(t) * .9 + .04;
+      pts.push(toWind([s.p[0] + s.n[0] * h, s.p[1] + s.n[1] * h]));
+    } else pts.push(TEtop);
+    for (let xr = .5; xr <= 7; xr += .5) pts.push([TEw[0] + xr, wakeTop(xr) - (wakeTop(xr) - wakeBottom(xr)) * .15]);
+    const len = [0]; for (let k = 1; k < pts.length; k++) len.push(len[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]));
+    shear = { pts, len, total: len[len.length - 1] };
   }
-  // Velocity at a point in the wind frame (wind along +x, y up); returns [vx, vy]
-  function potential(wx, wy) {
-    const zx = wx * ca - wy * sa, zy = wx * sa + wy * ca;          // into the airfoil frame
-    let wr = zx * zx - zy * zy - 4 * C * C, wi = 2 * zx * zy;
-    const m = Math.hypot(wr, wi);
-    let sr = Math.sqrt((m + wr) / 2), si = Math.sign(wi || 1) * Math.sqrt(Math.max(0, (m - wr) / 2));
-    let ax = (zx + sr) / 2, ay = (zy + si) / 2, bx = (zx - sr) / 2, by = (zy - si) / 2;
-    const da = Math.hypot(ax - MUX, ay - MUY), db = Math.hypot(bx - MUX, by - MUY);
-    const ex = da >= db ? ax : bx, ey = da >= db ? ay : by;
-    const qx = ex - MUX, qy = ey - MUY;
-    if (Math.hypot(qx, qy) < R0 * 1.0005) return null;              // inside the airfoil
-    const q2r = qx * qx - qy * qy, q2i = 2 * qx * qy, q2m = q2r * q2r + q2i * q2i;
-    // e^{-ia} - R0^2 e^{ia} / q^2 + i GAM / (2 pi q)
-    let dr = ca - R0 * R0 * (ca * q2r + sa * q2i) / q2m;
-    let di = -sa - R0 * R0 * (sa * q2r - ca * q2i) / q2m;
-    const qm = qx * qx + qy * qy;
-    dr += GAM / (2 * Math.PI) * (qy / qm); di += GAM / (2 * Math.PI) * (qx / qm);
-    // dz/dzeta = 1 - c^2 / zeta^2
-    const z2r = ex * ex - ey * ey, z2i = 2 * ex * ey, z2m = z2r * z2r + z2i * z2i;
-    const jr = 1 - C * C * z2r / z2m, ji = C * C * z2i / z2m;
-    const jm = jr * jr + ji * ji;
-    const Wr = (dr * jr + di * ji) / jm, Wi = (di * jr - dr * ji) / jm;
-    let u = Wr, v = -Wi;
-    const sp = Math.hypot(u, v); if (sp > 3) { u *= 3 / sp; v *= 3 / sp; }
-    return [u * ca + v * sa, -u * sa + v * ca];                      // back to the wind frame
+  const wakeTop = xr => TEtop[1] + xr * (.03 + .16 * depth);
+  const wakeBottom = xr => TEw[1] - .05 - xr * (.02 + .08 * depth);
+  function onShear(u) {
+    const { pts, len } = shear; let k = 1; while (k < len.length - 1 && len[k] < u) k++;
+    const f = (u - len[k - 1]) / Math.max(1e-6, len[k] - len[k - 1]);
+    return [pts[k - 1][0] + (pts[k][0] - pts[k - 1][0]) * f, pts[k - 1][1] + (pts[k][1] - pts[k - 1][1]) * f];
   }
 
-  // ---------- Separated wake ----------
-  let wake = null, depth = 0;
-  const vortices = [];
-  const toWind = p => [p[0] * ca + p[1] * sa, -p[0] * sa + p[1] * ca];
-  function buildWake() {
-    const s = sepFrac(alpha); depth = depthOf(alpha);
-    if (s <= 0) { wake = null; return; }
-    const n = Math.max(2, Math.round(s * (upper.length - 1)));
-    const surf = upper.slice(0, n + 1).map(toWind).reverse();      // separation point to trailing edge
-    const S = surf[0], T = surf[surf.length - 1];
-    const Lw = 2.2 + 3.2 * depth, Ht = .18 + 2.3 * Math.pow(depth, 1.25);
-    const poly = [...surf, [T[0] + Lw, T[1] - .25 * depth], [T[0] + Lw, S[1] + Ht], [S[0] + .02, S[1] + .02]];
-    const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
-    wake = { S, T, Lw, poly, box: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)] };
-  }
-  function inWake(x, y) {
-    if (!wake) return false;
-    const P = wake.poly; let inside = false;
-    for (let i = 0, j = P.length - 1; i < P.length; j = i++) {
-      const [xi, yi] = P[i], [xj, yj] = P[j];
-      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+  // ---------- Shed vortices (soft cores, so the velocity stays smooth) ----------
+  const vortices = []; let shedClock = 0;
+  function stepVortices(h) {
+    if (depth > 0) {
+      shedClock -= h;
+      if (shedClock <= 0) { shedClock = (.9 + Math.random() * .3) / (.4 + depth); vortices.push({ u: 0, g: (.4 + .9 * depth) * (.8 + .4 * Math.random()), ph: Math.random() * TAU }); }
     }
-    return inside;
+    for (let i = vortices.length - 1; i >= 0; i--) {
+      const w = vortices[i]; w.u += .55 * h;
+      if (!shear || w.u > shear.total) { vortices.splice(i, 1); continue; }
+      const p = onShear(w.u); w.x = p[0]; w.y = p[1] + .12 * Math.sin(w.ph + w.u * 2.5) * Math.min(1, w.u);
+      w.rc = .12 + .12 * w.u; w.gg = -w.g * Math.min(1, w.u / .5) * Math.exp(-Math.max(0, w.u - 2.5) / 3);
+    }
   }
-  function wakeVelocity(x, y, pot) {
-    let vx = .3 * pot[0] + .12, vy = .3 * pot[1];
+  const VV = [0, 0];
+  function vortexVel(x, y) {
+    let u = 0, v = 0;
     for (const w of vortices) {
-      const dx = x - w.x, dy = y - w.y, r2 = dx * dx + dy * dy + .06;
-      vx += -w.g * dy / (2 * Math.PI * r2); vy += w.g * dx / (2 * Math.PI * r2);
+      const dx = x - w.x, dy = y - w.y, r2 = dx * dx + dy * dy;
+      const f = w.gg / (TAU * (r2 + 1e-6)) * (1 - Math.exp(-r2 / (w.rc * w.rc)));
+      u -= f * dy; v += f * dx;
     }
-    return [vx + (Math.random() - .5) * .12 * depth, vy + (Math.random() - .5) * .12 * depth];
+    VV[0] = u; VV[1] = v; return VV;
+  }
+
+  // ---------- Velocity of the air at a point (wind frame) ----------
+  // Returns false inside the airfoil. Fills V = [u, v, s, wv]: s is how separated the air
+  // is here (0 attached, 1 fully in the recirculating region), wv the shear-layer weight.
+  const V = [0, 0, 0, 0, 0];
+  function velocity(x, y) {
+    const zx = x * ca - y * sa, zy = x * sa + y * ca;
+    let dist = 9, du = 9, t = 0;
+    const inFine = zx > -3.1 && zx < 3.1 && zy > -2.3 && zy < 2.3;
+    if (inFine) {
+      const i = Math.round((zx - fine.x0) / fine.dx), j = Math.round((zy - fine.y0) / fine.dx), k = i + j * fine.nx;
+      dist = fine.dist[k]; if (dist < 0) return false;
+      du = fine.du[k]; t = Math.min(1, Math.max(0, (zx - LE[0]) / CHORD));
+      sampleGrid(fine, zx, zy);
+    } else if (!sampleGrid(coarse, zx, zy)) { S[0] = 1; S[1] = 0; }
+    let u = S[0] * ca + S[1] * sa, v = -S[0] * sa + S[1] * ca;         // back to the wind frame
+    let s = 0, wv = 0, us = 0, vs = 0, cell = false, kick = 0;
+    const xr = x - TEw[0];
+    if (xr > .02) {
+      // Wake behind the trailing edge: a slow core between two shear layers, mixing out downstream
+      const yt = wakeTop(xr), yb = wakeBottom(xr), n = (y - yb) / (yt - yb);
+      const decay = Math.exp(-xr / Lwake);
+      s = smooth(-.12, .12, n) * (1 - smooth(.85, 1.18, n)) * decay;
+      const fac = .4 + .6 * smooth(0, 1, Math.abs(n - .5) * 2.1);
+      us = u * fac; vs = v * fac;
+      wv = (gauss((n - 1) / .3) + .4 * gauss(n / .3)) * decay * (.3 + depth);
+    } else if (inFine && du > 0 && zx < TE[0] && t > tSep) {
+      // Separated region on the wing: a recirculation cell. Air runs backward along the surface,
+      // lifts off at the separation point, and runs forward again under the shear layer, which
+      // also entrains a little of the outer air into the cell.
+      const hb = bubbleH(t) + .02, n = du / hb, tau = (t - tSep) / (1 - tSep), nn = Math.min(1, n);
+      s = 1 - smooth(.8, 1.25, n);
+      const k = .45, L = (1 - tSep) * CHORD;
+      const ut = -k * Math.sin(Math.PI * tau) * Math.cos(Math.PI * nn);
+      const un = k * (hb / L) * Math.cos(Math.PI * tau) * Math.sin(Math.PI * nn) - .06 * smooth(.6, 1.3, n);
+      us = ut * ca + un * sa; vs = -ut * sa + un * ca;                 // along the chord, and normal to it
+      wv = gauss((n - 1) / .55) * (.3 + depth); cell = true;
+      // The outer flow has to climb over the separated region, so lift it along the layer's slope
+      const dhdx = Math.min(1.5, hTE * .7 * Math.pow(Math.max(.02, tau), -.3) / L);
+      kick = .55 * dhdx * (1 - smooth(1, 2.8, n)) * (1 - s) * Math.hypot(u, v);
+    }
+    // Boundary layer: the air right next to the surface moves slower, more so toward the back
+    let bl = 1;
+    if (inFine && dist < .4) {
+      const d0 = du > 0 ? .022 + .1 * Math.pow(t, .6) * (1 + 2 * depth * t * t) : .02 + .06 * Math.pow(t, .6);
+      bl = .15 + .85 * Math.pow(Math.min(1, dist / d0), .55);
+    }
+    u = (1 - s) * u * bl + s * us + kick * sa; v = (1 - s) * v * bl + s * vs + kick * ca;
+    if (wv > .02) { vortexVel(x, y); u += VV[0] * wv; v += VV[1] * wv; }
+    V[0] = u; V[1] = v; V[2] = s; V[3] = wv; V[4] = cell ? 1 : 0; return true;
   }
 
   // ---------- View ----------
@@ -259,62 +375,58 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   }
   const sx = x => ox + x * scale, sy = y => oy - y * scale;
 
-  // ---------- Air particles: one kind of particle for all the air ----------
-  // Each dot is a bit of air moving at the local airspeed. A dot that drifts into separated
-  // air is carried by the turbulent wake instead and turns orange.
+  // ---------- Air particles: every dot is the same kind of particle ----------
   let parts = [];
-  const count = () => Math.round((W < 600 ? 1300 : 2600) * Math.min(1.4, Math.max(.7, W * H / 7e5)));
-  function newPart(anywhere) {
-    return { x: anywhere ? xmin + Math.random() * (xmax - xmin) : xmin - Math.random() * .3, y: ymin + Math.random() * (ymax - ymin), age: 0, sep: false };
+  const count = () => Math.round(Math.min(10000, Math.max(3000, W * H / 75)));
+  const newPart = anywhere => ({ x: anywhere ? xmin + Math.random() * (xmax - xmin) : xmin - Math.random() * .4, y: ymin + Math.random() * (ymax - ymin), c: 0, jx: 0, jy: 0, age: 0, sepAge: 0 });
+  function seed() { parts = Array.from({ length: count() }, () => newPart(true)); for (let k = 0; k < 30; k++) step(1 / 30, false); }
+  const NS = 6, NC = 6, colors = [];
+  function hsl(h, s, l) { const a = s * Math.min(l, 1 - l), f = n => { const k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); }; return [f(0), f(8), f(4)]; }
+  for (let i = 0; i < NS; i++) for (let j = 0; j < NC; j++) {
+    const b = hsl(208, .72, .38 + i * .09), o = hsl(26, .84, .58), m = j / (NC - 1);
+    colors.push('rgb(' + b.map((x, k) => Math.round(255 * (x * (1 - m) + o[k] * m))).join(',') + ')');
   }
-  // Separated air is a recirculating mass, so keep the wake stocked with tumbling air,
-  // most of it where the separation starts on the wing
-  function wakePart() {
-    const B = wake.box;
-    for (let k = 0; k < 24; k++) {
-      const x = B[0] + Math.pow(Math.random(), 1.6) * (B[2] - B[0]) * .8, y = B[1] + Math.random() * (B[3] - B[1]);
-      if (inWake(x, y)) return { x, y, age: 0, sep: true };
-    }
-    return null;
-  }
-  function seed() {
-    parts = Array.from({ length: count() }, () => newPart(true));
-    for (let k = 0; k < 40; k++) step(1 / 30, false);
-  }
-  const BUCKETS = 8, dots = Array.from({ length: BUCKETS + 1 }, () => []);
+  const dots = colors.map(() => []);
   function step(dt, draw) {
     const h = dt * 1.6, n = count();
+    stepVortices(h);
     while (parts.length < n) parts.push(newPart(false));
-    let tumbling = 0;
+    let inCell = 0;
     for (let i = parts.length - 1; i >= 0; i--) {
-      const p = parts[i], pot = potential(p.x, p.y);
-      let dead = !pot, v;
-      if (!dead) {
-        if (inWake(p.x, p.y)) { v = wakeVelocity(p.x, p.y, pot); p.sep = true; tumbling++; }
-        else {
-          v = potential(p.x + pot[0] * h / 2, p.y + pot[1] * h / 2) || pot;      // midpoint step around the nose
-          if (p.sep) v = [v[0] + (Math.random() - .5) * .1, v[1] + (Math.random() - .5) * .1];
-        }
-        p.x += v[0] * h; p.y += v[1] * h; p.age += dt;
-        if (draw) {
-          const b = p.sep ? BUCKETS : Math.min(BUCKETS - 1, Math.max(0, Math.floor((Math.hypot(v[0], v[1]) - .45) / 1.1 * BUCKETS)));
-          dots[b].push(sx(p.x), sy(p.y));
-        }
-        dead = p.x > xmax || p.y < ymin - 1 || p.y > ymax + 1 || p.age > (p.sep ? 9 : 20);
+      const p = parts[i];
+      if (!velocity(p.x, p.y)) { parts[i] = newPart(false); continue; }
+      const u0 = V[0], v0 = V[1];
+      if (!velocity(p.x + u0 * h / 2, p.y + v0 * h / 2)) { parts[i] = newPart(false); continue; }
+      let u = V[0], v = V[1]; const s = V[2];
+      if (V[4] && s > .5) inCell++;
+      // Turbulence in separated air: a slow random wander, not a per-frame jitter
+      const amp = s * (.35 + .9 * depth);
+      p.jx += (-2.5 * p.jx + (Math.random() - .5) * 4.5) * dt; p.jy += (-2.5 * p.jy + (Math.random() - .5) * 4.5) * dt;
+      u += p.jx * amp; v += p.jy * amp;
+      p.x += u * h; p.y += v * h; p.age += dt;
+      const target = s * sepColor;
+      p.c += (target - p.c) * Math.min(1, dt * (target > p.c ? 1.8 : .6));
+      if (s > .5) p.sepAge += dt;
+      if (draw) {
+        const sb = Math.min(NS - 1, Math.max(0, Math.floor((Math.hypot(u, v) - .4) / 1.25 * NS)));
+        const cb = Math.min(NC - 1, Math.floor(p.c * NC));
+        dots[sb * NC + cb].push(sx(p.x), sy(p.y));
       }
-      if (dead) { if (parts.length > n) { parts[i] = parts[parts.length - 1]; parts.pop(); } else parts[i] = newPart(false); }
+      if (p.x > xmax || p.y < ymin - .5 || p.y > ymax + .5 || p.age > 30 || p.sepAge > 7) parts[i] = parts.length > n ? parts.pop() : newPart(false);
     }
-    if (wake) {
-      const want = Math.round((W < 600 ? 170 : 340) * depth);
-      for (let k = 0; k < Math.min(14, want - tumbling); k++) { const q = wakePart(); if (q) parts.push(q); }
+    // Turbulent mixing keeps the dead-air region over the wing as full of air as anywhere else
+    if (tSep < .98) {
+      const Lb = (1 - tSep) * CHORD, want = Math.round(.9 * parts.length / ((xmax - xmin) * (ymax - ymin)) * .55 * Lb * hTE);
+      for (let k = 0; k < Math.min(12, want - inCell); k++) {
+        const t = tSep + Math.random() * (1 - tSep), zx = LE[0] + t * CHORD, zy = upperY(zx) + (.1 + .65 * Math.random()) * bubbleH(t);
+        const w = toWind([zx, zy]); parts.push({ x: w[0], y: w[1], c: .5 * sepColor, jx: 0, jy: 0, age: 0, sepAge: 0 });
+      }
     }
     if (!draw) return;
     dots.forEach((list, b) => {
       if (!list.length) return;
-      const r = b === BUCKETS ? 2.6 : 2.2;
-      tctx.fillStyle = b === BUCKETS ? 'hsl(26,84%,58%)' : `hsl(208,72%,${40 + b * 6}%)`;
-      tctx.beginPath();
-      for (let k = 0; k < list.length; k += 2) tctx.rect(list[k] - r / 2, list[k + 1] - r / 2, r, r);
+      tctx.fillStyle = colors[b]; tctx.beginPath();
+      for (let k = 0; k < list.length; k += 2) tctx.rect(list[k] - 1, list[k + 1] - 1, 2, 2);
       tctx.fill(); list.length = 0;
     });
   }
@@ -327,7 +439,6 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   $('raise').onclick = () => { if (alpha >= 19) setAlpha(4); target = 20; rate = 1.1; };
   $('recover').onclick = () => { target = 4; rate = 7; };
 
-  // Lift coefficient chart
   const cx = a => 34 + (a + 4) / 28 * 256, cy = c => 150 - (c + .2) / 1.9 * 136;
   let path = ''; for (let a = -4; a <= 24; a += .25) path += (path ? 'L' : 'M') + cx(a).toFixed(1) + ' ' + cy(CL(a)).toFixed(1);
   $('chart').innerHTML = `<svg viewBox="0 0 300 172" role="img" aria-label="Lift coefficient against angle of attack">
@@ -342,7 +453,6 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     <circle id="dot" r="5" fill="${TEXT}"/>
   </svg>`;
   const dot = document.getElementById('dot');
-
   function updateReadouts() {
     $('aoaOut').textContent = alpha.toFixed(1) + '°';
     slider.value = alpha;
@@ -350,32 +460,28 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     $('warn').classList.toggle('on', alpha >= 13);
     $('flow').textContent = alpha < 9 ? 'Smooth over the whole wing' : alpha < CRIT - .5 ? 'Starting to separate near the trailing edge'
       : alpha <= CRIT + .5 ? 'At the critical angle of attack' : 'Separated over most of the top: the wing is stalled';
-    $('lift').textContent = alpha < CRIT - 2 ? 'Increasing with angle of attack' : alpha <= CRIT + .5 ? 'At its maximum'
-      : 'Dropping off sharply while drag climbs';
+    $('lift').textContent = alpha < CRIT - 2 ? 'Increasing with angle of attack' : alpha <= CRIT + .5 ? 'At its maximum' : 'Dropping off sharply while drag climbs';
   }
 
-  // ---------- Drawing ----------
+  // ---------- Overlay: airfoil, chord line, angle, lift and drag ----------
   function arrow(ctx, x1, y1, x2, y2, color, w) {
     const a = Math.atan2(y2 - y1, x2 - x1), h = 9 + w;
     ctx.strokeStyle = ctx.fillStyle = color; ctx.lineWidth = w;
     ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - Math.cos(a) * h * .6, y2 - Math.sin(a) * h * .6); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - h * Math.cos(a - .4), y2 - h * Math.sin(a - .4)); ctx.lineTo(x2 - h * Math.cos(a + .4), y2 - h * Math.sin(a + .4)); ctx.closePath(); ctx.fill();
   }
-  function drawOverlay(t) {
+  function drawOverlay() {
     octx.clearRect(0, 0, W, H);
     const stalled = alpha > CRIT + .5;
     const jx = stalled && !reduce ? (Math.random() - .5) * 2.2 : 0, jy = stalled && !reduce ? (Math.random() - .5) * 2.2 : 0;
     octx.save(); octx.translate(jx, jy);
-    // Airfoil
     octx.beginPath();
     foil.forEach((p, i) => { const w = toWind(p); i ? octx.lineTo(sx(w[0]), sy(w[1])) : octx.moveTo(sx(w[0]), sy(w[1])); });
     octx.closePath(); octx.fillStyle = '#c9ced3'; octx.fill(); octx.strokeStyle = '#eef1f3'; octx.lineWidth = 1.2; octx.stroke();
-    // Chord line, extended forward to show the angle
     const le = toWind(LE), te = toWind(TE), ext = toWind([LE[0] - CHORD * .45, LE[1]]);
     octx.setLineDash([6, 5]); octx.strokeStyle = TEXT; octx.lineWidth = 1.2;
     octx.beginPath(); octx.moveTo(sx(ext[0]), sy(ext[1])); octx.lineTo(sx(te[0]), sy(te[1])); octx.stroke();
     octx.setLineDash([]);
-    // Relative wind reference and the angle between them
     const rx = sx(le[0]), ry = sy(le[1]), R = CHORD * .38 * scale;
     octx.strokeStyle = MUTED; octx.lineWidth = 1;
     octx.beginPath(); octx.moveTo(rx - R * 1.2, ry); octx.lineTo(rx, ry); octx.stroke();
@@ -383,17 +489,14 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       octx.strokeStyle = ACCENT; octx.lineWidth = 2;
       octx.beginPath(); octx.arc(rx, ry, R, Math.PI, Math.PI + alpha * Math.PI / 180, alpha < 0); octx.stroke();
     }
-    octx.font = '600 14px "Barlow Semi Condensed", sans-serif'; octx.fillStyle = TEXT;
-    octx.textAlign = 'center';
+    octx.font = '600 14px "Barlow Semi Condensed", sans-serif'; octx.fillStyle = TEXT; octx.textAlign = 'center';
     octx.fillText(`${alpha.toFixed(1)}°`, rx - R * .78, ry - R * Math.sin(Math.max(.12, alpha * Math.PI / 180) / 2) - 10);
     octx.fillStyle = MUTED; octx.font = '500 13px "Barlow Semi Condensed", sans-serif'; octx.textAlign = 'left';
     octx.fillText('Chord line', sx(te[0]) + 10, sy(te[1]) + 16);
     octx.restore();
-    // Relative wind arrow
     arrow(octx, 18, H * .2, 18 + Math.min(130, W * .16), H * .2, MUTED, 2);
     octx.fillStyle = MUTED; octx.textAlign = 'left'; octx.font = '600 13px "Barlow Semi Condensed", sans-serif';
     octx.fillText('Relative wind', 18, H * .2 - 10);
-    // Lift (perpendicular to the relative wind) and drag (along it), from the quarter chord
     const qc = toWind([LE[0] + CHORD * .25, .1]), qx = sx(qc[0]) + jx, qy = sy(qc[1]) + jy;
     const Lpx = CL(alpha) * scale * 1.1, Dpx = CD(alpha) * scale * 2.6;
     if (CL(alpha) > .03) { arrow(octx, qx, qy, qx, qy - Lpx, '#7fb6f0', 3); octx.fillStyle = '#7fb6f0'; octx.font = '700 14px "Barlow Semi Condensed", sans-serif'; octx.fillText('Lift', qx + 8, qy - Lpx + 6); }
@@ -404,27 +507,17 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   // ---------- Loop ----------
   setAlpha(4); updateReadouts();
   new ResizeObserver(resize).observe(stage); resize();
-  let last = performance.now(), shed = 0;
+  let last = performance.now();
   function frame(now) {
     const dt = Math.min(.033, (now - last) / 1000); last = now;
     if (target !== null) {
-      const step = Math.sign(target - alpha) * Math.min(Math.abs(target - alpha), rate * dt);
-      setAlpha(alpha + step); if (Math.abs(target - alpha) < 1e-3) target = null;
+      const d = Math.sign(target - alpha) * Math.min(Math.abs(target - alpha), rate * dt);
+      setAlpha(alpha + d); if (Math.abs(target - alpha) < 1e-3) target = null;
       updateReadouts();
     }
-    // Shed eddies from the separation point and carry them downstream
-    if (wake && depth > 0) {
-      shed -= dt;
-      if (shed <= 0) { shed = .09 / (.3 + depth); vortices.push({ x: wake.S[0] + .1, y: wake.S[1] + .08, g: -(.5 + Math.random()) * (.6 + 1.6 * depth) * (Math.random() < .15 ? -1 : 1) }); }
-    }
-    for (let i = vortices.length - 1; i >= 0; i--) {
-      const w = vortices[i]; w.x += (.42 + .1 * Math.random()) * dt * 1.6; w.y += (Math.random() - .5) * .3 * dt; w.g *= Math.pow(.6, dt);
-      if (!wake || w.x > wake.T[0] + wake.Lw + .6) vortices.splice(i, 1);
-    }
-    // Fade the old smoke, then move every puff
-    tctx.globalAlpha = .5; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1;   // a faint hint of motion behind each dot
+    tctx.globalAlpha = .45; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1;   // a short trail behind each dot
     step(dt, true);
-    drawOverlay(now);
+    drawOverlay();
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
