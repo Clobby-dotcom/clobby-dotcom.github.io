@@ -160,7 +160,7 @@ const TYPES = {
   barrel: { name: 'Cylinder barrel', sys: 'Power section', desc: 'The steel barrel the piston slides in, held to the crankcase by nuts around its base flange. The fins give the cooling air, directed by the baffles under the cowling, more surface to carry heat away. That\'s why long ground runs and steep, slow climbs push up cylinder head temperatures.' },
   head: { name: 'Cylinder head', sys: 'Power section', desc: 'The aluminum head, screwed and shrunk onto the barrel. It forms the combustion chamber and holds the intake and exhaust valves, both spark plugs, the fuel injector nozzle, and the rocker arms. The cylinder head temperature (CHT) probe sits here.' },
   ring: { name: 'Starter ring gear', sys: 'Accessories', desc: 'A ring of gear teeth just behind the propeller. When you turn the key to START, the starter\'s small gear meshes with it and turns the engine over. Its support also carries the pulley that drives the alternator belt.' },
-  prop: { name: 'Propeller and spinner', sys: 'Power section', desc: 'A fixed-pitch propeller bolted to the crankshaft flange, so it turns at exactly the engine RPM shown on the tachometer. The spinner streamlines the hub. Treat the propeller as live any time someone is near it.' },
+  prop: { name: 'Propeller and spinner', sys: 'Power section', desc: 'A fixed-pitch propeller bolted to the crankshaft flange, so it turns at exactly the engine RPM shown on the tachometer. It turns clockwise as seen from the pilot\'s seat, which is where the airplane\'s left-turning tendencies come from. The spinner streamlines the hub. Treat the propeller as live any time someone is near it.' },
   camshaft: { name: 'Camshaft', sys: 'Valve train', desc: 'Turns at half crankshaft speed, because each valve opens once every two turns of the crankshaft. On a Lycoming it sits above the crankshaft. As it turns, its lobes push the lifters out to open the valves at the right point in each cylinder\'s cycle.' },
   gears: { name: 'Timing gear', sys: 'Valve train', desc: 'The crankshaft gear drives the camshaft gear, which has twice as many teeth, so the camshaft turns once for every two turns of the crankshaft.' },
   lifter: { name: 'Hydraulic lifter', sys: 'Valve train', desc: 'Rides on a cam lobe and passes the motion to the pushrod. Oil pressure inside the lifter takes up any slack, so the valve train runs with zero clearance and doesn\'t need routine adjustment.' },
@@ -347,11 +347,12 @@ let theta = 0, explodeT = 0, explodeGoal = 0, showProp = false;
 
 function pose() {
   const { R, L } = LAY;
-  crank.rotation.x = -theta * deg;
-  cam.rotation.x = theta / 2 * deg;
+  // Clockwise seen from the cockpit (looking forward along +X); the cam gear turns the other way at half speed
+  crank.rotation.x = theta * deg;
+  cam.rotation.x = -theta / 2 * deg;
   cam.position.y = LAY.CAMY + 5.5 * explodeT;
   cyls.forEach(o => {
-    const { s, phi, fire } = o.c, b = (theta + phi) * deg;
+    const { s, phi, fire } = o.c, b = (phi - theta) * deg;
     const pinY = R * Math.sin(b), pinZ = s * R * Math.cos(b);
     const d = pinZ + Math.sqrt(L * L - pinY * pinY);
     o.piston.anim = V3(0, 0, d);

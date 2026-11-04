@@ -249,7 +249,7 @@ LOBES = [  # x, cylinder, valve  (opposite cylinders share the middle lobe of ea
 camparts = [cyl(.55, (-9.4, 0, 0), (6.6, 0, 0)), cyl(.85, (6.0, 0, 0), (6.7, 0, 0)), cyl(.85, (-.6, 0, 0), (.6, 0, 0)), cyl(.85, (-8.2, 0, 0), (-7.2, 0, 0))]
 for x, n, v in LOBES:
     c = CYL[n - 1]; peak = c['fire'] + (450 if v == 'intake' else 270)
-    gamma = (0 if c['s'] > 0 else 180) + peak / 2
+    gamma = (0 if c['s'] > 0 else 180) - peak / 2      # cam turns opposite the crank
     camparts.append(plate(lobe_pts(), x - .31, .62).rotate(V(0, 0, 0), V(1, 0, 0), -gamma))
 add('camshaft', 'steel', fuse(*camparts))
 camgear = plate(gear_pts(2.32, 2.52, 48), -9.15, .5)
