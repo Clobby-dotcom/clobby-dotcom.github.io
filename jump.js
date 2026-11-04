@@ -13,7 +13,7 @@
     const line = menu.getBoundingClientRect().bottom + 24;
     let i = -1;
     heads.forEach((h, j) => { if (h.getBoundingClientRect().top <= line) i = j; });
-    cur.textContent = i < 0 ? empty : links[i].textContent;
+    cur.textContent = i < 0 ? empty : links[i].querySelector('span').textContent;
     links.forEach((a, j) => j === i ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'));
   }
   addEventListener('scroll', update, { passive: true });

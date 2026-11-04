@@ -119,3 +119,15 @@ ol.steps h3{margin:4px 0 6px}
 @media (max-width:520px){.jump-menu ol{left:-16px;min-width:0;width:100vw}}
 .page-single{grid-template-columns:minmax(0,1fr)}
 .page-single article h2{scroll-margin-top:64px}
+.jump-menu ol{min-width:340px}
+.jump-menu ol a{display:flex;justify-content:space-between;align-items:baseline;gap:24px}
+.jump-menu ol small{font:500 .9rem/1.2 var(--cond);color:var(--muted)}
+@media (max-width:520px){.jump-menu ol{min-width:0}}
+/* Official regulation titles under a heading */
+article .regs{margin:-2px 0 14px;font:500 .98rem/1.35 var(--cond);color:var(--muted);max-width:none}
+article .regs span{display:block}
+article .regs span + span{margin-top:3px}
+article .regs b{font-weight:700;color:var(--chart);margin-right:6px}
+article .regs{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 8px}
+article .regs span{display:contents}
+article .regs b{margin-right:0}
