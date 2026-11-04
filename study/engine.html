@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engine</title>
+<meta name="description" content="A 3D four-cylinder Lycoming you can turn, run, and pull apart to see how the parts work together.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../site.css">
+<style>
+.eng{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:calc(100vh - 57px);min-height:600px}
+.stage{position:relative;overflow:hidden;background:var(--bg);touch-action:none}
+.stage canvas{display:block}
+.labels{position:absolute;inset:0;pointer-events:none}
+.lbl{font:700 .95rem/1 var(--cond);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:4px 7px}
+.lbl.front{color:var(--muted);font-weight:600}
+.hint{position:absolute;left:16px;bottom:14px;margin:0;font-size:.9rem;color:var(--muted);pointer-events:none;max-width:calc(100% - 32px)}
+.reset{position:absolute;top:14px;right:14px}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font:600 1rem/1 var(--cond)}
+
+.panel{border-left:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:24px 20px 32px}
+.panel h1{font:700 2.6rem/.95 var(--cond);margin:0;letter-spacing:-.02em}
+.panel .lede{color:var(--muted);margin:10px 0 0;font-size:1rem}
+.panel h2{font:700 1.1rem/1.2 var(--cond);margin:26px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
+.btn{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:9px 12px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ctl{margin:12px 0 0}
+.ctl label{display:flex;justify-content:space-between;font:600 .95rem/1.2 var(--cond);margin-bottom:6px}
+.ctl label output{color:var(--muted);font-weight:500}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.check{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:.95rem;cursor:pointer}
+.check input{accent-color:var(--accent);width:16px;height:16px}
+
+.strokes{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:center;margin:0}
+.strokes dt{font:700 .95rem/1 var(--cond);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2)}
+.strokes dd{margin:0;font:600 1rem/1.2 var(--cond);display:flex;align-items:center;gap:8px}
+.strokes dd i{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--muted)}
+.st-power i{background:#E8873A!important}.st-exhaust i{background:#8A939B!important}.st-intake i{background:#5B9BE0!important}.st-compression i{background:#C9A43B!important}
+.small{font-size:.88rem;color:var(--muted);margin:10px 0 0}
+
+.info{background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--chart);border-radius:6px;padding:12px 14px}
+.info h3{font:700 1.25rem/1.15 var(--cond);margin:0}
+.info .sys{font:500 .9rem/1.2 var(--cond);color:var(--muted);margin:3px 0 8px}
+.info p{margin:0;font-size:.97rem}
+.info .row{margin-top:12px}
+.info.empty{border-left-color:var(--line);color:var(--muted)}
+
+.plist h3{font:600 .95rem/1.2 var(--cond);color:var(--muted);margin:14px 0 4px}
+.plist ul{list-style:none;margin:0;padding:0}
+.plist button{width:100%;display:flex;justify-content:space-between;gap:8px;text-align:left;background:none;border:0;border-radius:4px;color:var(--text);font:500 1rem/1.25 var(--sans);padding:5px 8px;cursor:pointer}
+.plist button:hover{background:var(--surface-2)}
+.plist button.sel{background:var(--surface-2);color:var(--chart)}
+.plist button.off{color:var(--muted);text-decoration:line-through}
+.plist small{color:var(--muted);font:500 .85rem/1.25 var(--cond)}
+
+@media (max-width:900px){
+  .eng{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
+  .stage{height:62vh;min-height:380px}
+  .panel{border-left:0;border-top:1px solid var(--line);overflow:visible}
+}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<header class="site-head">
+  <div class="site-head-in">
+    <a class="wordmark" href="../index.html">Ground School</a>
+    <nav class="site-nav" aria-label="Main">
+      <div class="nav-drop">
+        <a href="../aircraft/index.html">Aircraft</a>
+        <ul class="nav-menu">
+          <li><a href="../aircraft/piper-pilot-100i.html">Piper Pilot 100i</a></li>
+          <li><a href="../aircraft/cessna-172r.html">Cessna 172R</a></li>
+          <li><a href="../aircraft/cessna-172k.html">Cessna 172K</a></li>
+        </ul>
+      </div>
+      <div class="nav-drop">
+        <a href="../study/index.html" aria-current="page">Study</a>
+        <ul class="nav-menu">
+          <li><a href="../study/regulations.html">Regulations</a></li>
+          <li><a href="../study/engine.html" aria-current="page">Engine</a></li>
+        </ul>
+      </div>
+      <a href="../vor-trainer.html">VOR trainer</a>
+      <a href="../weight-and-balance.html">Weight and balance</a>
+    </nav>
+  </div>
+</header>
+
+<main class="eng">
+  <div class="stage" id="stage">
+    <div class="loading" id="loading">Loading the engine…</div>
+    <div class="labels" id="labels"></div>
+    <button class="btn reset" id="reset" type="button">Reset view</button>
+    <p class="hint">Drag to turn it. Scroll or pinch to zoom. Click any part to see what it does.</p>
+  </div>
+
+  <aside class="panel" aria-label="Engine controls">
+    <p class="crumb"><a href="../study/index.html">Study</a></p>
+    <h1>Engine</h1>
+    <p class="lede">A four-cylinder, horizontally opposed Lycoming like the ones in the fleet: the O-320 in the 172K and the IO-360s in the 172R and Pilot 100i.</p>
+
+    <h2>Pull it apart</h2>
+    <div class="ctl">
+      <label for="explode">Spread the parts <output id="explodeOut">Together</output></label>
+      <input type="range" id="explode" min="0" max="100" value="0">
+    </div>
+    <label class="check"><input type="checkbox" id="cutaway"> See through the case and cylinders</label>
+    <label class="check"><input type="checkbox" id="labelsOn" checked> Cylinder numbers</label>
+
+    <h2>Run it</h2>
+    <div class="row">
+      <button class="btn" id="run" type="button" aria-pressed="true">Pause</button>
+      <button class="btn spd" type="button" data-v="40" aria-pressed="false">Slow</button>
+      <button class="btn spd" type="button" data-v="120" aria-pressed="true">Medium</button>
+      <button class="btn spd" type="button" data-v="360" aria-pressed="false">Fast</button>
+    </div>
+    <div class="ctl">
+      <label for="crank">Crankshaft angle <output id="crankOut">0°</output></label>
+      <input type="range" id="crank" min="0" max="719" value="0">
+    </div>
+    <dl class="strokes" id="strokes"></dl>
+    <p class="small">Firing order 1-3-2-4. Cylinders 1 and 3 are on the right, 2 and 4 on the left, with 1 and 2 nearest the propeller. One full cycle is two turns of the crankshaft.</p>
+
+    <h2>Selected part</h2>
+    <div class="info empty" id="info"><p>Click a part on the engine or in the list below.</p></div>
+
+    <h2>Parts</h2>
+    <div class="plist" id="plist"></div>
+    <p class="small">Simplified for study: shapes, sizes, and some locations are approximate. Use the POH and your mechanic for the real thing.</p>
+  </aside>
+</main>
+
+<footer class="site-foot">
+  <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
+  <p>Made by Colby Penn</p>
+</footer>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+// ---------- Part types: what students read when they click ----------
+const SYSTEMS = ['Power section', 'Valve train', 'Fuel, air, and exhaust', 'Ignition', 'Oil', 'Accessories'];
+const TYPES = {
+  crankcase: { name: 'Crankcase', sys: 'Power section', desc: 'Two aluminum halves bolted together along the engine\'s centerline. They hold the crankshaft and camshaft bearings, carry the oil passages, and the cylinders bolt onto them.' },
+  crankshaft: { name: 'Crankshaft', sys: 'Power section', desc: 'Turns the pistons\' back-and-forth motion into rotation. Each connecting rod rides on its own offset crankpin (a throw), and counterweights opposite the throws help balance it. The front end is the propeller flange, so on these direct-drive engines the propeller turns at crankshaft RPM.' },
+  rod: { name: 'Connecting rod', sys: 'Power section', desc: 'Links a piston to the crankshaft. The small end rides on the piston pin, and the big end wraps around a crankpin with a bearing insert in between.' },
+  piston: { name: 'Piston', sys: 'Power section', desc: 'Combustion pressure pushes it down the cylinder on the power stroke. The rings near the top seal in compression and scrape oil off the cylinder wall, and the piston pin connects it to the connecting rod.' },
+  barrel: { name: 'Cylinder barrel', sys: 'Power section', desc: 'The steel barrel the piston slides in. The fins give the cooling air, directed by the baffles under the cowling, more surface to carry heat away. That\'s why long ground runs and steep, slow climbs push up cylinder head temperatures.' },
+  head: { name: 'Cylinder head', sys: 'Power section', desc: 'The aluminum head, screwed and shrunk onto the barrel. It forms the combustion chamber and holds the intake and exhaust valves, both spark plugs, and the rocker arms. The cylinder head temperature (CHT) probe sits here.' },
+  ring: { name: 'Starter ring gear', sys: 'Accessories', desc: 'A ring of gear teeth just behind the propeller. When you turn the key to START, the starter\'s small gear meshes with it and turns the engine over.' },
+  camshaft: { name: 'Camshaft', sys: 'Valve train', desc: 'Turns at half crankshaft speed, because each valve opens once every two turns of the crankshaft. As it turns, its lobes push the lifters out to open the valves at the right point in each cylinder\'s cycle.' },
+  gears: { name: 'Timing gear', sys: 'Valve train', desc: 'The crankshaft gear drives the camshaft gear, which has twice as many teeth, so the camshaft turns once for every two turns of the crankshaft.' },
+  lifter: { name: 'Hydraulic lifter', sys: 'Valve train', desc: 'Rides on a cam lobe and passes the motion to the pushrod. Oil pressure inside the lifter takes up any slack, so the valve train runs with zero clearance and doesn\'t need routine adjustment.' },
+  pushrod: { name: 'Pushrod', sys: 'Valve train', desc: 'Carries the motion from the lifter out to the rocker arm in the cylinder head. It runs inside a shroud tube that keeps the oil in.' },
+  rocker: { name: 'Rocker arm', sys: 'Valve train', desc: 'Pivots like a seesaw. The pushrod pushes one end, and the other end pushes the valve open against its springs.' },
+  intake: { name: 'Intake valve', sys: 'Valve train', desc: 'Opens during the intake stroke to let the fuel-air mixture into the cylinder. Springs snap it closed for compression and power.' },
+  exhaust: { name: 'Exhaust valve', sys: 'Valve train', desc: 'Opens during the exhaust stroke to let the burned gases out. It runs much hotter than the intake valve, which is one reason a stuck or burned exhaust valve shows up as low compression.' },
+  cover: { name: 'Rocker cover', sys: 'Valve train', desc: 'Covers the rocker arms and valve springs and keeps the oil splashing around them inside the head. A leaking gasket here is a common source of oil on the cylinders.' },
+  carb: { name: 'Carburetor or fuel servo', sys: 'Fuel, air, and exhaust', desc: 'On the 172K\'s O-320, this is the carburetor: it mixes fuel into the incoming air, and carburetor heat melts any ice that forms in it. The IO-360s in the 172R and Pilot 100i have a fuel injection servo here instead, which meters fuel to an injector nozzle at each cylinder, so there\'s no carb ice and no carb heat.' },
+  intakePipe: { name: 'Intake pipe', sys: 'Fuel, air, and exhaust', desc: 'Carries air (and on a carbureted engine, the fuel-air mixture) up to each cylinder\'s intake port.' },
+  exhaustPipe: { name: 'Exhaust pipe', sys: 'Fuel, air, and exhaust', desc: 'Carries hot exhaust gas away from each cylinder. On most trainers it runs through a shroud, the heat muff, that warms air for cabin heat (and carb heat on a carbureted engine). A crack here can leak carbon monoxide into the cabin.' },
+  plug: { name: 'Spark plug', sys: 'Ignition', desc: 'Each cylinder has two, a top plug and a bottom plug, each fired by a different magneto. Two sparks burn the mixture faster and keep the engine running if one magneto or plug quits. The mag check on runup tests each side by itself.' },
+  mag: { name: 'Magneto', sys: 'Ignition', desc: 'A self-contained generator, geared to the engine, that makes the high voltage for the spark plugs. It doesn\'t need the battery or alternator, so the engine keeps running after an electrical failure. The ignition switch turns a magneto off by grounding its P-lead, so a broken P-lead means that mag stays live: treat the propeller as if it could start.' },
+  sump: { name: 'Oil sump', sys: 'Oil', desc: 'Holds the engine\'s oil at the bottom of the engine. The oil pump draws from here, sends oil through the filter to the bearings and other moving parts, and it drains back down. Check the quantity on the dipstick before every flight.' },
+  filter: { name: 'Oil filter', sys: 'Oil', desc: 'Cleans the oil before it reaches the bearings. Mechanics cut old filters open at oil changes to look for metal, an early sign of wear inside the engine.' },
+  accessory: { name: 'Accessory housing', sys: 'Accessories', desc: 'Bolted to the back of the crankcase. Gears inside it drive the magnetos, the oil pump, and the engine-driven fuel pump.' },
+  starter: { name: 'Starter', sys: 'Accessories', desc: 'An electric motor powered by the battery. On START, its pinion gear engages the ring gear and cranks the engine until it fires.' },
+  alternator: { name: 'Alternator', sys: 'Accessories', desc: 'Belt-driven from the front of the crankshaft. Once the engine is running, it powers the electrical system and recharges the battery.' }
+};
+
+// ---------- Renderer, scene, camera ----------
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.prepend(renderer.domElement);
+const labelRenderer = new CSS2DRenderer({ element: document.getElementById('labels') });
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#14171A');
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(20, 40, 25); scene.add(key);
+scene.add(new THREE.HemisphereLight(0xdde6ee, 0x20262c, 0.45));
+
+const camera = new THREE.PerspectiveCamera(35, 1, 0.5, 600);
+const HOME = new THREE.Vector3(36, 25, 45), TARGET = new THREE.Vector3(0, -1, 0);
+camera.position.copy(HOME);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.target.copy(TARGET);
+controls.minDistance = 10; controls.maxDistance = 160;
+
+// ---------- Materials ----------
+const std = (c, m, r) => new THREE.MeshStandardMaterial({ color: c, metalness: m, roughness: r });
+const MAT = {
+  alu: std(0xb4b9be, .55, .42), paint: std(0x646d76, .35, .5), steel: std(0x7b8288, .85, .32),
+  polished: std(0xd9dde1, 1, .16), piston: std(0xc8ccd0, .7, .3), dark: std(0x2a2f34, .4, .55),
+  brass: std(0xb39258, .9, .32), exhaust: std(0x8a6248, .55, .55), chrome: std(0xc9cdd1, .85, .28),
+  black: std(0x1c1f22, .2, .6), red: std(0x7d2a2a, .3, .5)
+};
+
+// ---------- Geometry helpers ----------
+const V2 = (x, y) => new THREE.Vector2(x, y), V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const Y = V3(0, 1, 0);
+function tubeX(r, x0, x1, seg = 32) { return new THREE.CylinderGeometry(r, r, Math.abs(x1 - x0), seg).rotateZ(-Math.PI / 2).translate((x0 + x1) / 2, 0, 0); }
+function tubeZ(r, z0, z1, seg = 32) { return new THREE.CylinderGeometry(r, r, Math.abs(z1 - z0), seg).rotateX(Math.PI / 2).translate(0, 0, (z0 + z1) / 2); }
+function rodBetween(a, b, r, seg = 16) {
+  const d = b.clone().sub(a), g = new THREE.CylinderGeometry(r, r, d.length(), seg);
+  g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(Y, d.clone().normalize()));
+  return g.translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
+}
+function box(w, h, d, x = 0, y = 0, z = 0) { return new THREE.BoxGeometry(w, h, d).translate(x, y, z); }
+function roundRect(x0, y0, x1, y1, r) {
+  const s = new THREE.Shape();
+  s.moveTo(x0 + r, y0); s.lineTo(x1 - r, y0); s.quadraticCurveTo(x1, y0, x1, y0 + r);
+  s.lineTo(x1, y1 - r); s.quadraticCurveTo(x1, y1, x1 - r, y1); s.lineTo(x0 + r, y1);
+  s.quadraticCurveTo(x0, y1, x0, y1 - r); s.lineTo(x0, y0 + r); s.quadraticCurveTo(x0, y0, x0 + r, y0);
+  return s;
+}
+// Shape drawn in (u,v) becomes a plate in the crank's (y,z) plane, thickness along x
+const PLATE = new THREE.Matrix4().set(0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1);
+function plate(shape, thick, x) { return new THREE.ExtrudeGeometry(shape, { depth: thick, bevelEnabled: false, curveSegments: 24 }).applyMatrix4(PLATE).translate(x - thick / 2, 0, 0); }
+function gearShape(rRoot, rTip, teeth, rHole = 0) {
+  const s = new THREE.Shape();
+  for (let i = 0; i < teeth * 4; i++) {
+    const a = i / (teeth * 4) * Math.PI * 2, r = (i % 4 === 1 || i % 4 === 2) ? rTip : rRoot;
+    i ? s.lineTo(Math.cos(a) * r, Math.sin(a) * r) : s.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  if (rHole) { const h = new THREE.Path(); h.absarc(0, 0, rHole, 0, Math.PI * 2, true); s.holes.push(h); }
+  return s;
+}
+// Finned cylinder made on a lathe around Y, turned to point along +Z
+function finnedLathe(rIn, rCore, rFin, h, n, z0) {
+  const p = [V2(rIn, 0), V2(rCore, 0)], pitch = h / n;
+  for (let k = 0; k < n; k++) { const a = k * pitch + pitch * .3, b = a + pitch * .4; p.push(V2(rCore, a), V2(rFin, a), V2(rFin, b), V2(rCore, b)); }
+  p.push(V2(rCore, h), V2(rIn, h), V2(rIn, 0));
+  return new THREE.LatheGeometry(p, 48).rotateX(Math.PI / 2).translate(0, 0, z0);
+}
+
+// ---------- Part registry ----------
+const parts = [];
+function addPart(type, obj, parent, opts = {}) {
+  const p = { type, obj, label: opts.label || '', ex: V3(...(opts.ex || [0, 0, 0])), base: obj.position.clone(), shell: !!opts.shell, mats: [] };
+  obj.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); if (p.shell) o.material.side = THREE.DoubleSide; p.mats.push(o.material); } });
+  obj.userData.part = p;
+  parent.add(obj); parts.push(p);
+  return p;
+}
+
+// ---------- Engine layout (units are roughly inches; +X is the propeller end, +Z is the right side) ----------
+const R = 2.19, L = 6.75, LIFT = 0.45;
+const CYL = [
+  { n: 1, s: 1, x: 5.25, fire: 0, phi: 0 },
+  { n: 2, s: -1, x: 1.75, fire: 360, phi: 180 },
+  { n: 3, s: 1, x: -1.75, fire: 180, phi: 180 },
+  { n: 4, s: -1, x: -5.25, fire: 540, phi: 0 }
+];
+const VX = { intake: 1.15, exhaust: -1.15 };            // valve offsets in each cylinder's own frame
+const STEM = V3(0, .75, .66).normalize();               // valve stem direction (toward the rocker box)
+const engine = new THREE.Group(); scene.add(engine);
+
+// Crankcase halves
+const caseShape = roundRect(-8.6, -4.6, 8.6, 5.4, 2.2);
+for (const s of [1, -1]) {
+  const g = new THREE.Group();
+  const body = new THREE.ExtrudeGeometry(caseShape, { depth: 4.6, bevelEnabled: false, curveSegments: 12 });
+  if (s < 0) body.translate(0, 0, -4.6);
+  g.add(new THREE.Mesh(body, MAT.alu));
+  g.add(new THREE.Mesh(new THREE.CylinderGeometry(2.6, 2.6, 0.6, 32, 1, false, s > 0 ? 0 : Math.PI, Math.PI).rotateZ(-Math.PI / 2).translate(8.9, 0, 0), MAT.alu));
+  addPart('crankcase', g, engine, { label: s > 0 ? 'Right half' : 'Left half', ex: [0, 0, 3.2 * s], shell: true });
+}
+
+// Crankshaft (rotates about X)
+const crank = new THREE.Group(); engine.add(crank);
+{
+  const g = new THREE.Group();
+  const throwX = CYL.map(c => c.x);
+  const mains = [[6.45, 8.6], [2.95, 4.05], [-0.55, 0.55], [-4.05, -2.95], [-9.8, -6.45]];
+  mains.forEach(([a, b]) => g.add(new THREE.Mesh(tubeX(1.15, a, b), MAT.polished)));
+  const web = new THREE.Shape(); web.absarc(0, R, 1.35, 0, Math.PI, false); web.lineTo(-1.6, 0); web.absarc(0, 0, 3.0, Math.PI, Math.PI * 2, false); web.lineTo(1.35, R);
+  CYL.forEach(c => {
+    const pin = new THREE.Mesh(tubeX(1.0, c.x - .7, c.x + .7), MAT.polished);
+    const th = new THREE.Group();
+    pin.position.z = R; th.add(pin);
+    th.add(new THREE.Mesh(plate(web, .5, c.x - .95), MAT.steel));
+    th.add(new THREE.Mesh(plate(web, .5, c.x + .95), MAT.steel));
+    th.rotation.x = -c.phi * Math.PI / 180;
+    g.add(th);
+  });
+  // Propeller flange and nose
+  g.add(new THREE.Mesh(tubeX(1.5, 8.6, 10.4), MAT.polished));
+  g.add(new THREE.Mesh(tubeX(3.4, 10.4, 11.0, 48), MAT.steel));
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; g.add(new THREE.Mesh(tubeX(.22, 11.0, 12.0, 10).translate(0, Math.sin(a) * 2.6, Math.cos(a) * 2.6), MAT.polished)); }
+  addPart('crankshaft', g, crank);
+  // Crank timing gear and starter ring gear ride on the crankshaft
+  addPart('gears', new THREE.Mesh(plate(gearShape(1.15, 1.35, 24), .5, -9.3), MAT.brass), crank, { label: 'Crankshaft gear', ex: [-2.2, 0, 0] });
+  const ringG = new THREE.Group();
+  ringG.add(new THREE.Mesh(plate(gearShape(6.0, 6.3, 90, 5.4), .55, 9.9), MAT.steel));
+  ringG.add(new THREE.Mesh(plate(roundDisk(5.5, 1.6), .25, 9.9), MAT.paint));
+  addPart('ring', ringG, crank, { ex: [4.5, 0, 0] });
+}
+function roundDisk(r, hole) { const s = new THREE.Shape(); s.absarc(0, 0, r, 0, Math.PI * 2, false); const h = new THREE.Path(); h.absarc(0, 0, hole, 0, Math.PI * 2, true); s.holes.push(h); return s; }
+
+// Camshaft (above the crankshaft, half speed, opposite direction)
+const CAMY = 3.75;
+const cam = new THREE.Group(); cam.position.y = CAMY; engine.add(cam);
+const lobeShape = (() => { const s = new THREE.Shape(); for (let i = 0; i <= 64; i++) { const a = i / 64 * Math.PI * 2, rr = .85 + LIFT * Math.pow(Math.max(0, Math.cos(a)), 3); const u = Math.sin(a) * rr, v = Math.cos(a) * rr; i ? s.lineTo(u, v) : s.moveTo(u, v); } return s; })();
+{
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(tubeX(.5, -9.6, 7.6, 20), MAT.polished));
+  CYL.forEach(c => ['intake', 'exhaust'].forEach(v => {
+    const wx = c.x + c.s * VX[v];
+    const peak = c.fire + (v === 'intake' ? 450 : 270);
+    const dirA = c.s > 0 ? 0 : Math.PI;
+    const lobe = new THREE.Mesh(plate(lobeShape, .7, wx), MAT.steel);
+    lobe.rotation.x = -(dirA + peak / 2 * Math.PI / 180);
+    g.add(lobe);
+  }));
+  addPart('camshaft', g, cam);
+  addPart('gears', new THREE.Mesh(plate(gearShape(2.35, 2.55, 48), .5, -9.3), MAT.brass), cam, { label: 'Camshaft gear', ex: [-2.2, 0, 0] });
+}
+
+// Cylinders and everything that hangs on them
+const cyls = CYL.map(c => {
+  const grp = new THREE.Group();
+  grp.position.x = c.x; if (c.s < 0) grp.rotation.y = Math.PI;
+  engine.add(grp);
+  const lbl = `Cylinder ${c.n}`;
+  const o = { c, grp };
+
+  // Barrel with fins and hold-down flange
+  const barrel = new THREE.Group();
+  barrel.add(new THREE.Mesh(finnedLathe(2.56, 2.75, 3.25, 7.0, 11, 4.6), MAT.steel));
+  barrel.add(new THREE.Mesh(new THREE.LatheGeometry([V2(2.56, 0), V2(3.4, 0), V2(3.4, .45), V2(2.56, .45), V2(2.56, 0)], 48).rotateX(Math.PI / 2).translate(0, 0, 4.6), MAT.paint));
+  addPart('barrel', barrel, grp, { label: lbl, ex: [0, 0, 8], shell: true });
+
+  // Head: finned, closed dome with a combustion chamber, plus the rocker box on top
+  const head = new THREE.Group();
+  const hp = [V2(2.56, 0), V2(2.95, 0)];
+  for (let k = 0; k < 6; k++) { const a = .25 + k * .62, b = a + .3; hp.push(V2(2.95, a), V2(3.45, a), V2(3.45, b), V2(2.95, b)); }
+  hp.push(V2(2.95, 4.2), V2(0, 4.2), V2(0, .9), V2(1.8, .75), V2(2.56, .3), V2(2.56, 0));
+  head.add(new THREE.Mesh(new THREE.LatheGeometry(hp, 48).rotateX(Math.PI / 2).translate(0, 0, 11.6), MAT.alu));
+  head.add(new THREE.Mesh(box(4.4, 1.4, 3.2, 0, 3.75, 14.1), MAT.alu));
+  addPart('head', head, grp, { label: lbl, ex: [0, 0, 14], shell: true });
+
+  addPart('cover', new THREE.Mesh(box(4.6, .35, 3.4, 0, 4.62, 14.1), MAT.chrome), grp, { label: lbl, ex: [0, 5.5, 14] });
+
+  // Piston (lathe around its pin), rings, and pin
+  const piston = new THREE.Group();
+  piston.add(new THREE.Mesh(new THREE.LatheGeometry([V2(0, 2.4), V2(2.5, 2.4), V2(2.5, -1.6), V2(2.25, -1.6), V2(2.25, 1.95), V2(0, 1.95)], 48).rotateX(Math.PI / 2), MAT.piston));
+  [2.15, 1.85, 1.55].forEach(z => piston.add(new THREE.Mesh(new THREE.TorusGeometry(2.5, .045, 6, 48).translate(0, 0, z), MAT.dark)));
+  piston.add(new THREE.Mesh(tubeX(.55, -2.2, 2.2, 20), MAT.polished));
+  o.piston = addPart('piston', piston, grp, { label: lbl, ex: [0, 0, 4.5] });
+
+  // Connecting rod built along +Z from big end (origin) to small end
+  const rod = new THREE.Group();
+  rod.add(new THREE.Mesh(tubeX(1.35, -.6, .6), MAT.steel));
+  rod.add(new THREE.Mesh(box(.6, .9, L - 2.0, 0, 0, L / 2), MAT.steel));
+  rod.add(new THREE.Mesh(tubeX(.8, -.55, .55), MAT.steel).translateZ(L));
+  o.rod = addPart('rod', rod, grp, { label: lbl, ex: [0, 0, 2] });
+
+  // Combustion flash (not a part)
+  o.glow = new THREE.Mesh(new THREE.CylinderGeometry(2.45, 2.45, 1, 32).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff8a3a, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+  grp.add(o.glow);
+
+  // Valve train for each valve
+  o.valves = {};
+  ['intake', 'exhaust'].forEach(v => {
+    const lx = VX[v];
+    const face = V3(lx, 0, 12.3), tip = face.clone().addScaledVector(STEM, 4.2);
+    const valve = new THREE.Group();
+    valve.add(new THREE.Mesh(new THREE.CylinderGeometry(.95, .55, .22, 32).applyQuaternion(new THREE.Quaternion().setFromUnitVectors(Y, STEM.clone().negate())).translate(face.x, face.y, face.z), v === 'exhaust' ? MAT.exhaust : MAT.steel));
+    valve.add(new THREE.Mesh(rodBetween(face, tip, .17), MAT.polished));
+    // Spring: a coil around the upper stem
+    const pts = []; for (let i = 0; i <= 140; i++) { const t = i / 140, a = t * Math.PI * 2 * 7; pts.push(new THREE.Vector3(Math.cos(a) * .48, Math.sin(a) * .48, 2.0 + t * 1.8)); }
+    const spring = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 280, .06, 6), MAT.dark);
+    spring.quaternion.setFromUnitVectors(V3(0, 0, 1), STEM); spring.position.copy(face);
+    valve.add(spring);
+    const vp = addPart(v, valve, grp, { label: lbl, ex: [0, 0, 9.5] });
+
+    // Rocker arm pivots near the top of the rocker box
+    const rocker = new THREE.Group(); rocker.position.set(lx, 4.05, 14.1);
+    rocker.add(new THREE.Mesh(rodBetween(V3(0, 0, 0), V3(0, tip.y - 4.05 + .2, tip.z - 14.1), .2, 10), MAT.steel));
+    rocker.add(new THREE.Mesh(rodBetween(V3(0, 0, 0), V3(0, -.3, -1.05), .2, 10), MAT.steel));
+    rocker.add(new THREE.Mesh(tubeX(.3, -.35, .35, 16), MAT.steel));
+    const rp = addPart('rocker', rocker, grp, { label: lbl, ex: [0, 3, 14] });
+
+    // Lifter in the crankcase and pushrod in its shroud tube
+    const lifter = new THREE.Mesh(tubeZ(.42, .95, 2.6, 20).translate(lx, CAMY, 0), MAT.steel);
+    const lp = addPart('lifter', lifter, grp, { label: lbl, ex: [0, 2, 2.5] });
+    const pr = new THREE.Group();
+    pr.add(new THREE.Mesh(tubeZ(.14, 2.6, 13.05, 10).translate(lx, CAMY, 0), MAT.polished));
+    pr.add(new THREE.Mesh(tubeZ(.32, 4.6, 11.8, 16).translate(lx, CAMY, 0), MAT.paint));
+    const pp = addPart('pushrod', pr, grp, { label: lbl, ex: [0, 3, 6] });
+    o.valves[v] = { vp, rp, lp, pp };
+  });
+
+  // Spark plugs, top and bottom
+  [[1, 'Top plug'], [-1, 'Bottom plug']].forEach(([u, name]) => {
+    const pl = new THREE.Group();
+    pl.add(new THREE.Mesh(new THREE.CylinderGeometry(.5, .5, .55, 6).translate(0, 3.65, 0), MAT.polished));
+    pl.add(new THREE.Mesh(new THREE.CylinderGeometry(.36, .36, 1.3, 16).translate(0, 4.55, 0), MAT.steel));
+    pl.add(new THREE.Mesh(new THREE.CylinderGeometry(.2, .2, .6, 12).translate(0, 5.4, 0), MAT.red));
+    if (u < 0) pl.rotation.x = Math.PI;
+    pl.position.z = 11.95;
+    addPart('plug', pl, grp, { label: `${lbl}, ${name.toLowerCase()}`, ex: [0, 2.5 * u, 14] });
+  });
+
+  // Intake and exhaust pipes
+  const ip = new THREE.CatmullRomCurve3([V3(.9, -5.4, 3.0), V3(.9, -5.6, 7.5), V3(1.1, -4.6, 11.4), V3(1.15, -3.0, 12.4)]);
+  addPart('intakePipe', new THREE.Mesh(new THREE.TubeGeometry(ip, 40, .55, 16), MAT.paint), grp, { label: lbl, ex: [0, -3, 8] });
+  const xp = new THREE.CatmullRomCurve3([V3(-1.15, -3.0, 13.3), V3(-1.15, -5.0, 14.6), V3(-1.0, -8.5, 14.0), V3(-.8, -11.5, 12.8)]);
+  addPart('exhaustPipe', new THREE.Mesh(new THREE.TubeGeometry(xp, 40, .6, 16), MAT.exhaust), grp, { label: lbl, ex: [0, -5, 16] });
+
+  // Number label above the head
+  const div = document.createElement('div'); div.className = 'lbl'; div.textContent = c.n;
+  o.label = new CSS2DObject(div); o.label.position.set(0, 6.2, 14); grp.add(o.label);
+  return o;
+});
+
+// Sump, carburetor or servo
+{
+  const sump = new THREE.ExtrudeGeometry(roundRect(-7.2, -8.0, 6.2, -4.4, 1.2), { depth: 7.2, bevelEnabled: false }).translate(0, 0, -3.6);
+  addPart('sump', new THREE.Mesh(sump, MAT.paint), engine, { ex: [0, -6, 0], shell: true });
+  const carb = new THREE.Group();
+  carb.add(new THREE.Mesh(box(3.2, 2.4, 3.0, -1.0, -9.4, 0), MAT.alu));
+  carb.add(new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 1.2, 24).translate(-1.0, -11.1, 0), MAT.dark));
+  carb.add(new THREE.Mesh(tubeZ(.15, 1.5, 2.6, 8).translate(.2, -9.0, 0), MAT.brass));
+  addPart('carb', carb, engine, { ex: [0, -10, 0] });
+}
+
+// Rear: accessory housing, magnetos, oil filter
+{
+  const acc = new THREE.ExtrudeGeometry(roundRect(-3.6, -3.6, 6.6, 3.6, 1.4), { depth: 2.0, bevelEnabled: false }).applyMatrix4(PLATE).translate(-10.6, 0, 0);
+  addPart('accessory', new THREE.Mesh(acc, MAT.paint), engine, { ex: [-5, 0, 0], shell: true });
+  [[-1, 'Left magneto'], [1, 'Right magneto']].forEach(([s, name]) => {
+    const m = new THREE.Group();
+    m.add(new THREE.Mesh(tubeX(1.3, -14.0, -10.6, 32), MAT.dark));
+    m.add(new THREE.Mesh(tubeX(1.45, -11.2, -10.6, 32), MAT.dark));
+    m.add(new THREE.Mesh(tubeX(.9, -14.8, -14.0, 24), MAT.black));
+    m.position.set(0, 2.6, 2.6 * s);
+    addPart('mag', m, engine, { label: name, ex: [-9, 1.5, 1.5 * s] });
+  });
+  const f = new THREE.Group();
+  f.add(new THREE.Mesh(tubeX(1.4, -14.2, -10.6, 32), MAT.red));
+  f.add(new THREE.Mesh(tubeX(1.0, -14.5, -14.2, 6), MAT.dark));
+  f.position.set(0, -2.0, 0);
+  addPart('filter', f, engine, { ex: [-9, -1.5, 0] });
+}
+
+// Front: starter and alternator
+{
+  const st = new THREE.Group();
+  st.add(new THREE.Mesh(tubeX(1.6, 3.0, 7.6, 32), MAT.dark));
+  st.add(new THREE.Mesh(plate(gearShape(.45, .6, 10), .6, 9.9), MAT.steel));
+  st.add(new THREE.Mesh(tubeX(.25, 7.6, 9.6, 12), MAT.polished));
+  st.position.set(0, -5.0, -4.3);
+  addPart('starter', st, engine, { ex: [7, -2.5, -3] });
+  const al = new THREE.Group();
+  al.add(new THREE.Mesh(tubeX(1.9, 6.9, 9.0, 32), MAT.alu));
+  al.add(new THREE.Mesh(tubeX(1.0, 9.0, 9.5, 32), MAT.dark));
+  al.position.set(0, -5.4, 4.6);
+  addPart('alternator', al, engine, { ex: [7, -2.5, 3] });
+}
+
+// Propeller-end label
+const frontDiv = document.createElement('div'); frontDiv.className = 'lbl front'; frontDiv.textContent = 'Propeller end';
+const frontLbl = new CSS2DObject(frontDiv); frontLbl.position.set(14.5, 0, 0); engine.add(frontLbl);
+
+// ---------- Motion ----------
+const deg = Math.PI / 180;
+function lift(cycle, center, half = 115) {
+  let u = ((cycle - center) % 720 + 1080) % 720 - 360;
+  return Math.abs(u) < half ? LIFT * .5 * (1 + Math.cos(Math.PI * u / half)) : 0;
+}
+const STROKES = ['Power', 'Exhaust', 'Intake', 'Compression'];
+let theta = 0, explodeT = 0, explodeGoal = 0;
+
+function pose() {
+  crank.rotation.x = -theta * deg;
+  cam.rotation.x = theta / 2 * deg;
+  cam.position.y = CAMY + 5.5 * explodeT;
+  cyls.forEach(o => {
+    const { s, phi, fire } = o.c, b = (theta + phi) * deg;
+    const pinY = R * Math.sin(b), pinZ = s * R * Math.cos(b);
+    const d = pinZ + Math.sqrt(L * L - pinY * pinY);
+    o.piston.anim = V3(0, 0, d);
+    o.rod.anim = V3(0, pinY, pinZ);
+    o.rod.obj.rotation.x = Math.atan2(pinY, d - pinZ);
+    const cycle = ((theta - fire) % 720 + 720) % 720;
+    o.cycle = cycle;
+    const glow = cycle < 70 ? 1 - cycle / 70 : 0;
+    const crown = d + 2.4, gap = Math.max(.05, 12.25 - crown);
+    o.glow.position.z = crown + gap / 2 + o.piston.ex.z * explodeT; o.glow.scale.z = gap;
+    o.glow.material.opacity = glow * (explodeT < .05 ? .85 : 0);
+    ['intake', 'exhaust'].forEach(v => {
+      const l = lift(cycle, v === 'intake' ? 450 : 270), P = o.valves[v];
+      P.lp.anim = V3(0, 0, l); P.pp.anim = V3(0, 0, l);
+      P.vp.anim = STEM.clone().multiplyScalar(-l * 1.4);
+      P.rp.obj.rotation.x = -l * .55;
+    });
+  });
+  parts.forEach(p => p.obj.position.copy(p.anim || p.base).addScaledVector(p.ex, explodeT));
+  cyls.forEach(o => o.label.position.set(0, 6.2 + 5.5 * explodeT, 14 + 14 * explodeT));
+}
+
+// ---------- UI ----------
+const $ = id => document.getElementById(id);
+let running = !matchMedia('(prefers-reduced-motion: reduce)').matches, speed = 120;
+const runBtn = $('run');
+function setRun(on) { running = on; runBtn.textContent = on ? 'Pause' : 'Run'; runBtn.setAttribute('aria-pressed', on); }
+setRun(running);
+runBtn.onclick = () => setRun(!running);
+document.querySelectorAll('.spd').forEach(b => b.onclick = () => {
+  speed = +b.dataset.v; document.querySelectorAll('.spd').forEach(x => x.setAttribute('aria-pressed', x === b)); if (!running) setRun(true);
+});
+$('crank').oninput = e => { setRun(false); theta = +e.target.value; };
+$('explode').oninput = e => { explodeGoal = e.target.value / 100; };
+$('reset').onclick = () => { camera.position.copy(HOME); controls.target.copy(TARGET); };
+
+function setCutaway(on) {
+  parts.forEach(p => { if (!p.shell) return; p.mats.forEach(m => { m.transparent = on; m.opacity = on ? .13 : 1; m.depthWrite = !on; m.needsUpdate = true; }); });
+}
+$('cutaway').onchange = e => setCutaway(e.target.checked);
+$('labelsOn').onchange = e => { cyls.forEach(o => o.label.visible = e.target.checked); frontLbl.visible = e.target.checked; };
+
+const strokesEl = $('strokes');
+strokesEl.innerHTML = [1, 2, 3, 4].map(n => `<dt>${n}</dt><dd id="st${n}"><i></i><span></span></dd>`).join('');
+function updateStrokes() {
+  cyls.forEach(o => {
+    const name = STROKES[Math.floor(o.cycle / 180)], el = $('st' + o.c.n);
+    if (el.dataset.s !== name) { el.dataset.s = name; el.className = 'st-' + name.toLowerCase(); el.lastChild.textContent = name; }
+  });
+  $('crankOut').textContent = Math.round(theta % 720) + '°';
+  if (running) $('crank').value = Math.round(theta % 720);
+}
+
+// Parts list
+const counts = {}; parts.forEach(p => counts[p.type] = (counts[p.type] || 0) + 1);
+const plist = $('plist');
+plist.innerHTML = SYSTEMS.map(sys => {
+  const ids = Object.keys(TYPES).filter(t => TYPES[t].sys === sys && counts[t]);
+  return `<h3>${sys}</h3><ul>${ids.map(t => `<li><button type="button" data-t="${t}"><span>${TYPES[t].name}</span><small>${counts[t] > 1 ? counts[t] : ''}</small></button></li>`).join('')}</ul>`;
+}).join('');
+const INSIDE = ['crankshaft', 'rod', 'piston', 'camshaft', 'gears', 'lifter', 'pushrod', 'rocker', 'intake', 'exhaust'];
+plist.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  // Parts hidden inside the engine are easier to find with the case see-through
+  if (INSIDE.includes(b.dataset.t) && explodeGoal < .3 && !$('cutaway').checked) { $('cutaway').checked = true; setCutaway(true); }
+  select(parts.filter(p => p.type === b.dataset.t));
+});
+
+// Selection and hiding
+const HL = new THREE.Color(0x82a8e8);
+let selected = [], hovered = null;
+function paint() {
+  parts.forEach(p => {
+    const k = selected.includes(p) ? .45 : p === hovered ? .18 : 0;
+    p.mats.forEach(m => { m.emissive.copy(HL); m.emissiveIntensity = k; });
+  });
+  plist.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('sel', selected.length > 0 && selected[0].type === b.dataset.t);
+    b.classList.toggle('off', parts.filter(p => p.type === b.dataset.t).every(p => !p.obj.visible));
+  });
+}
+function select(list) {
+  selected = list; paint();
+  const info = $('info');
+  if (!list.length) { info.className = 'info empty'; info.innerHTML = '<p>Click a part on the engine or in the list below.</p>'; return; }
+  const t = TYPES[list[0].type], one = list.length === 1;
+  const where = one && list[0].label ? list[0].label : list.length > 1 ? `${list.length} on this engine` : '';
+  const anyHidden = parts.some(p => !p.obj.visible);
+  info.className = 'info';
+  info.innerHTML = `<h3>${t.name}</h3><p class="sys">${t.sys}${where ? ', ' + where : ''}</p><p>${t.desc}</p>
+    <div class="row"><button class="btn" type="button" id="hideBtn">${one ? 'Take this part off' : 'Take all of these off'}</button>${anyHidden ? '<button class="btn" type="button" id="showAll">Put everything back</button>' : ''}</div>`;
+  $('hideBtn').onclick = () => { list.forEach(p => p.obj.visible = false); select(list); };
+  if (anyHidden) $('showAll').onclick = () => { parts.forEach(p => p.obj.visible = true); select(list); };
+}
+
+// Picking: a click (not a drag) selects the part under the pointer
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+function pick(ev) {
+  const r = renderer.domElement.getBoundingClientRect();
+  ptr.set((ev.clientX - r.left) / r.width * 2 - 1, -(ev.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  const cut = $('cutaway').checked;
+  for (const h of ray.intersectObjects(engine.children, true)) {
+    let o = h.object; if (!o.visible) continue;
+    while (o && !o.userData.part) o = o.parent;
+    if (!o) continue;
+    const p = o.userData.part;
+    let vis = true; for (let q = h.object; q; q = q.parent) if (!q.visible) vis = false;
+    if (!vis || (cut && p.shell)) continue;
+    return p;
+  }
+  return null;
+}
+let down = null;
+renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) < 5) { const p = pick(e); select(p ? [p] : []); }
+  down = null;
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || e.buttons) return;
+  const p = pick(e); if (p !== hovered) { hovered = p; renderer.domElement.style.cursor = p ? 'pointer' : ''; paint(); }
+});
+
+// ---------- Loop ----------
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h); labelRenderer.setSize(w, h);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stage); resize();
+$('loading').remove();
+
+let last = performance.now();
+renderer.setAnimationLoop(now => {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (running) theta = (theta + speed * dt) % 720;
+  explodeT += (explodeGoal - explodeT) * Math.min(1, dt * 6);
+  $('explodeOut').textContent = explodeGoal < .01 ? 'Together' : explodeGoal > .99 ? 'All the way apart' : Math.round(explodeGoal * 100) + '%';
+  pose(); updateStrokes();
+  controls.update();
+  renderer.render(scene, camera); labelRenderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
