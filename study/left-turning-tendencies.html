@@ -28,6 +28,23 @@ svg .flow{fill:none;stroke:var(--chart);stroke-width:2.5}
 svg .force{fill:none;stroke:var(--accent);stroke-width:3.5;stroke-linecap:round}
 svg .thin{fill:none;stroke:var(--muted);stroke-width:1.5}
 svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
+
+.demo{margin:20px 0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.demo canvas{display:block;width:100%;height:340px;background:var(--bg);touch-action:pan-y}
+.demo canvas.short{height:300px}
+@media (max-width:600px){.demo canvas,.demo canvas.short{height:270px}}
+.demo-ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 18px;padding:12px 14px 4px}
+.demo-ctl label{display:block;font:600 .92rem/1.2 var(--cond)}
+.demo-ctl label output{float:right;color:var(--muted);font-weight:500}
+.demo-ctl input[type=range]{width:100%;accent-color:var(--accent);margin-top:6px}
+.demo-ctl .btns{display:flex;gap:8px;flex-wrap:wrap;grid-column:1/-1}
+.demo-ctl button{font:600 .92rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:10px 12px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+.demo-ctl button:hover{border-color:var(--muted)}
+.demo-ctl button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.demo-ctl .check{display:flex;align-items:center;gap:8px;font:500 .95rem/1.2 var(--sans);cursor:pointer}
+.demo-ctl .check input{accent-color:var(--accent);width:16px;height:16px}
+.demo-read{grid-column:1/-1;margin:2px 0 6px;font:600 1rem/1.35 var(--cond);color:var(--text);min-height:1.35em}
+.demo figcaption{font-size:.92rem;color:var(--muted);padding:6px 14px 12px}
 </style>
 </head>
 <body>
@@ -80,12 +97,6 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
     <h1>Left-turning tendencies</h1>
     <p class="lede">Our airplanes' propellers turn clockwise as seen from the cockpit. That one fact is why the airplane wants to turn left at high power and low airspeed, and why you need right rudder on the takeoff roll and in the climb.</p>
 
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-      <defs>
-        <marker id="ahf" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="ah-f"/></marker>
-        <marker id="ahc" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="ah-c"/></marker>
-      </defs>
-    </svg>
 
     <h2 id="overview">The short version</h2>
     <div class="table-wrap">
@@ -103,82 +114,55 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
 
     <h2 id="torque">Torque reaction</h2>
     <p>For every action there's an equal and opposite reaction. The engine spins the propeller clockwise, so the propeller pushes back on the engine and tries to roll the airplane to the left, around its longitudinal axis.</p>
-    <figure>
-      <svg viewBox="0 0 420 230" role="img" aria-label="Rear view: the propeller turns clockwise and the airplane tends to roll left">
-        <circle cx="210" cy="130" r="72" class="thin" stroke-dasharray="5 5"/>
-        <path d="M210 58 A72 72 0 0 1 280 116" class="flow" marker-end="url(#ahc)"/>
-        <g class="air"><rect x="40" y="125" width="340" height="10" rx="5"/><rect x="160" y="104" width="100" height="8" rx="4"/><circle cx="210" cy="130" r="26"/></g>
-        <rect x="206" y="62" width="8" height="44" rx="3" style="fill:var(--text)"/>
-        <path d="M60 112 L60 172" class="force" marker-end="url(#ahf)"/>
-        <path d="M360 160 L360 100" class="force" marker-end="url(#ahf)"/>
-        <text x="414" y="48" text-anchor="end">Propeller turns clockwise</text>
-        <text x="22" y="200">Left wing pushed down</text>
-        <text x="300" y="200" class="muted">Right wing up</text>
-        <text x="210" y="226" text-anchor="middle" class="muted">Seen from behind, the way you see it from the cockpit</text>
-      </svg>
-      <figcaption>The propeller's reaction rolls the airplane left.</figcaption>
+    <figure class="demo">
+      <canvas id="d-torque" role="img" aria-label="Rear view of the airplane. The propeller turns clockwise and the airplane rolls left unless aileron holds it."></canvas>
+      <div class="demo-ctl">
+        <label>Power <output></output><input type="range" id="tq-power" min="0" max="100" value="100"></label>
+        <label>Airspeed <output></output><input type="range" id="tq-speed" min="45" max="120" value="60"></label>
+        <label>Right aileron <output></output><input type="range" id="tq-ail" min="0" max="100" value="80"></label>
+        <div class="btns"><button type="button" id="tq-reset">Level the wings</button></div>
+        <p class="demo-read" id="tq-read"></p>
+      </div>
+      <figcaption>Seen from behind, the way you see it from the cockpit. It starts balanced at full power and 60 knots. Take the aileron out and watch it roll, or bring the airspeed up and see how much less aileron it takes.</figcaption>
     </figure>
     <p>On the takeoff roll, the same reaction presses the left main wheel into the runway harder than the right. That adds friction on the left side and pulls the nose left. In flight, designers offset torque for cruise power with things like aileron trim tabs and how the wings and engine are rigged. At full power and low airspeed, that built-in correction isn't enough, and you hold it off with the controls.</p>
 
     <h2 id="slipstream">Spiraling slipstream</h2>
     <p>The propeller doesn't just push air straight back. It throws it backward in a corkscrew that wraps around the fuselage in the same direction the propeller turns. On its way back, the spiral strikes the left side of the vertical fin, which pushes the tail right and yaws the nose left. The handbook calls this the corkscrew effect.</p>
-    <figure>
-      <svg viewBox="0 0 420 300" role="img" aria-label="Top view: the slipstream spirals around the fuselage and hits the left side of the vertical fin">
-        <g transform="translate(0 0)" class="air">
-        <path d="M210 50 C228 50 232 80 230 120 L222 250 L198 250 L190 120 C188 80 192 50 210 50 Z"/>
-        <rect x="80" y="110" width="260" height="30" rx="6"/>
-        <rect x="160" y="232" width="100" height="14" rx="4"/>
-        <rect x="207" y="222" width="6" height="38" rx="2" class="fin"/>
-      </g>
-        <line x1="160" y1="46" x2="260" y2="46" style="stroke:var(--text);stroke-width:4;stroke-linecap:round"/>
-        <path d="M210.0 58.0 L204.8 59.4 L199.8 60.8 L194.9 62.2 L190.3 63.7 L186.0 65.1 L182.0 66.5 L178.5 67.9 L175.4 69.3 L172.8 70.8 L170.7 72.2 L169.2 73.6 L168.3 75.0 L168.0 76.4 L168.2 77.8 L169.1 79.2 L170.4 80.7 L172.4 82.1 L174.8 83.5 L177.7 84.9 L181.0 86.3 L184.7 87.8 L188.7 89.2 L193.0 90.6 L197.5 92.0 L202.1 93.4 L206.9 94.8 L211.6 96.2 L216.2 97.7 L220.8 99.1 L225.1 100.5 L229.2 101.9 L233.0 103.3 L236.5 104.8 L239.6 106.2 L242.2 107.6 L244.4 109.0 L246.1 110.4 L247.2 111.8 L247.9 113.2 L248.0 114.7 L247.6 116.1 L246.7 117.5 L245.2 118.9 L243.3 120.3 L241.0 121.8 L238.2 123.2 L235.1 124.6 L231.6 126.0 L227.9 127.4 L224.0 128.8 L219.9 130.2 L215.7 131.7 L211.4 133.1 L207.2 134.5 L203.0 135.9 L199.0 137.3 L195.2 138.8 L191.6 140.2 L188.2 141.6 L185.3 143.0 L182.6 144.4 L180.4 145.8 L178.6 147.2 L177.3 148.7 L176.4 150.1 L176.0 151.5 L176.1 152.9 L176.6 154.3 L177.6 155.8 L179.1 157.2 L180.9 158.6 L183.1 160.0 L185.7 161.4 L188.6 162.8 L191.8 164.2 L195.2 165.7 L198.8 167.1 L202.5 168.5 L206.2 169.9 L210.0 171.3 L213.7 172.8 L217.4 174.2 L220.9 175.6 L224.3 177.0 L227.4 178.4 L230.2 179.8 L232.7 181.2 L234.9 182.7 L236.7 184.1 L238.2 185.5 L239.2 186.9 L239.8 188.3 L240.0 189.8 L239.8 191.2 L239.2 192.6 L238.2 194.0 L236.7 195.4 L235.0 196.8 L232.9 198.2 L230.5 199.7 L227.9 201.1 L225.0 202.5 L222.0 203.9 L218.8 205.3 L215.5 206.8 L212.2 208.2 L208.9 209.6 L205.7 211.0 L202.5 212.4 L199.5 213.8 L196.6 215.2 L194.0 216.7 L191.6 218.1 L189.5 219.5 L187.8 220.9 L186.3 222.3 L185.2 223.8 L184.4 225.2 L184.0 226.6 L184.0 228.0" class="flow"/>
-        <path d="M184 228 L201 238" class="flow" marker-end="url(#ahc)"/>
-        <path d="M228 32 C214 14 194 14 180 26" class="force" marker-end="url(#ahf)"/>
-        <text x="120" y="18">Nose yaws left</text>
-        <text x="16" y="282">Slipstream hits the left side of the fin</text>
-        <text x="330" y="96" class="muted">Top view</text>
-      </svg>
-      <figcaption>At high power and low airspeed the spiral is tight and hits the tail hard. At cruise speed it stretches out and has much less effect.</figcaption>
+    <figure class="demo">
+      <canvas id="d-slip" class="short" role="img" aria-label="Top view. The slipstream spirals around the fuselage and strikes the left side of the fin, and the nose yaws left."></canvas>
+      <div class="demo-ctl">
+        <label>Power <output></output><input type="range" id="sl-power" min="0" max="100" value="100"></label>
+        <label>Airspeed <output></output><input type="range" id="sl-speed" min="45" max="120" value="60"></label>
+        <label>Right rudder <output></output><input type="range" id="sl-rud" min="0" max="100" value="85"></label>
+        <p class="demo-read" id="sl-read"></p>
+      </div>
+      <figcaption>Top view, nose to the left. It starts balanced. Take the rudder out and the nose swings left. At high power and low airspeed the spiral is tight and meets the fin at a steep angle; bring the airspeed up and watch it stretch out.</figcaption>
     </figure>
 
     <h2 id="p-factor">P-factor</h2>
     <p>P-factor, or asymmetric loading, shows up when the airplane flies at a high angle of attack, like in a climb or slow flight. The propeller disc is tilted nose-up into the relative wind, so the blade coming down on the right side meets the air at a greater angle of attack than the blade going up on the left. The descending blade takes the bigger bite and makes more thrust. That moves the center of thrust to the right of the propeller hub, and the nose yaws left.</p>
-    <figure>
-      <svg viewBox="0 0 420 322" role="img" aria-label="Top view at high angle of attack: the right blade makes more thrust than the left, so the nose yaws left">
-        <g transform="translate(0 30)" class="air">
-        <path d="M210 50 C228 50 232 80 230 120 L222 250 L198 250 L190 120 C188 80 192 50 210 50 Z"/>
-        <rect x="80" y="110" width="260" height="30" rx="6"/>
-        <rect x="160" y="232" width="100" height="14" rx="4"/>
-        <rect x="207" y="222" width="6" height="38" rx="2" class="fin"/>
-      </g>
-        <line x1="150" y1="76" x2="270" y2="76" style="stroke:var(--text);stroke-width:4;stroke-linecap:round"/>
-        <path d="M168 72 L168 46" class="flow" marker-end="url(#ahc)"/>
-        <path d="M252 72 L252 10" class="flow" marker-end="url(#ahc)"/>
-        <path d="M232 92 C218 104 198 104 186 94" class="force" marker-end="url(#ahf)"/>
-        <text x="14" y="38">Ascending blade:</text><text x="14" y="54" class="muted">smaller bite, less thrust</text>
-        <text x="264" y="24">Descending blade:</text><text x="264" y="40" class="muted">bigger bite, more thrust</text>
-        <text x="300" y="132" class="muted">Top view, nose high</text>
-        <text x="210" y="314" text-anchor="middle">Center of thrust moves right, nose yaws left</text>
-      </svg>
-      <figcaption>In level cruise the angle of attack is low, both blades bite about equally, and P-factor nearly disappears.</figcaption>
+    <figure class="demo">
+      <canvas id="d-pfactor" role="img" aria-label="Rear view of the propeller disc with the thrust from each side, and the velocity triangles for the descending and ascending blades."></canvas>
+      <div class="demo-ctl">
+        <label>Angle of attack <output></output><input type="range" id="pf-aoa" min="0" max="20" value="12"></label>
+        <label>Airspeed <output></output><input type="range" id="pf-speed" min="45" max="120" value="60"></label>
+        <label>RPM <output></output><input type="range" id="pf-rpm" min="1800" max="2700" step="50" value="2500"></label>
+        <p class="demo-read" id="pf-read"></p>
+      </div>
+      <figcaption>The blade angles of attack are computed at 75% of the blade from the real velocity triangles, so the difference is small, as it is on a real airplane. The center-of-thrust shift is exaggerated so you can see it. Set the angle of attack to zero and the effect disappears.</figcaption>
     </figure>
 
     <h2 id="precession">Gyroscopic precession</h2>
     <p>A spinning propeller is a gyroscope. When something tilts its plane of rotation, the reaction doesn't show up where the force was applied. It shows up 90° later, in the direction the propeller is turning.</p>
-    <figure>
-      <svg viewBox="0 0 470 250" role="img" aria-label="A force at the top of the clockwise propeller disc acts 90 degrees later, at the right side">
-        <circle cx="210" cy="128" r="84" class="thin"/>
-        <path d="M210 44 A84 84 0 0 1 294 128" class="flow" marker-end="url(#ahc)"/>
-        <path d="M126 128 A84 84 0 0 1 210 44" class="flow" style="opacity:.5"/>
-        <circle cx="210" cy="44" r="8" style="fill:var(--accent)"/>
-        <circle cx="294" cy="128" r="8" style="fill:var(--chart)"/>
-        <circle cx="210" cy="128" r="6" style="fill:var(--text)"/>
-        <text x="222" y="30">Force applied here</text>
-        <text x="306" y="124">Felt here, 90° later</text>
-        <text x="306" y="142" class="muted">in the direction of rotation</text>
-        <text x="210" y="238" text-anchor="middle" class="muted">Propeller disc seen from behind, turning clockwise</text>
-      </svg>
-      <figcaption>Pitching the nose down pushes the top of the disc forward. The reaction appears at the right side, which moves forward, so the nose yaws left.</figcaption>
+    <figure class="demo">
+      <canvas id="d-gyro" role="img" aria-label="A three-dimensional airplane with a spinning propeller. Pitch or yaw it and the airplane also moves 90 degrees later in the propeller's rotation."></canvas>
+      <div class="demo-ctl">
+        <div class="btns"><button type="button" data-g="pd">Pitch nose down</button><button type="button" data-g="pu">Pitch nose up</button><button type="button" data-g="yl">Yaw left</button><button type="button" data-g="yr">Yaw right</button></div>
+        <label class="check"><input type="checkbox" id="gy-stop"> Propeller stopped</label>
+        <p class="demo-read" id="gy-read"></p>
+      </div>
+      <figcaption>Hold a button. With the propeller turning, the airplane also swings 90° later in the direction of rotation. Stop the propeller and the precession disappears.</figcaption>
     </figure>
     <div class="table-wrap">
       <table>
@@ -232,6 +216,7 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
   <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
   <p>Made by Colby Penn</p>
 </footer>
+<script src="ltt-demos.js"></script>
 <script src="../jump.js"></script>
 </body>
 </html>
