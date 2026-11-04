@@ -82,8 +82,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     <canvas id="trails" aria-hidden="true"></canvas>
     <canvas id="overlay" role="img" aria-label="A wing section in a wind tunnel. Air flows from left to right over the airfoil."></canvas>
     <ul class="legend">
-      <li><i style="background:#7fb6f0"></i>Smooth airflow (brighter is faster)</li>
-      <li><i style="background:#e8873a"></i>Separated, turbulent airflow</li>
+      <li><i style="background:#7fb6f0;width:7px;height:7px"></i>Smooth airflow (brighter is faster)</li>
+      <li><i style="background:#e8873a;width:7px;height:7px"></i>Separated, turbulent airflow</li>
     </ul>
     <p class="hint">Air flows from left to right. Raise the angle of attack and watch the top of the wing.</p>
   </div>
@@ -222,7 +222,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     const surf = upper.slice(0, n + 1).map(toWind).reverse();      // separation point to trailing edge
     const S = surf[0], T = surf[surf.length - 1];
     const Lw = 2.2 + 3.2 * depth, Ht = .18 + 2.3 * Math.pow(depth, 1.25);
-    wake = { S, T, Lw, poly: [...surf, [T[0] + Lw, T[1] - .25 * depth], [T[0] + Lw, S[1] + Ht], [S[0] + .02, S[1] + .02]] };
+    const poly = [...surf, [T[0] + Lw, T[1] - .25 * depth], [T[0] + Lw, S[1] + Ht], [S[0] + .02, S[1] + .02]];
+    const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
+    wake = { S, T, Lw, poly, box: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)] };
   }
   function inWake(x, y) {
     if (!wake) return false;
@@ -257,55 +259,63 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   }
   const sx = x => ox + x * scale, sy = y => oy - y * scale;
 
-  // ---------- Smoke: one kind of particle for all the air ----------
-  // Puffs are released in pulses from a rake of nozzles on the left and move at the local
-  // airspeed, so the pulses spread out where the air is faster. A puff that drifts into
-  // separated air is carried by the turbulent wake instead and turns orange.
-  const NLANE = 30, EMIT = .03, PULSE_S = .34, PULSE_ON = .55;
-  let lanes = [], parts = [], emitClock = 0, simClock = 0;
-  const maxParts = () => W < 600 ? 2400 : 4800;
-  function seed() {
-    parts = [];
-    const half = Math.max(-ymin, ymax) * .95;
-    lanes = Array.from({ length: NLANE }, (_, i) => { const u = (i + .5) / NLANE * 2 - 1; return Math.sign(u) * Math.pow(Math.abs(u), 1.5) * half + .15; });
-    for (let k = 0; k < 220; k++) step(1 / 30, false);       // fill the tunnel before the first frame
+  // ---------- Air particles: one kind of particle for all the air ----------
+  // Each dot is a bit of air moving at the local airspeed. A dot that drifts into separated
+  // air is carried by the turbulent wake instead and turns orange.
+  let parts = [];
+  const count = () => Math.round((W < 600 ? 1300 : 2600) * Math.min(1.4, Math.max(.7, W * H / 7e5)));
+  function newPart(anywhere) {
+    return { x: anywhere ? xmin + Math.random() * (xmax - xmin) : xmin - Math.random() * .3, y: ymin + Math.random() * (ymax - ymin), age: 0, sep: false };
   }
-  const BUCKETS = 8, segs = Array.from({ length: BUCKETS + 1 }, () => []);
-  function step(dt, draw) {
-    simClock += dt; emitClock += dt;
-    while (emitClock > EMIT) {
-      emitClock -= EMIT;
-      if (simClock % PULSE_S < PULSE_S * PULSE_ON && parts.length < maxParts())
-        for (const y of lanes) parts.push({ x: xmin, y: y + (Math.random() - .5) * .015, age: 0, sep: false });
+  // Separated air is a recirculating mass, so keep the wake stocked with tumbling air,
+  // most of it where the separation starts on the wing
+  function wakePart() {
+    const B = wake.box;
+    for (let k = 0; k < 24; k++) {
+      const x = B[0] + Math.pow(Math.random(), 1.6) * (B[2] - B[0]) * .8, y = B[1] + Math.random() * (B[3] - B[1]);
+      if (inWake(x, y)) return { x, y, age: 0, sep: true };
     }
-    const h = dt * 1.6;
+    return null;
+  }
+  function seed() {
+    parts = Array.from({ length: count() }, () => newPart(true));
+    for (let k = 0; k < 40; k++) step(1 / 30, false);
+  }
+  const BUCKETS = 8, dots = Array.from({ length: BUCKETS + 1 }, () => []);
+  function step(dt, draw) {
+    const h = dt * 1.6, n = count();
+    while (parts.length < n) parts.push(newPart(false));
+    let tumbling = 0;
     for (let i = parts.length - 1; i >= 0; i--) {
       const p = parts[i], pot = potential(p.x, p.y);
       let dead = !pot, v;
       if (!dead) {
-        if (inWake(p.x, p.y)) { v = wakeVelocity(p.x, p.y, pot); p.sep = true; }
+        if (inWake(p.x, p.y)) { v = wakeVelocity(p.x, p.y, pot); p.sep = true; tumbling++; }
         else {
           v = potential(p.x + pot[0] * h / 2, p.y + pot[1] * h / 2) || pot;      // midpoint step around the nose
           if (p.sep) v = [v[0] + (Math.random() - .5) * .1, v[1] + (Math.random() - .5) * .1];
         }
-        const nx = p.x + v[0] * h, ny = p.y + v[1] * h;
+        p.x += v[0] * h; p.y += v[1] * h; p.age += dt;
         if (draw) {
           const b = p.sep ? BUCKETS : Math.min(BUCKETS - 1, Math.max(0, Math.floor((Math.hypot(v[0], v[1]) - .45) / 1.1 * BUCKETS)));
-          segs[b].push(sx(p.x), sy(p.y), sx(nx), sy(ny));
+          dots[b].push(sx(p.x), sy(p.y));
         }
-        p.x = nx; p.y = ny; p.age += dt;
-        dead = nx > xmax || ny < ymin - 1 || ny > ymax + 1 || p.age > (p.sep ? 9 : 20);
+        dead = p.x > xmax || p.y < ymin - 1 || p.y > ymax + 1 || p.age > (p.sep ? 9 : 20);
       }
-      if (dead) { parts[i] = parts[parts.length - 1]; parts.pop(); }
+      if (dead) { if (parts.length > n) { parts[i] = parts[parts.length - 1]; parts.pop(); } else parts[i] = newPart(false); }
+    }
+    if (wake) {
+      const want = Math.round((W < 600 ? 170 : 340) * depth);
+      for (let k = 0; k < Math.min(14, want - tumbling); k++) { const q = wakePart(); if (q) parts.push(q); }
     }
     if (!draw) return;
-    tctx.lineWidth = 1.8; tctx.lineCap = 'round';
-    segs.forEach((list, b) => {
+    dots.forEach((list, b) => {
       if (!list.length) return;
-      tctx.strokeStyle = b === BUCKETS ? 'hsl(26,82%,56%)' : `hsl(208,72%,${36 + b * 6.5}%)`;
+      const r = b === BUCKETS ? 2.6 : 2.2;
+      tctx.fillStyle = b === BUCKETS ? 'hsl(26,84%,58%)' : `hsl(208,72%,${40 + b * 6}%)`;
       tctx.beginPath();
-      for (let k = 0; k < list.length; k += 4) { tctx.moveTo(list[k], list[k + 1]); tctx.lineTo(list[k + 2], list[k + 3]); }
-      tctx.stroke(); list.length = 0;
+      for (let k = 0; k < list.length; k += 2) tctx.rect(list[k] - r / 2, list[k + 1] - r / 2, r, r);
+      tctx.fill(); list.length = 0;
     });
   }
 
@@ -412,7 +422,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       if (!wake || w.x > wake.T[0] + wake.Lw + .6) vortices.splice(i, 1);
     }
     // Fade the old smoke, then move every puff
-    tctx.globalAlpha = .12; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1;
+    tctx.globalAlpha = .5; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1;   // a faint hint of motion behind each dot
     step(dt, true);
     drawOverlay(now);
     requestAnimationFrame(frame);
