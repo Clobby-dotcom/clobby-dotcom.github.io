@@ -18,6 +18,8 @@
 .rose .faint{stroke:var(--chart-faint)}
 .rose .course{stroke:var(--accent)}
 @media (max-width:760px){.rose{right:-62%;opacity:.35}}
+/* On a phone the compass moves up beside the title, so it doesn't run under the paragraph */
+@media (max-width:520px){.rose{top:0;transform:translateY(-41%)}}
 
 .tools{max-width:1200px;margin:0 auto;padding:0 16px}
 .tools ul{list-style:none;margin:0;padding:0}
@@ -35,6 +37,7 @@
 .env-ax{stroke:var(--muted)}
 .cls-b{stroke:var(--chart)}
 .plane-s{fill:var(--accent)}
+.air{fill:none;stroke:var(--text);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:0 8.5}
 </style>
 </head>
 <body>
@@ -90,6 +93,22 @@
         </a>
       </li>
       <li>
+        <a class="tool" href="study/index.html">
+          <svg viewBox="0 0 112 112" aria-hidden="true">
+            <path d="M2 26 C16 24 26 8 46 10 S92 30 110 46" class="air"/>
+            <path d="M2 40 C14 38 22 22 40 22 S90 44 110 62" class="air"/>
+            <path d="M2 64 C16 66 30 74 50 76 S92 80 110 82" class="air"/>
+            <path d="M2 82 C24 84 50 92 72 94 S100 96 110 96" class="air"/>
+            <path d="M12 56 C12 42 32 38 54 42 C76 46 92 52 102 60 C88 63 68 66 48 66 C30 66 12 68 12 56 Z" class="env" stroke-width="2" transform="rotate(12 56 56)"/>
+          </svg>
+          <div>
+            <h2>Study</h2>
+            <p>The regulations and left-turning tendencies for the private pilot checkride, plus three simulators: a wing you can stall, an engine you can pull apart, and the Pilot 100i fuel system.</p>
+            <span class="open">See the study pages</span>
+          </div>
+        </a>
+      </li>
+      <li>
         <a class="tool" href="vor-trainer.html">
           <svg viewBox="0 0 112 112" aria-hidden="true">
             <rect width="112" height="112" rx="14" class="i-ring"/>
@@ -104,7 +123,7 @@
           </svg>
           <div>
             <h2>VOR trainer</h2>
-            <p>Put the airplane anywhere, turn the OBS, and watch the needle on a CDI or an HSI. Work through reverse sensing, station passage, and intercepting a radial in a crosswind, then try the "Where am I?" quiz.</p>
+            <p>Put the airplane anywhere, turn the OBS, and watch the needle on a CDI or an HSI. Work through reverse sensing, station passage, and intercepting a radial, then try the "Where am I?" quiz.</p>
             <span class="open">Open the VOR trainer</span>
           </div>
         </a>

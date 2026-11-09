@@ -18,7 +18,8 @@
 .lbl.front{color:var(--muted);font-weight:600}
 .hint{position:absolute;left:16px;bottom:14px;margin:0;font-size:.9rem;color:var(--muted);pointer-events:none;max-width:calc(100% - 32px)}
 .reset{position:absolute;top:14px;right:14px}
-.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font:600 1rem/1 var(--cond)}
+.loading{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:0 24px;color:var(--muted);font:600 1rem/1.35 var(--cond)}
+.loading.failed{color:var(--text)}
 
 .panel{border-left:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:24px 20px 32px}
 .panel h1{font:700 2.6rem/.95 var(--cond);margin:0;letter-spacing:-.02em}
@@ -57,10 +58,34 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .plist button.off{color:var(--muted);text-decoration:line-through}
 .plist small{color:var(--muted);font:500 .85rem/1.25 var(--cond)}
 
+@media (pointer:coarse){
+  .plist button{padding:10px 8px}
+  .check{margin-top:4px;padding:6px 0}
+}
+/* Wide screens: the selected part stays pinned at the top of the controls, so its description is in sight wherever the list is scrolled to */
+@media (min-width:901px){
+  .panel{overflow-anchor:none;padding-top:0}
+  .panel :is(button,input):not(.selpart *){scroll-margin-top:var(--pin,0px)}   /* a control you tab to stops below the pinned box, not under it */
+  .panel::before{content:"";display:block;height:24px}   /* the panel's top padding, moved here so the pinned box sits flush with the top */
+  .selpart{position:sticky;top:0;z-index:2;margin:16px -20px 0;padding:10px 20px 14px;max-height:60vh;overflow-y:auto;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:0 10px 14px -10px rgba(0,0,0,.6)}
+  .selpart:has(.info.empty){position:static;box-shadow:none}   /* nothing selected: the hint scrolls away with the page */
+  .selpart h2{display:none}
+  .selpart + h2{border-top:0;margin-top:14px;padding-top:0}
+}
+/* Narrow screens: the engine stays at the top while the controls scroll under it */
 @media (max-width:900px){
   .eng{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
-  .stage{height:62vh;min-height:380px}
-  .panel{border-left:0;border-top:1px solid var(--line);overflow:visible}
+  .stage{position:sticky;top:0;z-index:5;height:46vh;min-height:300px;border-bottom:1px solid var(--line)}
+  .panel{border-left:0;overflow:visible;display:flex;flex-direction:column}
+  .info{scroll-margin:calc(max(300px,46vh) + 64px) 0 12px}
+  .hint{font-size:.82rem;left:12px;bottom:10px}
+}
+/* A phone on its side: engine on the left, controls in their own scrolling column */
+@media (max-width:900px) and (min-width:560px) and (max-height:520px){
+  .eng{grid-template-columns:minmax(0,1fr) 300px;height:100vh;min-height:0}
+  .stage{position:relative;height:auto;min-height:0;border-bottom:0}
+  .panel{border-left:1px solid var(--line);overflow-y:auto}
+  .info{scroll-margin:12px 0}
 }
 </style>
 <script type="importmap">
@@ -81,7 +106,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         </ul>
       </div>
       <div class="nav-drop">
-        <a href="../study/index.html" aria-current="page">Study</a>
+        <a href="../study/index.html" aria-current="true">Study</a>
         <ul class="nav-menu">
           <li><a href="../study/regulations.html">Regulations</a></li>
           <li><a href="../study/left-turning-tendencies.html">Left-turning tendencies</a></li>
@@ -109,9 +134,14 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     <h1>Engine</h1>
     <p class="lede">A Lycoming IO-360, the fuel-injected engine in the 172R and Pilot 100i, modeled in CAD to its real bore, stroke, and layout. The 172K's O-320 is built the same way, with a carburetor in place of the fuel injection.</p>
 
+    <section class="selpart" aria-label="Selected part">
+      <h2>Selected part</h2>
+      <div class="info empty" id="info"><p>Click a part on the engine or in the list below.</p></div>
+    </section>
+
     <h2>Pull it apart</h2>
     <div class="ctl">
-      <label for="explode">Spread the parts <output id="explodeOut">Together</output></label>
+      <label for="explode">Spread the parts <output id="explodeOut" aria-live="off">Together</output></label>
       <input type="range" id="explode" min="0" max="100" value="0">
     </div>
     <label class="check"><input type="checkbox" id="cutaway"> See through the case and cylinders</label>
@@ -126,14 +156,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       <button class="btn spd" type="button" data-v="360" aria-pressed="false">Fast</button>
     </div>
     <div class="ctl">
-      <label for="crank">Crankshaft angle <output id="crankOut">0°</output></label>
+      <label for="crank">Crankshaft angle <output id="crankOut" aria-live="off">0°</output></label>
       <input type="range" id="crank" min="0" max="719" value="0">
     </div>
     <dl class="strokes" id="strokes"></dl>
     <p class="small">Firing order 1-3-2-4. Cylinders 1 and 3 are on the right, 2 and 4 on the left, with 1 and 2 nearest the propeller. One full cycle is two turns of the crankshaft.</p>
-
-    <h2>Selected part</h2>
-    <div class="info empty" id="info"><p>Click a part on the engine or in the list below.</p></div>
 
     <h2>Parts</h2>
     <div class="plist" id="plist"></div>
@@ -146,7 +173,14 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   <p>Made by Colby Penn</p>
 </footer>
 
-<script type="module">
+<script>
+// Says why the 3D viewer isn't there. The module script below calls it, or lands in it if its own files don't load.
+function engineFail(msg) {
+  var l = document.getElementById('loading');
+  if (l) { l.textContent = msg; l.classList.add('failed'); }
+}
+</script>
+<script type="module" onerror="engineFail('The 3D viewer didn\u2019t load. Check your connection, then reload the page.')">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -196,7 +230,11 @@ const TYPES = {
 
 // ---------- Renderer, scene, camera ----------
 const stage = document.getElementById('stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ antialias: true }); }
+catch (e) { engineFail('This browser or device can\u2019t draw 3D graphics, so the engine viewer can\u2019t run here.'); throw e; }
+renderer.domElement.setAttribute('role', 'img');
+renderer.domElement.setAttribute('aria-label', '3D model of the engine. Every part is also in the parts list.');
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -238,11 +276,15 @@ const $ = id => document.getElementById(id);
 let gltf, LAY;
 try {
   [gltf, LAY] = await Promise.all([
-    new GLTFLoader().loadAsync('models/io360.glb'),
+    new GLTFLoader().loadAsync('models/io360.glb', p => {   // the model is about 4 MB, so show how far along it is
+      $('loading').textContent = 'Loading the engine… ' + (p.total ? Math.round(p.loaded / p.total * 100) + '%' : (p.loaded / 1048576).toFixed(1) + ' MB');
+    }),
     fetch('models/io360-layout.json').then(r => r.json())
   ]);
 } catch (e) {
-  $('loading').textContent = 'The engine model didn\'t load. Refresh the page to try again.';
+  engineFail(location.protocol === 'file:'
+    ? 'The engine model can\u2019t load when this page is opened straight from a file. Open it from the website.'
+    : 'The engine model didn\u2019t load. Check your connection, then reload the page.');
   throw e;
 }
 const GEO = {};
@@ -412,8 +454,9 @@ function updateStrokes() {
     const name = STROKES[Math.floor(o.cycle / 180)], el = $('st' + o.c.n);
     if (el.dataset.s !== name) { el.dataset.s = name; el.className = 'st-' + name.toLowerCase(); el.lastChild.textContent = name; }
   });
-  $('crankOut').textContent = Math.round(theta % 720) + '°';
-  if (running) $('crank').value = Math.round(theta % 720);
+  const deg = Math.floor(theta % 720);
+  $('crankOut').textContent = deg + '°';
+  if (running) $('crank').value = deg;
 }
 
 // Parts list
@@ -429,7 +472,7 @@ plist.addEventListener('click', e => {
   // Parts hidden inside the engine are easier to find with the case see-through
   if (INSIDE.includes(b.dataset.t) && explodeGoal < .3 && !$('cutaway').checked) { $('cutaway').checked = true; setCutaway(true); }
   if (b.dataset.t === 'prop' && !showProp) { $('propOn').checked = true; showProp = true; }
-  select(parts.filter(p => p.type === b.dataset.t));
+  select(parts.filter(p => p.type === b.dataset.t), true);
 });
 
 // Selection and taking parts off
@@ -445,19 +488,36 @@ function paint() {
     b.classList.toggle('off', parts.filter(p => p.type === b.dataset.t).every(p => p.hidden));
   });
 }
-function select(list) {
+const TOUCH = matchMedia('(hover:none) and (pointer:coarse)').matches, narrow = matchMedia('(max-width:900px)');
+const panel = document.querySelector('.panel');
+if (TOUCH) document.querySelector('.hint').textContent = 'Drag to turn it. Pinch to zoom. Tap any part to see what it does.';
+function select(list, reveal) {
   selected = list; paint();
-  const info = $('info');
-  if (!list.length) { info.className = 'info empty'; info.innerHTML = '<p>Click a part on the engine or in the list below.</p>'; return; }
+  const info = $('info'), box = info.parentElement, h0 = box.offsetHeight;
+  // On a wide screen the box is pinned above the list once the page has scrolled past it. When its height changes, hold the list still under the pointer.
+  const past = !narrow.matches && box.getBoundingClientRect().top - panel.getBoundingClientRect().top < 1;
+  fillInfo(info, list);
+  const h1 = box.offsetHeight;
+  if (past && h1 !== h0) panel.scrollTop += h1 - h0;
+  panel.style.setProperty('--pin', (list.length ? h1 + 8 : 0) + 'px');
+  // on a narrow screen the description can be off screen, so bring it into view
+  if (reveal && narrow.matches) info.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
+function fillInfo(info, list) {
+  if (!list.length) { info.className = 'info empty'; info.innerHTML = `<p>${TOUCH ? 'Tap' : 'Click'} a part on the engine or in the list below.</p>`; return; }
   const t = TYPES[list[0].type], one = list.length === 1;
   const where = one && list[0].label ? list[0].label : list.length > 1 ? `${list.length} on this engine` : '';
-  const anyHidden = parts.some(p => p.hidden);
+  const allOff = list.every(p => p.hidden), othersOff = parts.some(p => p.hidden && !list.includes(p));
+  const showAll = othersOff || (!allOff && list.some(p => p.hidden));   // skip it when the first button already does the same thing
+  const toggle = allOff ? (one ? 'Put it back' : 'Put these back') : (one ? 'Take this part off' : 'Take all of these off');
   info.className = 'info';
   info.innerHTML = `<h3>${t.name}</h3><p class="sys">${t.sys}${where ? ', ' + where : ''}</p><p>${t.desc}</p>
-    <div class="row"><button class="btn" type="button" id="hideBtn">${one ? 'Take this part off' : 'Take all of these off'}</button>${anyHidden ? '<button class="btn" type="button" id="showAll">Put everything back</button>' : ''}</div>`;
-  $('hideBtn').onclick = () => { list.forEach(p => p.hidden = true); select(list); };
-  if (anyHidden) $('showAll').onclick = () => { parts.forEach(p => p.hidden = false); select(list); };
+    <div class="row"><button class="btn" type="button" id="hideBtn">${toggle}</button>${showAll ? '<button class="btn" type="button" id="showAll">Put everything back</button>' : ''}</div>`;
+  // the buttons are rebuilt each time, so put the focus back on the one that was pressed
+  $('hideBtn').onclick = () => { list.forEach(p => p.hidden = !allOff); select(list); $('hideBtn').focus(); };
+  if ($('showAll')) $('showAll').onclick = () => { parts.forEach(p => p.hidden = false); select(list); $('hideBtn').focus(); };
 }
+select([]);
 
 // Picking: a click (not a drag) selects the part under the pointer
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
@@ -480,7 +540,7 @@ function pick(ev) {
 let down = null;
 renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
 renderer.domElement.addEventListener('pointerup', e => {
-  if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) < 5) { const p = pick(e); select(p ? [p] : []); }
+  if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) < 5) { const p = pick(e); select(p ? [p] : [], true); }
   down = null;
 });
 renderer.domElement.addEventListener('pointermove', e => {
@@ -502,7 +562,8 @@ renderer.setAnimationLoop(now => {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   if (running) theta = (theta + speed * dt) % 720;
   explodeT += (explodeGoal - explodeT) * Math.min(1, dt * 6);
-  $('explodeOut').textContent = explodeGoal < .01 ? 'Together' : explodeGoal > .99 ? 'All the way apart' : Math.round(explodeGoal * 100) + '%';
+  const spread = explodeGoal < .01 ? 'Together' : explodeGoal > .99 ? 'All the way apart' : Math.round(explodeGoal * 100) + '%';
+  if ($('explodeOut').textContent !== spread) $('explodeOut').textContent = spread;
   pose(); updateStrokes();
   controls.update();
   renderer.render(scene, camera); labelRenderer.render(scene, camera);

@@ -52,7 +52,7 @@
   </div>
 </header>
 
-<div class="page">
+<main class="page">
   <nav class="toc" aria-label="On this page">
     <h2>On this page</h2>
     <ol>
@@ -118,18 +118,18 @@
       <table>
         <caption>The example airplane's limits</caption>
         <tbody>
-          <tr><td>Maximum takeoff weight</td><td>2,550 lb</td></tr>
-          <tr><td>Forward CG limit</td><td>35.0 in up to 1,950 lb, moving aft to 41.0 in at 2,550 lb</td></tr>
-          <tr><td>Aft CG limit</td><td>47.3 in at all weights</td></tr>
-          <tr><td>Front seats arm</td><td>37.0 in</td></tr>
-          <tr><td>Rear seats arm</td><td>73.0 in</td></tr>
-          <tr><td>Fuel arm</td><td>48.0 in</td></tr>
-          <tr><td>Baggage arm</td><td>95.0 in</td></tr>
-          <tr><td>Usable fuel</td><td>50 gal</td></tr>
+          <tr><th scope="row">Maximum takeoff weight</th><td>2,550 lb</td></tr>
+          <tr><th scope="row">Forward CG limit</th><td>35.0 in up to 1,950 lb, moving aft to 41.0 in at 2,550 lb</td></tr>
+          <tr><th scope="row">Aft CG limit</th><td>47.3 in at all weights</td></tr>
+          <tr><th scope="row">Front seats arm</th><td>37.0 in</td></tr>
+          <tr><th scope="row">Rear seats arm</th><td>73.0 in</td></tr>
+          <tr><th scope="row">Fuel arm</th><td>48.0 in</td></tr>
+          <tr><th scope="row">Baggage arm</th><td>95.0 in</td></tr>
+          <tr><th scope="row">Usable fuel</th><td>50 gal</td></tr>
         </tbody>
       </table>
     </div>
-    <p>You're taking two passengers and a bag on a one-hour flight with 40 gallons of fuel. Is it legal?</p>
+    <p>You're taking two passengers and a bag on a three-hour flight with 40 gallons of fuel. Is it legal?</p>
 
     <ol class="steps">
       <li>
@@ -173,7 +173,7 @@
       </li>
       <li>
         <h3>Do it again for landing</h3>
-        <p>The fuel you burn changes both the weight and the CG. An hour at 8 gallons per hour plus taxi and climb is about 24 gallons, or 144 lb. Take that weight and its moment back out:</p>
+        <p>The fuel you burn changes both the weight and the CG. Three hours at 8 gallons per hour, with taxi and climb, is about 24 gallons, or 144 lb. Take that weight and its moment back out:</p>
         <div class="table-wrap">
           <table>
             <caption>Landing</caption>
@@ -215,7 +215,7 @@
       <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 10, Weight and Balance</li>
     </ul>
   </article>
-</div>
+</main>
 
 <footer class="site-foot">
   <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
@@ -227,23 +227,30 @@
 (function(){
   const svg = document.getElementById('envChart');
   const X0 = 34, X1 = 48, Y0 = 1500, Y1 = 2600;
-  const L = 70, R = 600, T = 20, B = 340;
-  const x = cg => L + (cg - X0) / (X1 - X0) * (R - L);
-  const y = w => B - (w - Y0) / (Y1 - Y0) * (B - T);
   const env = [[35, 1500], [35, 1950], [41, 2550], [47.3, 2550], [47.3, 1500]];
   const to = [103200 / 2420, 2420], ld = [96288 / 2276, 2276];
-  let s = '';
-  for (let c = X0; c <= X1; c += 2) s += `<line class="grid" x1="${x(c)}" y1="${T}" x2="${x(c)}" y2="${B}"/><text class="tick" x="${x(c)}" y="${B + 22}" text-anchor="middle">${c}</text>`;
-  for (let w = Y0; w <= Y1; w += 100) s += `<line class="grid" x1="${L}" y1="${y(w)}" x2="${R}" y2="${y(w)}"/><text class="tick" x="${L - 10}" y="${y(w)}" text-anchor="end" dominant-baseline="central">${w.toLocaleString()}</text>`;
-  s += `<path class="axis" d="M${L} ${T} V${B} H${R}" fill="none"/>`;
-  s += `<text class="tick" x="${(L + R) / 2}" y="${B + 50}" text-anchor="middle">CG, inches aft of datum</text>`;
-  s += `<text class="tick" transform="translate(16 ${(T + B) / 2}) rotate(-90)" text-anchor="middle">Weight, lb</text>`;
-  s += `<path class="env" d="M${env.map(p => x(p[0]) + ' ' + y(p[1])).join(' L')} Z"/>`;
-  s += `<text class="envlab" x="${x(45.5)}" y="${y(1650)}" text-anchor="middle">Within limits</text>`;
-  s += `<line class="path" x1="${x(to[0])}" y1="${y(to[1])}" x2="${x(ld[0])}" y2="${y(ld[1])}"/>`;
-  s += `<circle class="pt" cx="${x(to[0])}" cy="${y(to[1])}" r="7"/><text class="ptlab" x="${x(to[0]) + 14}" y="${y(to[1])}" dominant-baseline="central">Takeoff</text>`;
-  s += `<circle class="pt-open" cx="${x(ld[0])}" cy="${y(ld[1])}" r="6"/><text class="ptlab" x="${x(ld[0]) + 14}" y="${y(ld[1])}" dominant-baseline="central">Landing</text>`;
-  svg.innerHTML = s;
+  const narrow = matchMedia('(max-width:520px)');
+  function draw() {
+    // A phone gets a smaller, squarer drawing, so the labels stay a readable size instead of shrinking with the chart
+    const n = narrow.matches, W = n ? 360 : 620, H = n ? 330 : 400;
+    const L = n ? 58 : 70, R = W - (n ? 10 : 20), T = n ? 14 : 20, B = H - 60;
+    const x = cg => L + (cg - X0) / (X1 - X0) * (R - L);
+    const y = w => B - (w - Y0) / (Y1 - Y0) * (B - T);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    let s = '';
+    for (let c = X0; c <= X1; c += 2) s += `<line class="grid" x1="${x(c)}" y1="${T}" x2="${x(c)}" y2="${B}"/><text class="tick" x="${x(c)}" y="${B + 22}" text-anchor="middle">${c}</text>`;
+    for (let w = Y0; w <= Y1; w += 100) s += `<line class="grid" x1="${L}" y1="${y(w)}" x2="${R}" y2="${y(w)}"/><text class="tick" x="${L - 10}" y="${y(w)}" text-anchor="end" dominant-baseline="central">${w.toLocaleString()}</text>`;
+    s += `<path class="axis" d="M${L} ${T} V${B} H${R}" fill="none"/>`;
+    s += `<text class="tick" x="${(L + R) / 2}" y="${B + 50}" text-anchor="middle">CG, inches aft of datum</text>`;
+    s += `<text class="tick" transform="translate(${n ? 12 : 16} ${(T + B) / 2}) rotate(-90)" text-anchor="middle">Weight, lb</text>`;
+    s += `<path class="env" d="M${env.map(p => x(p[0]) + ' ' + y(p[1])).join(' L')} Z"/>`;
+    s += `<text class="envlab" x="${x(47.3) - 10}" y="${y(1650)}" text-anchor="end">Within limits</text>`;
+    s += `<line class="path" x1="${x(to[0])}" y1="${y(to[1])}" x2="${x(ld[0])}" y2="${y(ld[1])}"/>`;
+    s += `<circle class="pt" cx="${x(to[0])}" cy="${y(to[1])}" r="7"/><text class="ptlab" x="${x(to[0]) + 14}" y="${y(to[1])}" dominant-baseline="central">Takeoff</text>`;
+    s += `<circle class="pt-open" cx="${x(ld[0])}" cy="${y(ld[1])}" r="6"/><text class="ptlab" x="${x(ld[0]) + 14}" y="${y(ld[1])}" dominant-baseline="central">Landing</text>`;
+    svg.innerHTML = s;
+  }
+  draw(); narrow.addEventListener('change', draw);
 })();
 </script>
 </body>

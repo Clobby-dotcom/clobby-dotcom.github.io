@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>VOR trainer</title>
+<meta name="description" content="Practice VOR navigation: put the airplane anywhere, turn the OBS, and watch the needle on a CDI or an HSI. Covers reverse sensing, station passage, and intercepting a radial.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
@@ -73,10 +74,25 @@ input[type=number]{width:4.6em;font-variant-numeric:tabular-nums}
 .feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
 
 .main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,.9fr);gap:20px;align-items:start}
-@media (max-width:880px){.main{grid-template-columns:1fr}}
+/* Narrow screens: Play, then the map, then the instrument, so the needle is on screen while the airplane moves */
+@media (max-width:559px),(max-width:880px) and (orientation:portrait){
+  .main{display:flex;flex-direction:column;align-items:stretch;gap:12px}
+  .main > div,.main .sim{display:contents}
+  .main .transport{order:1}
+  .main .map-wrap{order:2;align-self:center;max-width:max(240px,46vh);max-width:max(240px,46svh)}
+  .main .inst-panel{order:3;margin:0}
+  .main .layers{order:4;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .main .read-panel{order:5;margin:0}
+  .inst-panel .inst-svg{max-width:clamp(200px,32vh,330px);max-width:clamp(200px,32svh,330px)}
+}
+/* A phone on its side has room for the map and the instrument next to each other */
+@media (min-width:560px) and (max-width:880px) and (orientation:landscape){
+  .main{grid-template-columns:minmax(0,1fr) minmax(240px,.8fr);gap:14px}
+  .inst-panel .inst-svg{max-width:clamp(180px,calc(100vh - 110px),330px)}
+}
 
-.map-wrap{position:relative;aspect-ratio:1/1;width:100%;border-radius:12px;overflow:hidden;background:var(--map-bg);border:1px solid var(--line);touch-action:none;cursor:crosshair}
-.map-wrap.locked{cursor:default}
+.map-wrap{position:relative;aspect-ratio:1/1;width:100%;border-radius:12px;overflow:hidden;background:var(--map-bg);border:1px solid var(--line);touch-action:none;cursor:crosshair;max-width:max(240px,calc(100vh - 24px));margin-inline:auto}
+.map-wrap.locked{cursor:default;touch-action:auto}
 .map-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
@@ -93,12 +109,12 @@ input[type=number]{width:4.6em;font-variant-numeric:tabular-nums}
 .check input{width:17px;height:17px;accent-color:var(--accent)}
 
 .inst-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
-.inst-svg{width:100%;max-width:330px;display:block;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.inst-svg{width:100%;max-width:330px;display:block;margin:0 auto;user-select:none;-webkit-user-select:none}
 .inst-svg text{font-family:var(--cond);font-weight:600}
 .i-bezel{fill:var(--inst-bezel)} .i-face{fill:var(--inst-face)} .i-mark{fill:var(--inst-mark)} .i-mark-s{stroke:var(--inst-mark)}
 .i-dim{fill:var(--inst-dim)} .i-dim-s{stroke:var(--inst-dim)} .i-green{fill:var(--inst-green)} .i-red{fill:var(--inst-red)}
 .i-window{fill:var(--inst-window)} .i-knob{fill:var(--inst-knob);stroke:#000;stroke-width:1.5}
-.knob{cursor:grab;outline:none}
+.knob{cursor:grab;outline:none;touch-action:none}
 .knob:active{cursor:grabbing}
 .knob:focus-visible .i-knob{stroke:var(--focus);stroke-width:3}
 
@@ -109,6 +125,14 @@ input[type=number]{width:4.6em;font-variant-numeric:tabular-nums}
 .steps button{min-width:44px;padding:8px 9px}
 .sub{color:var(--muted);font-size:.88rem;min-height:1.3em;margin-top:2px;text-align:right}
 .keys{color:var(--muted);font-size:.88rem;margin:12px 0 0}
+@media (max-width:480px){
+  .dial-row{grid-template:"lab steps" auto "big steps" auto / auto 1fr;gap:0 10px}
+  .dial-row .lab{grid-area:lab;font-size:.85rem}
+  .dial-row .big{grid-area:big}
+  .steps{grid-area:steps;flex-wrap:nowrap}
+  .steps button{min-height:44px}
+}
+@media (hover:none) and (pointer:coarse){.keys .kb{display:none}}
 
 dl.readouts{display:grid;grid-template-columns:1fr auto;gap:7px 14px;margin:0}
 dl.readouts dt{color:var(--muted)}
@@ -149,7 +173,7 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
     </nav>
   </div>
 </header>
-<div class="app">
+<main class="app">
   <h1>VOR trainer</h1>
   <p class="lede">Put the airplane anywhere, turn the OBS, and watch the needle. Your position and the OBS move it. Your heading never changes what it tells you.</p>
 
@@ -176,7 +200,7 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
         <canvas id="map" role="img" aria-label="Map of the VOR station, the selected course, and the airplane"></canvas>
       </div>
       <div class="panel sim">
-        <div class="row">
+        <div class="row transport">
           <button id="play" class="primary" type="button" style="min-width:86px">Play</button>
           <span class="field">Sim speed
             <span class="seg" id="speedSeg" role="group" aria-label="Simulation speed">
@@ -184,7 +208,7 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
             </span>
           </span>
         </div>
-        <div class="row">
+        <div class="row layers">
           <label class="check"><input type="checkbox" id="tZones" checked> TO and FROM sides</label>
           <label class="check"><input type="checkbox" id="tBand" checked> Full-scale band</label>
           <label class="check"><input type="checkbox" id="tRadial" checked> Radial and bearing</label>
@@ -195,7 +219,7 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
     </div>
 
     <div>
-      <div class="panel">
+      <div class="panel inst-panel">
         <div class="inst-head">
           <h3 id="instTitle" style="margin:0">Course deviation indicator</h3>
           <span class="seg" id="dispSeg" role="group" aria-label="Instrument">
@@ -203,7 +227,7 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
           </span>
         </div>
 
-        <svg id="cdi" class="inst-svg" viewBox="0 0 300 300" role="img" aria-label="VOR course deviation indicator">
+        <svg id="cdi" class="inst-svg" viewBox="0 0 300 300" role="group" aria-label="VOR course deviation indicator">
           <defs><clipPath id="cdiClip"><circle cx="150" cy="150" r="92"/></clipPath></defs>
           <rect x="2" y="2" width="296" height="296" rx="22" class="i-bezel"/>
           <circle cx="150" cy="150" r="134" class="i-face"/>
@@ -224,7 +248,7 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
           </g>
         </svg>
 
-        <svg id="hsi" class="inst-svg" viewBox="0 0 300 300" role="img" aria-label="Horizontal situation indicator" hidden>
+        <svg id="hsi" class="inst-svg" viewBox="0 0 300 300" role="group" aria-label="Horizontal situation indicator" hidden>
           <rect x="2" y="2" width="296" height="296" rx="22" class="i-bezel"/>
           <circle cx="150" cy="150" r="134" class="i-face"/>
           <g id="hsiCard"></g>
@@ -270,10 +294,10 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
           </div>
         </div>
         <div class="sub" id="hdgTgt"></div>
-        <p class="keys">Keyboard: ← and → turn the airplane, [ and ] turn the OBS (hold Shift for bigger steps), space plays or pauses. You can also drag or scroll on the knob.</p>
+        <p class="keys"><span class="kb">Keyboard: ← and → turn the airplane, [ and ] turn the OBS (hold Shift for bigger steps), space plays or pauses. </span>You can also drag the knob to turn it.</p>
       </div>
 
-      <div class="panel">
+      <div class="panel read-panel">
         <h3>Where the airplane is</h3>
         <dl class="readouts" id="readouts">
           <dt>Radial (from the station)</dt><dd id="rRadial">—</dd>
@@ -296,7 +320,7 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
       <li>Aeronautical Information Manual, 1-1-3 (VHF Omni-directional Range)</li>
     </ul>
   </section>
-</div>
+</main>
 
 <script>
 (function(){
@@ -316,16 +340,17 @@ const CONE_NM = 0.75, ABEAM_BAND = 2, FULL_SCALE = 10, TURN_RATE = 3;
 const SIM_BASE = 8, RANGES = [5, 10, 20, 40];
 
 const S = {
-  x: 0, y: -12, hdg: 45, tgtHdg: 45, obs: 45, tas: 100,
+  x: 0, y: -12, hdg: 45, tgtHdg: 45, pend: 0, obs: 45, tas: 100,
   windDir: 0, windSpd: 0, running: false, speed: 1, range: 20, display: 'cdi',
   show: { zones: true, band: true, radial: true, trail: true },
   trail: [], scenario: 'free', quiz: null, needleDisp: 0, t: 0
 };
 
 /* ---------- Scenarios ---------- */
+const TAP = matchMedia('(hover:none) and (pointer:coarse)').matches ? 'Tap' : 'Click';
 const SCENARIOS = [
   { id: 'free', label: 'Free practice',
-    brief: 'Click or drag anywhere on the map to put the airplane there, then press Play to fly it. Spin the heading all the way around and watch the needle: it doesn’t move. Only your position and the OBS move it.',
+    brief: TAP + ' or drag anywhere on the map to put the airplane there, then press Play to fly it. Spin the heading all the way around and watch the needle: it doesn’t move. Only your position and the OBS move it.',
     setup() { place(pos(225, 12)); headingNow(45); S.obs = 45; S.range = 20; } },
   { id: 'reverse', label: 'Reverse sensing',
     brief: 'You’re north of the station, heading 180 toward it, but the OBS is set to 360. The flag reads FROM and the needle is left. Press Play and turn toward the needle. It runs away from you: that’s reverse sensing. Fix it by setting the OBS to 180 so the course agrees with your heading, or switch to the HSI and compare.',
@@ -342,10 +367,10 @@ const SCENARIOS = [
 ];
 
 function place(p) { S.x = p.x; S.y = p.y; S.trail = []; }
-function headingNow(h) { S.hdg = S.tgtHdg = norm360(h); }
+function headingNow(h) { S.hdg = S.tgtHdg = norm360(h); S.pend = 0; }
 function setObs(v) { S.obs = norm360(Math.round(v)); }
 function turnBy(d) {
-  if (S.running) S.tgtHdg = norm360(Math.round(S.tgtHdg) + d);
+  if (S.running) { if (Math.abs(S.pend + d) > 360) return; S.pend += d; S.tgtHdg = norm360(Math.round(S.tgtHdg) + d); }   // pend is signed, so a turn of more than 180° keeps going the way you asked
   else headingNow(Math.round(S.hdg) + d);
 }
 const isHidden = () => S.scenario === 'quiz' && S.quiz && !S.quiz.answered;
@@ -414,8 +439,9 @@ function autoRange(dist) {
 }
 function step(dtReal) {
   const dt = dtReal * S.speed * SIM_BASE; // simulated seconds
-  const diff = norm180(S.tgtHdg - S.hdg), maxTurn = TURN_RATE * dt;
-  S.hdg = Math.abs(diff) <= maxTurn ? norm360(S.tgtHdg) : norm360(S.hdg + Math.sign(diff) * maxTurn);
+  const maxTurn = TURN_RATE * dt, dir = Math.sign(S.pend);
+  if (Math.abs(S.pend) <= maxTurn) { S.hdg = norm360(S.tgtHdg); S.pend = 0; }
+  else { S.hdg = norm360(S.hdg + dir * maxTurn); S.pend -= dir * maxTurn; }
   const v = groundVec();
   S.x += v.x * dt / 3600; S.y += v.y * dt / 3600;
   const last = S.trail[S.trail.length - 1];
@@ -597,7 +623,7 @@ function draw(n) {
       ctx.strokeStyle = COL.plane; ctx.globalAlpha = .45; ctx.lineWidth = 1.5; ctx.setLineDash([3, 4]);
       ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(tx, ty); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
       drawPlane(px, py, S.hdg);
-      if (S.scenario !== 'quiz') { ctx.font = '500 12px ' + COL.sans; haloText('Click or drag to move the airplane', W - 10, H - 14, COL.muted, 'right'); }
+      if (S.scenario !== 'quiz') { ctx.font = '500 12px ' + COL.sans; haloText(TAP + (W < 420 ? ' to move the airplane' : ' or drag to move the airplane'), W - 10, H - 14, COL.muted, 'right'); }
     }
   }
 }
@@ -647,12 +673,16 @@ el('cdiKnurl').innerHTML = knurl(); el('hsiKnurl').innerHTML = knurl();
   el('hsiDots').innerHTML = h;
 }
 
+// The knob is the only part of each instrument a screen reader needs; the readouts below say what the needle shows
+for (const id of ['cdi', 'hsi']) for (const c of el(id).children) if (!c.classList.contains('knob')) c.setAttribute('aria-hidden', 'true');
+
 function bindKnob(k) {
   let sx = null, sy = 0, start = 0;
   k.addEventListener('pointerdown', e => { e.preventDefault(); k.setPointerCapture(e.pointerId); sx = e.clientX; sy = e.clientY; start = S.obs; k.focus({ preventScroll: true }); });
   k.addEventListener('pointermove', e => { if (sx === null) return; setObs(start + Math.round(((e.clientX - sx) - (e.clientY - sy)) / 3)); });
   const up = () => { sx = null; };
   k.addEventListener('pointerup', up); k.addEventListener('pointercancel', up);
+  k.addEventListener('touchstart', e => e.preventDefault(), { passive: false });   // keeps the page still while a finger turns the knob
   k.addEventListener('wheel', e => { e.preventDefault(); setObs(S.obs + (e.deltaY < 0 ? 1 : -1) * (e.shiftKey ? 10 : 1)); }, { passive: false });
   k.addEventListener('keydown', e => {
     const m = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 10, PageDown: -10 }[e.key];
@@ -699,7 +729,7 @@ function updateReadouts(n, now) {
   if (now - lastRead < 90) return; lastRead = now;
   el('obsVal').textContent = fmt3(S.obs) + '°';
   el('hdgVal').textContent = fmt3(S.hdg) + '°';
-  el('hdgTgt').textContent = Math.abs(norm180(S.tgtHdg - S.hdg)) > .5 ? `Turning to ${fmt3(S.tgtHdg)}°` : '';
+  el('hdgTgt').textContent = Math.abs(S.pend) > .5 ? `Turning to ${fmt3(S.tgtHdg)}°` : '';
   const hide = isHidden();
   el('readouts').hidden = hide; el('readHidden').hidden = !hide;
   if (hide) return;
@@ -734,6 +764,7 @@ document.querySelectorAll('[data-hdg]').forEach(b => b.addEventListener('click',
 
 document.addEventListener('keydown', e => {
   const tag = (e.target.tagName || '').toLowerCase();
+  if (e.altKey || e.ctrlKey || e.metaKey) return;   // leave browser shortcuts such as Alt+Left alone
   if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
   if (e.target.closest && e.target.closest('[role="slider"]')) return;
   if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); turnBy((e.key === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 10 : 5)); }

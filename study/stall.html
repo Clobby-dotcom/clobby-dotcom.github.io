@@ -17,6 +17,7 @@
 .legend{position:absolute;left:12px;top:12px;margin:0;padding:6px 8px;border-radius:6px;background:var(--bg);list-style:none;font:500 .9rem/1.3 var(--cond);color:var(--muted);pointer-events:none}
 .legend li{display:flex;align-items:center;gap:8px}
 .legend i{display:inline-block;width:18px;height:3px;border-radius:2px}
+.stagebtn{position:absolute;top:12px;right:12px;min-width:68px}
 
 .panel{border-left:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:24px 20px 32px}
 .panel h1{font:700 2.6rem/.95 var(--cond);margin:0;letter-spacing:-.02em}
@@ -38,14 +39,24 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .warn i{width:10px;height:10px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line)}
 .warn.on{color:#1a0b0e;background:#e8b04a;border-color:#e8b04a}
 .warn.on i{background:#1a0b0e;border-color:#1a0b0e}
+.warn b{font-weight:700}
 .chart{margin-top:6px}
 .chart svg{display:block;width:100%;height:auto}
 .chart text{font:500 11px "Barlow Semi Condensed",sans-serif;fill:var(--muted)}
 .small{font-size:.88rem;color:var(--muted);margin:10px 0 0}
+/* Narrow screens: the wing stays at the top while the controls scroll under it */
 @media (max-width:900px){
   .sim{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
-  .stage{height:58vh;min-height:340px}
-  .panel{border-left:0;border-top:1px solid var(--line);overflow:visible}
+  .stage{position:sticky;top:0;z-index:5;height:46vh;height:46svh;min-height:300px;border-bottom:1px solid var(--line)}
+  .panel{border-left:0;overflow:visible}
+  .hint{font-size:.82rem;bottom:10px}
+  .legend{font-size:.82rem}
+}
+/* A phone on its side: wing on the left, controls in their own scrolling column */
+@media (max-width:900px) and (min-width:560px) and (max-height:520px){
+  .sim{grid-template-columns:minmax(0,1fr) 300px;height:100vh;height:100svh;min-height:0}
+  .stage{position:relative;height:auto;min-height:0;border-bottom:0}
+  .panel{border-left:1px solid var(--line);overflow-y:auto}
 }
 </style>
 </head>
@@ -63,7 +74,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         </ul>
       </div>
       <div class="nav-drop">
-        <a href="../study/index.html" aria-current="page">Study</a>
+        <a href="../study/index.html" aria-current="true">Study</a>
         <ul class="nav-menu">
           <li><a href="../study/regulations.html">Regulations</a></li>
           <li><a href="../study/left-turning-tendencies.html">Left-turning tendencies</a></li>
@@ -86,6 +97,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       <li><i style="background:#7fb6f0;width:7px;height:7px"></i>Smooth airflow (brighter is faster)</li>
       <li><i style="background:#e8873a;width:7px;height:7px"></i>Separated, turbulent airflow</li>
     </ul>
+    <button class="btn stagebtn" id="pause" type="button">Pause</button>
     <p class="hint">Air flows from left to right. Raise the angle of attack and watch the top of the wing.</p>
   </div>
 
@@ -96,15 +108,15 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
     <h2>Angle of attack</h2>
     <div class="ctl">
-      <label for="aoa">Between the chord line and the relative wind <output id="aoaOut">4.0°</output></label>
+      <label for="aoa">Between the chord line and the relative wind <output id="aoaOut" aria-live="off">4.0°</output></label>
       <input type="range" id="aoa" min="-4" max="24" step="0.5" value="4">
     </div>
     <div class="row">
       <button class="btn" id="raise" type="button">Slowly raise to a stall</button>
       <button class="btn" id="recover" type="button">Recover</button>
     </div>
-    <span class="warn" id="warn"><i></i>Stall warning</span>
-    <dl class="readout">
+    <span class="warn" id="warn" role="status"><i></i>Stall warning <b id="warnState">off</b></span>
+    <dl class="readout" aria-live="polite">
       <dt>Airflow</dt><dd id="flow">Smooth over the whole wing</dd>
       <dt>Lift</dt><dd id="lift">Increasing with angle of attack</dd>
     </dl>
@@ -364,16 +376,23 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
   // ---------- View ----------
   let W = 0, H = 0, dpr = 1, scale = 1, ox = 0, oy = 0, xmin = -6, xmax = 6, ymin = -3, ymax = 3;
+  let paused = reduce, settle = 0, seedTimer = 0;   // settle: steps still to run so a paused picture matches the angle
   function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    if (!w || !h || (w === W && h === H)) return;
+    const first = !W;
     dpr = Math.min(devicePixelRatio || 1, 2);
-    W = stage.clientWidth; H = stage.clientHeight;
+    W = w; H = h;
     [trails, overlay].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
     scale = Math.min(W * (W < 600 ? .56 : .42), H * .9) / CHORD;
     ox = W * (W < 600 ? .5 : .46); oy = H * .53;
     xmin = -ox / scale - .5; xmax = (W - ox) / scale + .5; ymin = -(H - oy) / scale; ymax = oy / scale;
     tctx.setTransform(dpr, 0, 0, dpr, 0, 0); octx.setTransform(dpr, 0, 0, dpr, 0, 0);
     tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H);
-    seed();
+    settle = Math.max(settle, 3);
+    if (first) { seed(); return; }
+    clearTimeout(seedTimer);   // a phone's address bar resizes the page many times a second, so wait for it to stop
+    seedTimer = setTimeout(() => { seed(); settle = Math.max(settle, 3); }, 200);
   }
   const sx = x => ox + x * scale, sy = y => oy - y * scale;
 
@@ -437,9 +456,13 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   const $ = id => document.getElementById(id);
   const slider = $('aoa');
   let target = null, rate = 0;
-  slider.addEventListener('input', () => { target = null; setAlpha(+slider.value); updateReadouts(); });
-  $('raise').onclick = () => { if (alpha >= 19) setAlpha(4); target = 20; rate = 1.1; };
-  $('recover').onclick = () => { target = 4; rate = 7; };
+  const pauseBtn = $('pause');
+  function setPaused(v) { paused = v; pauseBtn.textContent = v ? 'Play' : 'Pause'; }
+  pauseBtn.onclick = () => { setPaused(!paused); if (paused) target = null; };   // pausing also stops a slow raise
+  setPaused(paused);
+  slider.addEventListener('input', () => { target = null; setAlpha(+slider.value); updateReadouts(); settle = 240; });   // about eight seconds of air, enough for the wake to settle at the new angle
+  $('raise').onclick = () => { if (alpha >= 19) setAlpha(4); target = 20; rate = 1.1; setPaused(false); };
+  $('recover').onclick = () => { target = 4; rate = 7; setPaused(false); };
 
   const cx = a => 34 + (a + 4) / 28 * 256, cy = c => 150 - (c + .2) / 1.9 * 136;
   let path = ''; for (let a = -4; a <= 24; a += .25) path += (path ? 'L' : 'M') + cx(a).toFixed(1) + ' ' + cy(CL(a)).toFixed(1);
@@ -455,14 +478,16 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     <circle id="dot" r="5" fill="${TEXT}"/>
   </svg>`;
   const dot = document.getElementById('dot');
+  const put = (id, s) => { const e = $(id); if (e.textContent !== s) e.textContent = s; };
   function updateReadouts() {
-    $('aoaOut').textContent = alpha.toFixed(1) + '°';
-    slider.value = alpha;
+    put('aoaOut', alpha.toFixed(1) + '°');
+    slider.value = alpha; slider.setAttribute('aria-valuetext', alpha.toFixed(1) + ' degrees');
     dot.setAttribute('cx', cx(alpha)); dot.setAttribute('cy', cy(CL(alpha)));
-    $('warn').classList.toggle('on', alpha >= 13);
-    $('flow').textContent = alpha < 9 ? 'Smooth over the whole wing' : alpha < CRIT - .5 ? 'Starting to separate near the trailing edge'
-      : alpha <= CRIT + .5 ? 'At the critical angle of attack' : 'Separated over most of the top: the wing is stalled';
-    $('lift').textContent = alpha < CRIT - 2 ? 'Increasing with angle of attack' : alpha <= CRIT + .5 ? 'At its maximum' : 'Dropping off sharply while drag climbs';
+    const horn = alpha >= 13;
+    $('warn').classList.toggle('on', horn); put('warnState', horn ? 'on' : 'off');
+    put('flow', alpha < 9 ? 'Smooth over the whole wing' : alpha < CRIT - .5 ? 'Starting to separate near the trailing edge'
+      : alpha <= CRIT + .5 ? 'At the critical angle of attack' : 'Separated over most of the top: the wing is stalled');
+    put('lift', alpha < CRIT - 2 ? 'Increasing with angle of attack' : alpha <= CRIT + .5 ? 'At its maximum' : 'Dropping off sharply while drag climbs');
   }
 
   // ---------- Overlay: airfoil, chord line, angle, lift and drag ----------
@@ -484,7 +509,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     octx.setLineDash([6, 5]); octx.strokeStyle = TEXT; octx.lineWidth = 1.2;
     octx.beginPath(); octx.moveTo(sx(ext[0]), sy(ext[1])); octx.lineTo(sx(te[0]), sy(te[1])); octx.stroke();
     octx.setLineDash([]);
-    const rx = sx(le[0]), ry = sy(le[1]), R = CHORD * .38 * scale;
+    const rx = sx(le[0]), ry = sy(le[1]), R = Math.min(CHORD * .38 * scale, rx - 16);
     octx.strokeStyle = MUTED; octx.lineWidth = 1;
     octx.beginPath(); octx.moveTo(rx - R * 1.2, ry); octx.lineTo(rx, ry); octx.stroke();
     if (Math.abs(alpha) >= .5) {
@@ -496,9 +521,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     octx.fillStyle = MUTED; octx.font = '500 13px "Barlow Semi Condensed", sans-serif'; octx.textAlign = 'left';
     octx.fillText('Chord line', sx(te[0]) + 10, sy(te[1]) + 16);
     octx.restore();
-    arrow(octx, 18, H * .2, 18 + Math.min(130, W * .16), H * .2, MUTED, 2);
+    const wy = Math.max(H * .2, 104);   // below the legend, however short the stage is
+    arrow(octx, 18, wy, 18 + Math.min(130, W * .16), wy, MUTED, 2);
     octx.fillStyle = MUTED; octx.textAlign = 'left'; octx.font = '600 13px "Barlow Semi Condensed", sans-serif';
-    octx.fillText('Relative wind', 18, H * .2 - 10);
+    octx.fillText('Relative wind', 18, wy - 10);
     const qc = toWind([LE[0] + CHORD * .25, .1]), qx = sx(qc[0]) + jx, qy = sy(qc[1]) + jy;
     const Lpx = CL(alpha) * scale * 1.1, Dpx = CD(alpha) * scale * 2.6;
     if (CL(alpha) > .03) { arrow(octx, qx, qy, qx, qy - Lpx, '#7fb6f0', 3); octx.fillStyle = '#7fb6f0'; octx.font = '700 14px "Barlow Semi Condensed", sans-serif'; octx.fillText('Lift', qx + 8, qy - Lpx + 6); }
@@ -508,7 +534,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
   // ---------- Loop ----------
   setAlpha(4); updateReadouts();
-  new ResizeObserver(resize).observe(stage); resize();
+  resize(); new ResizeObserver(resize).observe(stage);
+  // The air stops moving while the wing is off the screen, so it doesn't run the battery down while you read.
+  let onScreen = true;
+  if ('IntersectionObserver' in window) new IntersectionObserver(es => { onScreen = es[es.length - 1].isIntersecting; }).observe(stage);
+  const fade = () => { tctx.globalAlpha = .45; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1; };   // a short trail behind each dot
   let last = performance.now();
   function frame(now) {
     const dt = Math.min(.033, (now - last) / 1000); last = now;
@@ -517,13 +547,19 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       setAlpha(alpha + d); if (Math.abs(target - alpha) < 1e-3) target = null;
       updateReadouts();
     }
-    tctx.globalAlpha = .45; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1;   // a short trail behind each dot
-    step(dt, true);
-    drawOverlay();
+    if (onScreen && !paused) { settle = 0; fade(); step(dt, true); drawOverlay(); }
+    else if (onScreen && settle > 0) {
+      // Paused: run the air forward without showing it, then draw one still picture for the new angle
+      const n = Math.min(settle, 10); settle -= n;
+      for (let k = 3; k < n; k++) step(1 / 30, false);
+      tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H);
+      for (let k = 0; k < 3; k++) { fade(); step(1 / 30, true); }
+      drawOverlay();
+    }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  if (location.search.includes('debug')) window.__sim = { step, setAlpha, updateReadouts, drawOverlay, fade: () => { tctx.globalAlpha = .45; tctx.fillStyle = BG; tctx.fillRect(0, 0, W, H); tctx.globalAlpha = 1; }, get parts() { return parts; } };
+  if (location.search.includes('debug')) window.__sim = { step, setAlpha, updateReadouts, drawOverlay, fade, setPaused, frame, get parts() { return parts; }, get state() { return { paused, settle, onScreen, W, H }; } };
 })();
 </script>
 </body>
