@@ -4,37 +4,43 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pilot 100i fuel system</title>
-<meta name="description" content="An interactive diagram of the Piper Pilot 100i fuel system. Change the fuel selector, the fuel pump, and the mixture and watch what happens to the fuel and the engine.">
+<meta name="description" content="A working diagram of the Piper Pilot 100i fuel system. Move the fuel selector, the fuel pump, the throttle, and the mixture, or fail a part, and watch what happens to the fuel and the engine.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="../site.css">
 <style>
-:root{--fuel:#5AA9F0;--fuel-hi:#D4E9FF;--hot:#E8873A;--amber:#E8B04A;--red:#F07272;--lever:#D0464B}
+:root{--fuel:#4F9DEB;--fuel-hi:#DCEcFF;--water:#C3CDD4;--hot:#E8873A;--amber:#E8B04A;--red:#F07272;--lever:#D0464B;--tube:#0E1114}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
 .sim-head{max-width:1200px;margin:0 auto;padding:32px 16px 0}
 .sim-head h1{font:700 clamp(2.6rem,7vw,4.2rem)/.95 var(--cond);margin:0;letter-spacing:-.02em}
 .sim-head .lede{font-size:1.2rem;color:var(--muted);margin:14px 0 0;max-width:68ch}
 
-/* Simulator layout. Wide screens: schematic on the left, gauges and controls on the right.
-   Narrow screens: gauges stick to the top, controls stick to the bottom, the schematic scrolls between them. */
-.sim{max-width:1200px;margin:24px auto 0;padding:0 16px;display:grid;grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:24px;align-items:start}
+/* Wide screens: diagram on the left, engine display and controls on the right.
+   Narrow screens: the display sticks to the top, the controls stick to the bottom, the diagram scrolls between them. */
+.sim{max-width:1200px;margin:24px auto 0;padding:0 16px;display:grid;grid-template-columns:minmax(0,500px) minmax(0,1fr);gap:24px;align-items:start}
 .board{position:sticky;top:min(12px,calc(100vh - var(--board-h,0px) - 12px));background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:clip}
-.board svg{display:block;width:100%;height:auto;max-height:max(600px,calc(100vh - 170px))}
+.board svg{display:block;width:100%;height:auto;max-height:max(620px,calc(100vh - 170px))}
 .side{display:flex;flex-direction:column;gap:14px;min-width:0}
 .strip{position:sticky;top:0;z-index:8;background:var(--bg);padding:11px 0 8px;box-shadow:0 10px 10px -6px var(--bg)}
 
-.readouts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(0,1.35fr);gap:6px}
-.ro{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px 7px;min-width:0}
-.ro b{display:block;font:600 .8rem/1.2 var(--cond);color:var(--muted);white-space:nowrap}
-.ro span{display:block;font:700 1.45rem/1.1 var(--cond);font-variant-numeric:tabular-nums;white-space:nowrap}
-.ro i{display:block;height:5px;margin-top:4px;border-radius:3px;background:var(--surface-2);overflow:hidden}
-.ro i u{display:block;height:100%;width:50%;background:var(--fuel)}
-.ro.low span{color:var(--red);animation:lowflash 1s step-end infinite}
-.ro.low i u{background:var(--red)}
+/* Engine display */
+.panel{background:#0B0D0F;border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+#gauges{display:block;width:100%;height:auto}
+#gauges text{font-family:var(--cond);fill:var(--text);font-variant-numeric:tabular-nums}
+#gauges .gl{font-size:10.5px;font-weight:600;fill:var(--muted)}
+#gauges .gv{font-size:21px;font-weight:700}
+#gauges .gn{font-size:13px;font-weight:700}
+#gauges .arc{fill:none;stroke-width:5;stroke-linecap:butt}
+#gauges .slot{fill:#1B1F23}
+#gauges .bar{fill:var(--fuel)}
+#gauges .egtbar{fill:var(--ok)}
+#gauges .tick{stroke:var(--text);stroke-width:1.2}
+#gauges .low{fill:var(--red);animation:lowflash 1s step-end infinite}
+#gauges .lowbar{fill:var(--red)}
 @keyframes lowflash{50%{opacity:.3}}
-.st-ok{color:var(--ok)} .st-warn{color:var(--amber)} .st-bad{color:var(--red)}
+.st-ok{fill:var(--ok);color:var(--ok)} .st-warn{fill:var(--amber);color:var(--amber)} .st-bad{fill:var(--red);color:var(--red)}
 .now{margin:8px 0 0;font-size:.95rem;line-height:1.4;min-height:2.8em}
 
 .part-info{border-top:1px solid var(--line);padding:12px 16px 14px;min-height:118px;background:var(--surface)}
@@ -45,35 +51,58 @@
 .tour span{font:600 .9rem/1 var(--cond);color:var(--muted)}
 .tour .x{margin-left:auto}
 
+/* Diagram */
 #schem text{font-family:var(--cond);font-weight:600;font-size:17px;fill:var(--text)}
 #schem .sub{font-size:14px;font-weight:500;fill:var(--muted)}
 #schem .tiny{font-size:12.5px;font-weight:600;fill:var(--muted)}
-#schem .pipe{fill:none;stroke:var(--line);stroke-width:8;stroke-linecap:round;stroke-linejoin:round}
-#schem .fuel{fill:none;stroke:var(--fuel);stroke-width:8;stroke-linecap:butt;stroke-linejoin:round;opacity:.6}
-#schem .dots{fill:none;stroke:var(--fuel-hi);stroke-width:3.6;stroke-linecap:round;stroke-dasharray:0 13}
+#schem .zone{font-size:13px;font-weight:600;fill:var(--muted);opacity:.75}
+#schem .pipe{fill:none;stroke:#4A525A;stroke-width:11;stroke-linecap:round;stroke-linejoin:round}
+#schem .bore{fill:none;stroke:var(--tube);stroke-width:7.6;stroke-linecap:round;stroke-linejoin:round}
+#schem .fuel{fill:none;stroke:var(--fuel);stroke-width:7.6;stroke-linecap:butt;stroke-linejoin:round;opacity:.62}
+#schem .water{fill:none;stroke:var(--water);stroke-width:7.6;stroke-linecap:butt;stroke-linejoin:round;opacity:.8}
+#schem .dots{fill:none;stroke:var(--fuel-hi);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+#schem .wdots{fill:none;stroke:#fff;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
 #schem .thin{fill:none;stroke:var(--muted);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 #schem .sig{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:2 4}
-#schem .lead{fill:none;stroke:var(--muted);stroke-width:1}
-#schem .comp{fill:var(--surface-2);stroke:var(--muted);stroke-width:1.6}
-#schem .fin{stroke:var(--line);stroke-width:2}
+#schem .lead{fill:none;stroke:var(--muted);stroke-width:1.2;stroke-linecap:round}
+#schem .comp{fill:var(--surface-2);stroke:var(--muted);stroke-width:1.6;stroke-linejoin:round}
+#schem .inner{fill:var(--tube);stroke:var(--line);stroke-width:1.2}
+#schem .metal{fill:#48515A;stroke:none}
+#schem .fin{stroke:#454C54;stroke-width:2}
 #schem .box{fill:var(--bg);stroke:var(--muted);stroke-width:1.2}
-#schem .tankfuel{fill:var(--fuel);opacity:.42}
+#schem .duct{fill:none;stroke:#3A4148;stroke-width:22;stroke-linecap:butt;stroke-linejoin:round}
+#schem .ductin{fill:none;stroke:var(--tube);stroke-width:18;stroke-linecap:butt;stroke-linejoin:round}
 #schem .airdots{fill:none;stroke:var(--muted);stroke-width:3;stroke-linecap:round;stroke-dasharray:0 16}
+#schem .tank{fill:var(--tube);stroke:var(--muted);stroke-width:1.6;stroke-linejoin:round}
+#schem .tankline{fill:none;stroke:var(--muted);stroke-width:1.6;stroke-linejoin:round}
+#schem .tankfuel{fill:var(--fuel);opacity:.5}
+#schem .tankwater{fill:var(--water);opacity:.9}
+#schem .surf{stroke:var(--fuel-hi);stroke-width:1.2;opacity:.7}
+#schem .float{fill:var(--amber);stroke:#7A5A1C;stroke-width:1}
+#schem .plate{stroke:var(--text);stroke-width:3.4;stroke-linecap:round}
+#schem .mixarm{stroke:var(--lever);stroke-width:4;stroke-linecap:round}
+#schem .chan{fill:none;stroke:var(--tube);stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+#schem .chanfuel{fill:none;stroke:var(--fuel);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+#schem .chanfuel.flow{opacity:.75}
+#schem #selPlug{transform-box:view-box;transform-origin:240px 604px;transition:transform .35s ease}
 #schem .part{cursor:pointer}
-#schem .part:hover .comp,#schem .part:focus-visible .comp,#schem .part.picked .comp{stroke:var(--accent);stroke-width:2.6}
+#schem .part:hover .comp,#schem .part:focus-visible .comp,#schem .part.picked .comp,
+#schem .part:hover .tankline,#schem .part:focus-visible .tankline,#schem .part.picked .tankline{stroke:var(--accent);stroke-width:2.6}
 #schem .part:hover text,#schem .part.picked text{fill:var(--accent)}
 #schem .part:focus{outline:none}
 #schem .hit{fill:transparent;stroke:none}
-#schem .pass{fill:none;stroke:var(--fuel);stroke-width:7;stroke-linecap:round}
-#schem .shut{fill:none;stroke:var(--red);stroke-width:4;stroke-linecap:round}
 #schem .on{fill:var(--ok)!important}
+#schem .bad{fill:var(--red)!important}
 #schem .lowq{fill:var(--red)!important}
 #schem .fail{stroke:var(--red);stroke-width:4;stroke-linecap:round}
+#schem .clog{fill:var(--amber);stroke:#5c4312;stroke-width:.8}
 
-.dock{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:210px minmax(0,1fr);grid-template-areas:"sel mix" "sel thr" "sel pump";gap:14px 24px;align-items:start}
+/* Controls */
+.dock{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:210px minmax(0,1fr);grid-template-areas:"sel thr" "sel mix" "sel pump";gap:14px 24px;align-items:start}
 .selbox{grid-area:sel}.pumpbox{grid-area:pump}.mixbox{grid-area:mix}.thrbox{grid-area:thr}
 .knob{display:block;width:100%;max-width:210px;height:auto;margin:0 auto}
 .knob text{font:700 12px var(--cond);fill:var(--text)}
+.knob .gal{font-weight:500;font-size:10px;fill:var(--muted)}
 .knob .lbl{cursor:pointer}
 .knob .lbl rect{fill:var(--bg);stroke:var(--line);stroke-width:1.2}
 .knob .lbl:hover rect,.knob .lbl:focus-visible rect{stroke:var(--accent)}
@@ -101,6 +130,7 @@
 .switch b{margin-left:auto;font-weight:700}
 .switch[aria-checked="true"] b{color:var(--ok)}
 .small{font-size:.88rem;color:var(--muted);margin:8px 0 0}
+#selHint{min-height:6.2em}
 .flash{color:var(--amber)}
 
 .ctl{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"label out" "input input" "ends ends";gap:2px 8px;align-items:baseline}
@@ -108,10 +138,22 @@
 .ctl output{grid-area:out;font:700 1.1rem/1 var(--cond);font-variant-numeric:tabular-nums}
 .ctl input{grid-area:input}
 .ctl .ends{grid-area:ends;display:flex;justify-content:space-between;font:500 .82rem/1 var(--cond);color:var(--muted)}
-input[type=range]{width:100%;margin:0;accent-color:var(--muted)}
-#mix{accent-color:var(--lever)}
+input[type=range]{width:100%;margin:0;accent-color:var(--fuel)}
+/* Throttle and mixture look like the levers: a slot with a black or red knob */
+.lever{-webkit-appearance:none;appearance:none;height:30px;background:none;cursor:pointer;--knob:#08090A;--ring:#AEB6BC}
+.lever::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--bg);border:1px solid var(--line)}
+.lever::-moz-range-track{height:8px;border-radius:4px;background:var(--bg);border:1px solid var(--line)}
+.lever::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-11px;border-radius:50%;background:var(--knob);border:2px solid var(--ring);box-shadow:0 2px 5px rgba(0,0,0,.6)}
+.lever::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--knob);border:2px solid var(--ring);box-shadow:0 2px 5px rgba(0,0,0,.6)}
+.lever:focus{outline:none}
+.lever:focus-visible::-webkit-slider-thumb{outline:2px solid var(--focus);outline-offset:2px}
+.lever:focus-visible::-moz-range-thumb{outline:2px solid var(--focus);outline-offset:2px}
+#mix{--knob:var(--lever);--ring:#F2B3B5}
 
-.more{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px 24px;align-items:start}
+.more{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"faults loads" "chart chart";gap:18px 24px;align-items:start}
+.more h2{font:700 1.05rem/1.2 var(--cond);margin:0 0 8px;border:0;padding:0}
+.faults{grid-area:faults}.loads{grid-area:loads}.curve{grid-area:chart;min-width:0;display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1fr);gap:0 20px;align-items:center}
+.curve h2{grid-column:1/-1}
 .chart svg{display:block;width:100%;height:auto}
 .chart text{font:500 11px var(--cond);fill:var(--muted)}
 .chart .egt{fill:none;stroke:var(--chart);stroke-width:2.2}
@@ -124,39 +166,46 @@ input[type=range]{width:100%;margin:0;accent-color:var(--muted)}
 .btn{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:9px 12px;cursor:pointer}
 .btn:hover{border-color:var(--muted)}
 .btn:disabled{opacity:.4;cursor:default}
-.chk{display:flex;gap:8px;align-items:center;font-size:.95rem;margin-bottom:12px;cursor:pointer}
-.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.chk{display:flex;gap:9px;align-items:center;font-size:.95rem;line-height:1.25;padding:5px 0;cursor:pointer}
+.chk input{flex:none;width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.faults .btn{margin:4px 0 0 27px}
+.faults .btn[hidden]{display:none}
+.loads .ctl + .ctl{margin-top:10px}
+.loads .btn{margin-top:14px}
 
 .page-single{padding-top:8px}
 
+@media (max-width:1120px){
+  .more{grid-template-columns:minmax(0,1fr);grid-template-areas:"faults" "loads" "chart"}
+  .curve{display:block}
+  .switch{white-space:nowrap}
+  .switch .track{display:none}
+  .switch[aria-checked="true"]{border-color:var(--ok)}
+}
 @media (max-width:960px){
   .sim{display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0;margin-top:20px}
   .side{display:contents}
-  .strip{order:1;top:0;z-index:10;padding:7px 16px 6px;border-bottom:1px solid var(--line);box-shadow:none}
-  .readouts{gap:2px}
-  .ro{background:none;border:0;border-radius:0;padding:0}
-  .ro b{font-size:.7rem}
-  .ro span{font-size:1.12rem}
-  .ro i{height:4px;margin-top:3px;margin-right:6px}
-  .now{font-size:.86rem;line-height:1.32;min-height:3.96em;margin-top:6px}
+  .strip{order:1;top:0;z-index:10;padding:6px 10px 6px;border-bottom:1px solid var(--line);box-shadow:none}
+  .panel{border:0;border-radius:0;padding:0;background:none}
+  #gauges{max-width:520px;margin:0 auto}
+  .now{font-size:.86rem;line-height:1.32;min-height:3.96em;max-width:520px;margin:4px auto 0;padding:0 6px}
   .board{order:2;position:static;border-width:0 0 1px;border-radius:0}
-  .board svg{max-height:none;min-height:0;max-width:480px;margin:0 auto}
+  .board svg{max-height:none;min-height:0;max-width:500px;margin:0 auto}
   .part-info{min-height:0}
   .part-info.open{position:sticky;bottom:var(--dock-h,190px);z-index:7;border-bottom:1px solid var(--line);box-shadow:0 -8px 18px rgba(0,0,0,.4)}
-  .dock{order:4;position:sticky;bottom:0;z-index:8;border-width:1px 0 0;border-radius:0;padding:8px 16px calc(8px + env(safe-area-inset-bottom));grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-areas:"sel pump" "mix mix" "thr thr";gap:7px 8px;align-items:center;box-shadow:0 -8px 18px rgba(0,0,0,.4)}
+  .dock{order:4;position:sticky;bottom:0;z-index:8;border-width:1px 0 0;border-radius:0;padding:8px 16px calc(8px + env(safe-area-inset-bottom));grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-areas:"sel pump" "thr thr" "mix mix";gap:7px 8px;align-items:center;box-shadow:0 -8px 18px rgba(0,0,0,.4)}
   .knob,#selHint{display:none}
   .seg{display:flex}
   .switch{min-height:40px;padding:0 10px;gap:6px;font-size:.95rem}
   .switch .track{display:none}
   .switch[aria-checked="true"]{border-color:var(--ok)}
-  .ctl{grid-template-columns:4.3em minmax(0,1fr) 5.2em;grid-template-areas:"label input out";align-items:center}
-  .ctl output{text-align:right;font-size:1rem}
-  .ctl input{height:30px}
-  .ctl .ends{display:none}
-  .more{order:3;border-width:1px 0;border-radius:0;grid-template-columns:minmax(0,1fr);margin-top:0}
+  .dock .ctl{grid-template-columns:4.3em minmax(0,1fr) 5.2em;grid-template-areas:"label input out";align-items:center}
+  .dock .ctl output{text-align:right;font-size:1rem}
+  .dock .ctl .ends{display:none}
+  .more{order:3;border-width:1px 0;border-radius:0;grid-template-columns:minmax(0,1fr);grid-template-areas:"faults" "loads" "chart";margin-top:0}
 }
 @media (max-width:960px) and (max-height:520px){.strip,.dock,.part-info.open{position:static}}
-@media (prefers-reduced-motion:reduce){.knob #selPtr,.switch .track::after{transition:none}.ro.low span{animation:none}}
+@media (prefers-reduced-motion:reduce){.knob #selPtr,#schem #selPlug,.switch .track::after{transition:none}#gauges .low{animation:none}}
 </style>
 </head>
 <body>
@@ -187,257 +236,291 @@ input[type=range]{width:100%;margin:0;accent-color:var(--muted)}
     </nav>
   </div>
 </header>
+
 <main>
-  <div class="sim-head">
-    <p class="crumb"><a href="../study/index.html">Study</a></p>
-    <h1>Pilot 100i fuel system</h1>
-    <p class="lede">How fuel gets from the wing tanks to the cylinders, and what the fuel selector, the fuel pump, and the mixture do along the way.</p>
+<div class="sim-head">
+  <p class="crumb"><a href="../study/index.html">Study</a></p>
+  <h1>Pilot 100i fuel system</h1>
+  <p class="lede">How fuel gets from the wing tanks to the cylinders. Work the controls, or fail a part, and watch what the fuel and the engine do.</p>
+</div>
+
+<section class="sim" id="simulator" aria-label="Fuel system simulator">
+<div class="board">
+<svg id="schem" viewBox="0 0 480 760" role="img" aria-labelledby="schemTitle">
+<title id="schemTitle">Diagram of the Pilot 100i fuel system. Two wing tanks feed a selector valve, then a strainer, the electric pump, the engine-driven pump, the fuel injector servo, a flow divider, and four nozzles.</title>
+<defs>
+  <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" style="stroke:var(--muted)" stroke-width="2" opacity=".5"/></pattern>
+  <pattern id="mesh" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 0L4 4M4 0L0 4" style="stroke:var(--muted)" stroke-width=".7"/></pattern>
+  <clipPath id="clipL"><polygon points="22,606 178,624 178,686 22,668"/></clipPath>
+  <clipPath id="clipR"><polygon points="458,606 302,624 302,686 458,668"/></clipPath>
+</defs>
+
+<g class="part" data-part="firewall" tabindex="0" role="button" aria-label="Firewall">
+  <rect class="hit" x="0" y="522" width="480" height="28"/>
+  <rect x="0" y="532" width="480" height="8" fill="url(#hatch)"/>
+  <path class="lead" d="M0 532H480M0 540H480"/>
+  <text class="zone" x="12" y="525">Engine compartment</text>
+  <text class="zone" x="12" y="557">Cabin and wings</text>
+</g>
+
+<g class="part" data-part="air" tabindex="0" role="button" aria-label="Induction air">
+  <path class="duct" d="M40 318H182V224"/>
+  <path class="ductin" d="M38 318H182V222"/>
+  <path class="airdots" id="airDots" d="M40 318H182V224"/>
+  <path class="lead" d="M175 220L182 211L189 220"/>
+  <text x="40" y="298">Induction air</text>
+  <text class="tiny" x="166" y="231" text-anchor="end">To the cylinders</text>
+</g>
+
+<path class="sig" d="M254 198H372"/>
+<path class="sig" d="M178 646H186V729H190"/>
+<path class="sig" d="M302 646H294V729H290"/>
+
+<g id="pipes"></g>
+
+<g class="part" data-part="cylinders" tabindex="0" role="button" aria-label="Cylinders">
+  <text class="zone" x="28" y="15">Cylinders</text>
+  <g id="cyls"></g>
+</g>
+<g class="part" data-part="nozzles" tabindex="0" role="button" aria-label="Fuel nozzles">
+  <g id="nozzles"></g>
+  <text class="tiny" x="54" y="101" text-anchor="end">Nozzle</text>
+</g>
+
+<g class="part" data-part="distributor" tabindex="0" role="button" aria-label="Flow divider">
+  <circle class="comp" cx="240" cy="150" r="14"/>
+  <circle class="inner" cx="240" cy="150" r="5.5"/>
+  <text x="262" y="170">Flow divider</text>
+</g>
+
+<g class="part" data-part="transducer" tabindex="0" role="button" aria-label="Fuel flow transducer">
+  <rect class="comp" x="226" y="186" width="28" height="24" rx="4"/>
+  <circle class="inner" cx="240" cy="198" r="7"/>
+  <path class="lead" id="ftRot" d="M240 192V204M234 198H246"/>
+  <text x="218" y="202" text-anchor="end">Flow transducer</text>
+</g>
+
+<g class="part" data-part="gea" tabindex="0" role="button" aria-label="Fuel flow and fuel quantity to the G3X display">
+  <rect class="box" x="372" y="176" width="96" height="44" rx="4"/>
+  <text class="sub" x="382" y="195">Fuel flow</text>
+  <text class="tiny" x="382" y="211">to the G3X</text>
+  <rect class="box" x="190" y="708" width="100" height="42" rx="4"/>
+  <text class="sub" x="201" y="726">Fuel quantity</text>
+  <text class="tiny" x="201" y="741">to the G3X</text>
+</g>
+
+<g class="part" data-part="servo" tabindex="0" role="button" aria-label="Fuel injector servo">
+  <rect class="comp" x="158" y="238" width="116" height="54" rx="5"/>
+  <rect class="inner" x="166" y="238.8" width="32" height="52.4"/>
+  <path class="lead" d="M206 238V292"/>
+  <path class="inner" d="M229 254H251L240 265ZM229 276H251L240 265Z"/>
+  <line class="plate" id="fly" x1="167" y1="265" x2="197" y2="265"/>
+  <circle cx="182" cy="265" r="2.6" style="fill:var(--muted)"/>
+  <line class="mixarm" id="mixArm" x1="274" y1="265" x2="296" y2="265"/>
+  <circle cx="274" cy="265" r="3.6" style="fill:var(--muted)"/>
+  <text class="tiny" x="150" y="262" text-anchor="end">Throttle</text>
+  <text class="tiny" x="276" y="308">Mixture</text>
+  <text x="306" y="258">Fuel injector servo</text>
+  <text class="sub" x="306" y="274">Meters fuel to match the air</text>
+</g>
+
+<g class="part" data-part="edp" tabindex="0" role="button" aria-label="Engine-driven fuel pump">
+  <circle class="comp" cx="240" cy="346" r="24"/>
+  <circle class="inner" cx="240" cy="346" r="17"/>
+  <path id="edpDia" d="M223 346Q240 346 257 346" fill="none" style="stroke:var(--text)" stroke-width="2.6" stroke-linecap="round"/>
+  <path class="lead" id="edpRod" d="M240 346V363"/>
+  <path class="fail" id="edpX" d="M225 331L255 361M255 331L225 361" visibility="hidden"/>
+  <text x="274" y="343">Engine-driven pump</text>
+  <text class="sub" x="274" y="359">Turns with the propeller</text>
+</g>
+
+<g class="part" data-part="elec" tabindex="0" role="button" aria-label="Electric fuel pump">
+  <rect class="comp" x="252" y="404" width="44" height="24" rx="3"/>
+  <path class="lead" d="M270 404V428M284 404V428"/>
+  <circle class="comp" cx="240" cy="416" r="17"/>
+  <circle class="inner" cx="240" cy="416" r="11"/>
+  <path id="elecRot" d="M240 406V426M231.3 421L248.7 411M231.3 411L248.7 421" fill="none" style="stroke:var(--text)" stroke-width="1.8" stroke-linecap="round"/>
+  <text x="304" y="413">Electric fuel pump</text>
+  <text class="sub" id="pumpTxt" x="304" y="429">Off</text>
+</g>
+
+<g class="part" data-part="filter" tabindex="0" role="button" aria-label="Fuel strainer">
+  <path class="thin" d="M229 506L217 515"/>
+  <path class="comp" d="M223 472V497Q223 511 240 511Q257 511 257 497V472Z"/>
+  <rect class="comp" x="219" y="461" width="42" height="12" rx="3"/>
+  <rect x="231" y="477" width="18" height="26" rx="2" fill="url(#mesh)" style="stroke:var(--muted)" stroke-width="1"/>
+  <g id="clog" visibility="hidden"><circle class="clog" cx="235" cy="483" r="2.6"/><circle class="clog" cx="244" cy="488" r="3"/><circle class="clog" cx="237" cy="494" r="2.8"/><circle class="clog" cx="245" cy="498" r="2.2"/><circle class="clog" cx="241" cy="480" r="2"/></g>
+  <text x="270" y="484">Fuel strainer</text>
+  <text class="sub" x="270" y="500">Screen and drain</text>
+</g>
+
+<g class="part" data-part="selector" tabindex="0" role="button" aria-label="Fuel selector valve">
+  <circle class="comp" cx="240" cy="604" r="30"/>
+  <path class="chan" d="M211 604H218M269 604H262M240 575V582" stroke-linecap="butt"/>
+  <g id="selPlug">
+    <circle class="inner" cx="240" cy="604" r="23"/>
+    <path class="chan" d="M219 604H240V583"/>
+    <path class="chanfuel" id="passFuel" d="M219 604H240V583"/>
+  </g>
+  <text x="282" y="570">Fuel selector</text>
+  <text class="sub" id="selTxt" x="282" y="586">Left tank</text>
+</g>
+
+<g class="part" data-part="vents" tabindex="0" role="button" aria-label="Tank vents">
+  <rect class="hit" x="0" y="606" width="20" height="116"/><rect class="hit" x="460" y="606" width="20" height="116"/>
+  <path class="lead" d="M22 614H12V702M458 614H468V702" stroke-width="2"/>
+  <text class="tiny" x="4" y="716">Vent</text>
+  <text class="tiny" x="476" y="716" text-anchor="end">Vent</text>
+</g>
+
+<g class="part" data-part="tanks" tabindex="0" role="button" aria-label="Fuel tanks">
+  <polygon class="tank" points="22,606 178,624 178,686 22,668"/>
+  <g clip-path="url(#clipL)">
+    <rect class="tankfuel" id="fillL" x="0" y="640" width="200" height="60"/>
+    <line class="surf" id="surfL" x1="20" x2="180" y1="640" y2="640"/>
+    <rect class="tankwater" id="waterL" x="0" y="700" width="200" height="20"/>
+  </g>
+  <g transform="translate(100 615) rotate(6.6)"><rect class="metal" x="-13" y="-7" width="26" height="6" rx="2"/><path class="lead" d="M-7 0V17H3M7 0V8"/></g>
+  <rect class="metal" x="171" y="639" width="7" height="14" rx="1"/>
+  <line class="lead" id="armL" x1="172" y1="646" x2="128" y2="640"/><circle class="float" id="bobL" cx="128" cy="640" r="5.5"/>
+  <polygon class="tankline" points="22,606 178,624 178,686 22,668"/>
+  <text x="28" y="597">Left tank</text>
+  <text class="sub" id="qtyL" x="176" y="611" text-anchor="end">20 gal</text>
+
+  <polygon class="tank" points="458,606 302,624 302,686 458,668"/>
+  <g clip-path="url(#clipR)">
+    <rect class="tankfuel" id="fillR" x="280" y="640" width="200" height="60"/>
+    <line class="surf" id="surfR" x1="300" x2="460" y1="640" y2="640"/>
+  </g>
+  <g transform="translate(380 615) rotate(-6.6)"><rect class="metal" x="-13" y="-7" width="26" height="6" rx="2"/><path class="lead" d="M7 0V17H-3M-7 0V8"/></g>
+  <rect class="metal" x="302" y="639" width="7" height="14" rx="1"/>
+  <line class="lead" id="armR" x1="308" y1="646" x2="352" y2="640"/><circle class="float" id="bobR" cx="352" cy="640" r="5.5"/>
+  <polygon class="tankline" points="458,606 302,624 302,686 458,668"/>
+  <text x="452" y="597" text-anchor="end">Right tank</text>
+  <text class="sub" id="qtyR" x="304" y="611">22 gal</text>
+</g>
+
+<g class="part" data-part="drains" tabindex="0" role="button" aria-label="Tank drains">
+  <rect class="hit" x="150" y="686" width="34" height="30"/><rect class="hit" x="296" y="686" width="34" height="30"/>
+  <path class="thin" d="M170 686V696M310 686V696"/>
+  <path class="lead" d="M165 697H175M305 697H315" stroke-width="2"/>
+  <circle id="drip" cx="170" cy="702" r="2.8" style="fill:var(--water)" opacity="0"/>
+  <text class="tiny" x="160" y="713" text-anchor="middle">Drain</text>
+  <text class="tiny" x="320" y="713" text-anchor="middle">Drain</text>
+</g>
+</svg>
+<div class="part-info" id="info" aria-live="polite"></div>
+</div>
+
+<div class="side">
+  <div class="strip">
+    <div class="panel">
+    <svg id="gauges" viewBox="0 0 360 96" role="img" aria-label="Engine display: RPM, fuel flow, EGT for each cylinder, and fuel in each tank">
+      <path class="arc" d="M25.13 80.87A38 38 0 1 1 78.87 80.87" stroke="#1B1F23"/>
+      <path class="arc" d="M14 54A38 38 0 1 1 88.14 65.74" style="stroke:var(--ok)"/>
+      <path d="M83.4 64.2L93.8 67.6" style="stroke:var(--red)" stroke-width="3"/>
+      <path id="tachNeedle" d="M79 54H93" style="stroke:var(--text)" stroke-width="3" stroke-linecap="round"/>
+      <text class="gv" id="rRpm" x="52" y="59" text-anchor="middle">0</text>
+      <text class="gl" x="52" y="72" text-anchor="middle">RPM</text>
+      <text class="gn st-ok" id="rEng" x="52" y="92" text-anchor="middle">Running</text>
+
+      <text class="gl" x="112" y="14">Fuel flow</text>
+      <rect class="slot" x="112" y="22" width="12" height="50" rx="2"/>
+      <rect class="bar" id="ffBar" x="112" y="72" width="12" height="0" rx="2"/>
+      <text class="gv" id="rFf" x="131" y="48">0.0</text>
+      <text class="gl" x="131" y="62">gal/hr</text>
+
+      <text class="gl" x="186" y="14">EGT °F</text>
+      <text class="gn" id="rEgt" x="262" y="14" text-anchor="end">0</text>
+      <g id="egtBars"></g>
+
+      <text class="gl" x="282" y="14">Fuel, gal</text>
+      <rect class="slot" x="282" y="22" width="12" height="50" rx="2"/>
+      <rect class="bar" id="barL" x="282" y="72" width="12" height="0" rx="2"/>
+      <text class="gl" x="299" y="34">L</text>
+      <text class="gn" id="numL" x="299" y="52">0</text>
+      <rect class="slot" x="320" y="22" width="12" height="50" rx="2"/>
+      <rect class="bar" id="barR" x="320" y="72" width="12" height="0" rx="2"/>
+      <text class="gl" x="337" y="34">R</text>
+      <text class="gn" id="numR" x="337" y="52">0</text>
+    </svg>
+    </div>
+    <p class="now" id="now" aria-live="polite"></p>
   </div>
 
-  <section class="sim" id="simulator" aria-label="Fuel system simulator">
-    <div class="board">
-      <svg id="schem" viewBox="0 0 460 710" role="img" aria-labelledby="schemTitle">
-        <title id="schemTitle">Fuel system schematic. Fuel runs from the left and right wing tanks through the fuel selector, up through the firewall, the filter, the electric pump, the engine-driven pump, the injector servo, the flow transducer, and the distributor to the four fuel nozzles.</title>
-        <defs>
-          <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="var(--surface-2)"/><line x1="0" y1="0" x2="0" y2="8" stroke="var(--muted)" stroke-width="2"/></pattern>
-          <marker id="ahAir" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="var(--muted)"/></marker>
-        </defs>
-
-        <!-- Zones and firewall -->
-        <text class="sub" x="14" y="512">Engine compartment</text>
-        <text class="sub" x="14" y="550">Cabin and wings</text>
-        <g class="part" data-part="firewall" tabindex="0" role="button" aria-label="Firewall">
-          <rect class="hit" x="14" y="514" width="440" height="22"/>
-          <rect x="14" y="520" width="366" height="10" fill="url(#hatch)" stroke="var(--muted)" stroke-width="1.2"/>
-          <text x="388" y="531">Firewall</text>
-        </g>
-
-        <!-- Vents and signal wiring -->
-        <path class="thin" d="M26 582 H12 V668"/>
-        <path class="thin" d="M434 582 H448 V668"/>
-        <path class="sig" d="M96 636 V669 H190"/>
-        <path class="sig" d="M364 636 V669 H270"/>
-        <path class="sig" d="M220 184 H166"/>
-
-        <!-- Pipes are built here by the script -->
-        <g id="pipes"></g>
-
-        <!-- Induction air -->
-        <g class="part" data-part="air" tabindex="0" role="button" aria-label="Induction air">
-          <rect class="hit" x="30" y="230" width="160" height="38"/>
-          <text class="sub" x="40" y="246">Induction air</text>
-          <path class="thin" d="M40 258 H186" marker-end="url(#ahAir)"/>
-          <path id="airDots" class="airdots" d="M40 258 H182"/>
-        </g>
-        <path class="lead" d="M192 271 L178 286"/>
-        <text class="sub" x="182" y="300" text-anchor="end">Throttle and mixture</text>
-
-        <!-- Cylinders -->
-        <g class="part" data-part="cylinders" tabindex="0" role="button" aria-label="Cylinders">
-          <text x="18" y="122">Cylinders</text>
-          <g id="cyls"></g>
-        </g>
-
-        <!-- Nozzles -->
-        <g class="part" data-part="nozzles" tabindex="0" role="button" aria-label="Fuel nozzles">
-          <g id="nozzles"></g>
-          <path class="lead" d="M405 90 L420 108"/>
-          <text x="446" y="124" text-anchor="end">Fuel nozzles</text>
-        </g>
-
-        <!-- Distributor -->
-        <g class="part" data-part="distributor" tabindex="0" role="button" aria-label="Fuel distributor">
-          <circle class="hit" cx="230" cy="136" r="22"/>
-          <circle class="comp" cx="230" cy="136" r="12"/>
-          <path class="lead" d="M241 141 L256 150"/>
-          <text x="260" y="158">Fuel distributor</text>
-        </g>
-
-        <!-- Flow transducer and its GEA 24 -->
-        <g class="part" data-part="transducer" tabindex="0" role="button" aria-label="Fuel flow transducer">
-          <rect class="hit" x="212" y="166" width="210" height="36"/>
-          <rect class="comp" x="220" y="170" width="20" height="28" rx="9"/>
-          <path class="lead" d="M242 184 H256"/>
-          <text x="260" y="189">Fuel flow transducer</text>
-        </g>
-        <g class="part" data-part="gea" tabindex="0" role="button" aria-label="GEA 24 engine and airframe unit, fuel flow">
-          <rect class="box" x="96" y="171" width="70" height="26" rx="3"/>
-          <text class="tiny" x="131" y="189" text-anchor="middle">GEA 24</text>
-          <text class="sub" x="131" y="214" text-anchor="middle">Fuel flow to G3X</text>
-        </g>
-
-        <!-- Servo -->
-        <g class="part" data-part="servo" tabindex="0" role="button" aria-label="Fuel injector servo">
-          <rect class="hit" x="188" y="228" width="264" height="52"/>
-          <rect class="comp" x="192" y="232" width="76" height="44" rx="5"/>
-          <path d="M206 241 v26 M254 241 v26" stroke="var(--line)" stroke-width="2"/>
-          <text x="278" y="251">Fuel injector servo</text>
-          <text class="sub" x="278" y="268">Meters fuel to match the air</text>
-        </g>
-
-        <!-- Engine-driven pump -->
-        <g class="part" data-part="edp" tabindex="0" role="button" aria-label="Engine-driven fuel pump">
-          <rect class="hit" x="208" y="308" width="244" height="44"/>
-          <circle class="comp" cx="230" cy="330" r="19"/>
-          <g id="edpRot"><path d="M230 316 V344 M218 323 L242 337 M218 337 L242 323" stroke="var(--muted)" stroke-width="2.4" stroke-linecap="round"/></g>
-          <path id="edpX" class="fail" d="M216 316 L244 344 M244 316 L216 344" visibility="hidden"/>
-          <path class="lead" d="M251 330 H258"/>
-          <text x="262" y="328">Engine-driven fuel pump</text>
-          <text class="sub" x="262" y="345">Turns with the propeller</text>
-        </g>
-
-        <!-- Electric pump -->
-        <g class="part" data-part="elec" tabindex="0" role="button" aria-label="Electric fuel pump">
-          <rect class="hit" x="166" y="380" width="270" height="56"/>
-          <rect class="comp" x="214" y="384" width="32" height="30" rx="4"/>
-          <rect class="comp" x="172" y="388" width="42" height="22" rx="7"/>
-          <path d="M182 394 v10 M190 394 v10 M198 394 v10 M206 394 v10" stroke="var(--line)" stroke-width="2"/>
-          <text id="pumpTxt" class="tiny" x="193" y="428" text-anchor="middle">OFF</text>
-          <path class="lead" d="M248 399 H258"/>
-          <text x="262" y="404">Electric fuel pump</text>
-        </g>
-
-        <!-- Filter -->
-        <g class="part" data-part="filter" tabindex="0" role="button" aria-label="Filter and drain">
-          <rect class="hit" x="190" y="448" width="250" height="56"/>
-          <path class="thin" d="M218 474 H202 V490"/>
-          <circle class="comp" cx="202" cy="494" r="4"/>
-          <path class="comp" d="M216 452 h28 v18 a14 14 0 0 1 -28 0 z"/>
-          <path class="lead" d="M246 462 H258"/>
-          <text x="262" y="464">Filter and drain</text>
-          <text class="sub" x="262" y="481">The fuel strainer</text>
-        </g>
-
-        <!-- Selector valve -->
-        <g class="part" data-part="selector" tabindex="0" role="button" aria-label="Fuel selector valve">
-          <circle class="hit" cx="230" cy="601" r="32"/>
-          <rect class="hit" x="258" y="540" width="150" height="22"/>
-          <circle class="comp" cx="230" cy="601" r="26"/>
-          <path id="passL" class="pass" d="M230 601 V578 M230 601 H207"/>
-          <path id="passR" class="pass" d="M230 601 V578 M230 601 H253" visibility="hidden"/>
-          <path id="passOff" class="shut" d="M216 587 L244 615" visibility="hidden"/>
-          <text id="selTxt" class="tiny" x="230" y="644" text-anchor="middle">L</text>
-          <path class="lead" d="M248 581 L262 562"/>
-          <text x="264" y="557">Fuel selector valve</text>
-        </g>
-
-        <!-- Tanks -->
-        <g class="part" data-part="tanks" tabindex="0" role="button" aria-label="Left fuel tank">
-          <rect class="comp" x="26" y="566" width="144" height="70" rx="10"/>
-          <rect id="fillL" class="tankfuel" x="28" y="590" width="140" height="44" rx="8"/>
-          <path id="floatL" class="thin" d="M126 572 L146 600" style="stroke-width:2"/>
-          <circle id="floatLb" cx="146" cy="600" r="6" class="comp"/>
-          <text x="40" y="592">Left tank</text>
-          <text id="qtyL" class="sub" x="40" y="613">24.0 gal</text>
-        </g>
-        <g class="part" data-part="tanks" tabindex="0" role="button" aria-label="Right fuel tank">
-          <rect class="comp" x="290" y="566" width="144" height="70" rx="10"/>
-          <rect id="fillR" class="tankfuel" x="292" y="590" width="140" height="44" rx="8"/>
-          <path id="floatR" class="thin" d="M334 572 L314 600" style="stroke-width:2"/>
-          <circle id="floatRb" cx="314" cy="600" r="6" class="comp"/>
-          <text x="420" y="592" text-anchor="end">Right tank</text>
-          <text id="qtyR" class="sub" x="420" y="613" text-anchor="end">24.0 gal</text>
-        </g>
-        <g class="part" data-part="vents" tabindex="0" role="button" aria-label="Fuel tank vents">
-          <rect class="hit" x="0" y="574" width="26" height="118"/>
-          <rect class="hit" x="434" y="574" width="26" height="118"/>
-          <text class="sub" x="3" y="686">Vent</text>
-          <text class="sub" x="457" y="686" text-anchor="end">Vent</text>
-        </g>
-        <g class="part" data-part="drains" tabindex="0" role="button" aria-label="Tank drains">
-          <rect class="hit" x="110" y="636" width="64" height="26"/>
-          <rect class="hit" x="286" y="636" width="64" height="26"/>
-          <path class="thin" d="M160 637 V646 M300 637 V646"/>
-          <circle class="comp" cx="160" cy="650" r="4"/>
-          <circle class="comp" cx="300" cy="650" r="4"/>
-          <text class="sub" x="151" y="656" text-anchor="end">Drain</text>
-          <text class="sub" x="309" y="656">Drain</text>
-        </g>
-        <g class="part" data-part="gea" tabindex="0" role="button" aria-label="GEA 24 engine and airframe unit, fuel quantity">
-          <rect class="box" x="190" y="656" width="80" height="26" rx="3"/>
-          <text class="tiny" x="230" y="674" text-anchor="middle">GEA 24</text>
-          <text class="sub" x="230" y="700" text-anchor="middle">Fuel quantity to G3X</text>
-        </g>
+  <div class="dock" role="group" aria-label="Simulator controls">
+    <div class="selbox">
+      <svg class="knob" viewBox="0 0 200 150" role="radiogroup" aria-label="Fuel selector">
+        <circle cx="100" cy="90" r="54" style="fill:var(--surface-2);stroke:var(--line)" stroke-width="2"/>
+        <circle cx="100" cy="90" r="38" style="fill:var(--bg);stroke:var(--line)"/>
+        <g id="selPtr"><path d="M100 40L112 84Q112 102 100 104Q88 102 88 84Z" style="fill:var(--text)"/><path d="M95 104L100 126L105 104Z" style="fill:var(--muted)"/></g>
+        <g id="pushBtn" role="button" tabindex="0" aria-label="Push the button to allow OFF"><circle cx="100" cy="90" r="9"/><text x="100" y="140" text-anchor="middle" style="font-size:9px;fill:var(--muted)">PUSH FOR OFF</text></g>
+        <g class="lbl" data-v="L" role="radio" tabindex="0" aria-label="Left tank"><rect x="23" y="8" width="54" height="33" rx="4"/><text x="50" y="22" text-anchor="middle">L TANK</text><text class="gal" x="50" y="35" text-anchor="middle">24 GAL</text></g>
+        <g class="lbl" data-v="R" role="radio" tabindex="0" aria-label="Right tank"><rect x="144" y="56" width="54" height="33" rx="4"/><text x="171" y="70" text-anchor="middle">R TANK</text><text class="gal" x="171" y="83" text-anchor="middle">24 GAL</text></g>
+        <g class="lbl" data-v="OFF" role="radio" tabindex="0" aria-label="Off"><rect x="2" y="90" width="46" height="24" rx="4"/><text x="25" y="107" text-anchor="middle">OFF</text></g>
       </svg>
-      <div class="part-info" id="info" aria-live="polite"></div>
+      <div class="seg" role="radiogroup" aria-label="Fuel selector">
+        <button type="button" role="radio" data-v="L" aria-label="Left tank">L TANK</button>
+        <button type="button" role="radio" data-v="R" aria-label="Right tank">R TANK</button>
+        <button type="button" role="radio" data-v="OFF" aria-label="Off">OFF</button>
+      </div>
+      <p class="small" id="selHint" aria-live="polite"></p>
     </div>
 
-    <div class="side">
-      <div class="strip">
-        <div class="readouts" role="group" aria-label="Engine display">
-          <div class="ro"><b>RPM</b><span id="rRpm">0</span></div>
-          <div class="ro"><b>Gal/hr</b><span id="rFf">0</span></div>
-          <div class="ro"><b>EGT °F</b><span id="rEgt">0</span></div>
-          <div class="ro" id="roL"><b>Left gal</b><span id="numL">0</span><i id="barL"><u></u></i></div>
-          <div class="ro" id="roR"><b>Right gal</b><span id="numR">0</span><i id="barR"><u></u></i></div>
-          <div class="ro"><b>Engine</b><span id="rEng" class="st-ok">Running</span></div>
-        </div>
-        <p class="now" id="now" aria-live="polite"></p>
-      </div>
-
-      <div class="dock" role="group" aria-label="Simulator controls">
-        <div class="selbox">
-          <svg class="knob" viewBox="0 0 200 150" role="radiogroup" aria-label="Fuel selector">
-            <circle cx="100" cy="90" r="54" fill="var(--surface-2)" stroke="var(--line)" stroke-width="2"/>
-            <circle cx="100" cy="90" r="36" fill="var(--bg)" stroke="var(--line)"/>
-            <g id="selPtr"><path d="M100 42 L111 84 Q100 102 89 84 Z" fill="var(--text)"/><path d="M94 96 L100 124 L106 96 Z" fill="var(--muted)"/></g>
-            <g id="pushBtn" role="button" tabindex="0" aria-label="Push the button to allow OFF"><circle cx="100" cy="90" r="11"/><text x="100" y="110" text-anchor="middle" style="font-size:9px;fill:var(--muted)">PUSH</text></g>
-            <g class="lbl" data-v="L" role="radio" tabindex="0" aria-label="Left tank"><rect x="25" y="17" width="52" height="24" rx="4"/><text x="51" y="34" text-anchor="middle">L TANK</text></g>
-            <g class="lbl" data-v="R" role="radio" tabindex="0" aria-label="Right tank"><rect x="146" y="64" width="52" height="24" rx="4"/><text x="172" y="81" text-anchor="middle">R TANK</text></g>
-            <g class="lbl" data-v="OFF" role="radio" tabindex="0" aria-label="Off"><rect x="6" y="90" width="42" height="24" rx="4"/><text x="27" y="107" text-anchor="middle">OFF</text></g>
-          </svg>
-          <div class="seg" role="radiogroup" aria-label="Fuel selector">
-            <button type="button" role="radio" data-v="L" aria-label="Left tank">L TANK</button>
-            <button type="button" role="radio" data-v="R" aria-label="Right tank">R TANK</button>
-            <button type="button" role="radio" data-v="OFF" aria-label="Off">OFF</button>
-          </div>
-          <p class="small" id="selHint" aria-live="polite"></p>
-        </div>
-
-        <div class="pumpbox">
-          <button type="button" class="switch" id="pumpSw" role="switch" aria-checked="false"><span class="track"></span>FUEL PUMP<b id="pumpState">OFF</b></button>
-        </div>
-
-        <div class="ctl mixbox">
-          <label for="mix">Mixture</label>
-          <output id="mixOut" for="mix">Full rich</output>
-          <input type="range" id="mix" min="0" max="100" value="100">
-          <div class="ends"><span>Idle cutoff</span><span>Full rich</span></div>
-        </div>
-        <div class="ctl thrbox">
-          <label for="thr">Throttle</label>
-          <output id="thrOut" for="thr">85%</output>
-          <input type="range" id="thr" min="0" max="100" value="85">
-          <div class="ends"><span>Idle</span><span>Full</span></div>
-        </div>
-      </div>
-
-      <div class="more">
-        <div>
-          <div class="chart" id="chart"></div>
-          <p class="small">EGT (solid) and RPM (dashed) across the mixture range. The red line is the mixture lever.</p>
-        </div>
-        <div>
-          <label class="chk"><input type="checkbox" id="edpFail"> Engine-driven pump failed</label>
-          <button type="button" class="btn" id="reset">Refill tanks and reset</button>
-        </div>
-      </div>
+    <div class="ctl thrbox">
+      <label for="thr">Throttle</label>
+      <output id="thrOut" for="thr">85%</output>
+      <input type="range" class="lever" id="thr" min="0" max="100" value="85">
+      <div class="ends"><span>Idle</span><span>Full</span></div>
     </div>
-  </section>
-
-  <div class="page page-single">
-    <article>
-      <h2>Key points</h2>
-      <ul>
-        <li>The tanks sit below the engine, so a pump has to be working for fuel to reach it. The engine-driven pump is the main one, and the electric pump backs it up.</li>
-        <li>The selector feeds the engine from one tank at a time: L, R, or OFF. There's no BOTH. To select OFF, you press the button first.</li>
-        <li>The fuel pump goes on for engine start, takeoff, landing, and switching tanks. It's off in cruise, so a failed engine-driven pump shows up right away.</li>
-        <li>The mixture sets the ratio of fuel to air. Peak EGT is best economy, 100°F rich of peak is best power, and idle cutoff stops the fuel.</li>
-        <li>Each tank holds 24 gallons usable, or 17 when the fuel is at the bottom of the tab in the filler neck.</li>
-      </ul>
-      <p class="small">The diagram is redrawn from the fuel system schematic in the Pilot 100i <a href="https://www.tampabayaviation.com/wp-content/uploads/2023/11/Pilot-100i-e-POH.pdf">POH</a> (VB-2960, Figure 7-13). The simulator's RPM, EGT, and fuel flow are a simplified model, not POH data.</p>
-    </article>
+    <div class="ctl mixbox">
+      <label for="mix">Mixture</label>
+      <output id="mixOut" for="mix">Full rich</output>
+      <input type="range" class="lever" id="mix" min="0" max="100" value="100">
+      <div class="ends"><span>Idle cutoff</span><span>Full rich</span></div>
+    </div>
+    <div class="pumpbox">
+      <button type="button" class="switch" id="pumpSw" role="switch" aria-checked="false"><span class="track"></span>FUEL PUMP<b id="pumpState">OFF</b></button>
+    </div>
   </div>
+
+  <div class="more">
+    <div class="faults" role="group" aria-labelledby="faultsH">
+      <h2 id="faultsH">Failures</h2>
+      <label class="chk"><input type="checkbox" id="edpFail"> Engine-driven pump failed</label>
+      <label class="chk"><input type="checkbox" id="clogFail"> Strainer partly blocked</label>
+      <label class="chk"><input type="checkbox" id="nozFail"> No. 3 nozzle partly blocked</label>
+      <label class="chk"><input type="checkbox" id="waterFail"> Water in the left tank</label>
+      <button type="button" class="btn" id="sump" hidden>Drain the left tank sump</button>
+    </div>
+    <div class="loads" role="group" aria-labelledby="loadsH">
+      <h2 id="loadsH">Fuel on board</h2>
+      <div class="ctl"><label for="loadL">Left tank</label><output id="loadLOut" for="loadL">20 gal</output><input type="range" id="loadL" min="0" max="24" step="1" value="20"></div>
+      <div class="ctl"><label for="loadR">Right tank</label><output id="loadROut" for="loadR">22 gal</output><input type="range" id="loadR" min="0" max="24" step="1" value="22"></div>
+      <button type="button" class="btn" id="reset">Reset everything</button>
+    </div>
+    <div class="curve">
+      <h2>Leaning</h2>
+      <div class="chart" id="chart"></div>
+      <p class="small">EGT (solid) and RPM (dashed) across the mixture range. The red line is the mixture lever.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="page page-single">
+  <article>
+    <h2>Key points</h2>
+    <ul>
+      <li>The tanks sit below the engine, so a pump has to be working for fuel to reach it. The engine-driven pump is the main one, and the electric pump backs it up.</li>
+      <li>The selector feeds the engine from one tank at a time: L, R, or OFF. There's no BOTH. To select OFF, you press the button first.</li>
+      <li>The fuel pump goes on for engine start, takeoff, landing, and switching tanks. It's off in cruise, so a failed engine-driven pump shows up right away.</li>
+      <li>The mixture sets the ratio of fuel to air. Peak EGT is best economy, 100°F rich of peak is best power, and idle cutoff stops the fuel.</li>
+      <li>Each tank holds 24 gallons usable, or 17 when the fuel is at the bottom of the tab in the filler neck.</li>
+    </ul>
+    <p class="small">The diagram is redrawn from the fuel system schematic in the Pilot 100i <a href="https://www.tampabayaviation.com/wp-content/uploads/2023/11/Pilot-100i-e-POH.pdf">POH</a> (VB-2960, Figure 7-13). The engine numbers and the size of each failure are a simplified model, not POH data, and the tanks drain 60 times faster than real.</p>
+  </article>
+</div>
 </main>
 
 <footer class="site-foot">
@@ -459,62 +542,112 @@ const narrow = matchMedia('(max-width: 960px)');
 // ---------- Engine model (simplified, tuned to the POH best-economy fuel flows) ----------
 const K = 214.9;          // gal/hr per unit of (air flow fraction x fuel/air ratio)
 const FA_STOICH = 0.0667; // chemically correct fuel/air ratio for avgas
-const LINE_GAL = 0.035;   // fuel downstream of the selector, in gallons
-const sigma = h => Math.pow(1 - 6.8756e-6 * h, 4.2559);
+const LINE_GAL = 0.035;   // fuel between the tank and the nozzles, in gallons
+const ALT = 5500;         // the model flies at one altitude
+const SG = Math.pow(1 - 6.8756e-6 * ALT, 4.2559);
+const ONES = [1, 1, 1, 1];
+const NOZ_BLOCKED = [1, 1, 0.62, 1];   // share of fuel each nozzle passes with No. 3 partly blocked
 const leverFA = m => m < 0.04 ? 0 : 0.036 + 0.044 * Math.pow((m - 0.04) / 0.96, 0.85);
 function powerRatio(l) {
   const p = l < 0.87 ? 1 - 4 * (0.87 - l) * (0.87 - l)
                      : 1 - 2.2 * (l - 0.87) * (l - 0.87) - (l > 1.25 ? 3 * (l - 1.25) * (l - 1.25) : 0);
   return Math.max(0, p);
 }
-function engine(mix, thr, alt, press) {
-  const sg = sigma(alt);
-  const af = sg * (0.025 + 0.975 * Math.pow(thr, 1.15));
-  const fa = leverFA(mix) / Math.sqrt(sg) * press;   // thinner air: same lever runs richer
-  const ff = K * af * fa;
-  if (fa <= 0) return { fires: false, ff: 0, lam: Infinity, p: 0, rpm: 900, egt: null, rough: 0, af };
-  const lam = FA_STOICH / fa;
-  const fires = lam > 0.55 && lam < 1.5;
-  const p = fires ? af * powerRatio(lam) : 0;
-  const rough = fires ? Math.max(ramp(1.22, 1.45, lam), ramp(0.66, 0.56, lam)) : 0;
-  const rpm = fires ? Math.max(900, 2671 * Math.cbrt(p / sg)) : 900;
+// o.cap: the most fuel the supply can pass, gal/hr. o.noz: nozzle shares. o.deliv: 0 to 1, how much of each nozzle's flow is fuel.
+function engine(mix, thr, press, o) {
+  o = o || {};
+  const af = SG * (0.025 + 0.975 * Math.pow(thr, 1.15));
+  const fa0 = leverFA(mix) / Math.sqrt(SG) * press;   // thinner air: same lever runs richer
+  const ff0 = K * af * fa0, ff = Math.min(ff0, o.cap == null ? Infinity : o.cap);
+  const faM = ff0 > 0 ? fa0 * ff / ff0 : 0;            // what the servo actually delivers
+  const w = o.noz || ONES, ws = (w[0] + w[1] + w[2] + w[3]) / 4, dl = o.deliv || ONES;
   const epk = 950 + 560 * Math.pow(af, 0.6);
-  const egt = fires ? (lam < 1.05 ? epk - 650 * (1.05 - lam) : epk - 800 * Math.pow(lam - 1.05, 1.2)) : null;
-  return { fires, ff, lam, p, rpm, egt, rough, af };
+  const cyl = [];
+  let n = 0, pr = 0, egt = 0, lo = 1, hi = 0, rough = 0;
+  for (let i = 0; i < 4; i++) {
+    const fa = faM * w[i] / ws * dl[i], l = fa > 0 ? FA_STOICH / fa : Infinity;
+    const fires = l > 0.55 && l < 1.5;
+    const c = { lam: l, fires, pr: fires ? powerRatio(l) : 0,
+      egt: fires ? (l < 1.05 ? epk - 650 * (1.05 - l) : epk - 800 * Math.pow(l - 1.05, 1.2)) : null };
+    cyl.push(c); lo = Math.min(lo, c.pr); hi = Math.max(hi, c.pr);
+    if (fires) { n++; pr += c.pr; egt += c.egt; rough = Math.max(rough, ramp(1.22, 1.45, l), ramp(0.66, 0.56, l)); }
+  }
+  const fires = n > 0, p = af * pr / 4;
+  if (fires) rough = Math.max(rough, ramp(0.12, 0.6, hi - lo));   // cylinders making unequal power
+  return { fires, n, ff, ff0, lam: faM > 0 ? FA_STOICH / faM : Infinity, p, rough, af, cyl,
+    rpm: fires ? Math.max(900, 2671 * Math.cbrt(p / SG)) : 900, egt: fires ? egt / n : null };
 }
 
 // ---------- State ----------
-const S = { sel: 'L', armed: 0, pump: false, edpFail: false, thr: 0.85, mix: 1, alt: 5500,
-  qL: 20, qR: 22, a: 1, b: 0, press: 1, rpm: 2400, egt: 1300, ff: 9,
-  running: true, supply: true, t: 0, e: null };
+const S = { sel: 'L', armed: 0, pump: false, edpFail: false, clog: false, noz: false, waterOn: false, water: 0, wc: 0,
+  thr: 0.85, mix: 1, qL: 20, qR: 22, press: 1, rpm: 2400, egt: [1200, 1200, 1200, 1200], ff: 9, deliv: [1, 1, 1, 1],
+  running: true, supply: true, air: false, wet: false, v: 0, ph: 0, drip: 0, t: 0, e: null };
+const WATER_CELLS = 40;   // how much water the "water in the left tank" failure puts in the tank, in line cells
 
-// ---------- Build pipes and engine parts ----------
+// ---------- Pipes. Each one is a row of cells 13 px long: 0 air, 1 fuel, 2 water ----------
+const CELL = 13, NPATH = 51;   // NPATH: cells from a tank to a nozzle, on average
 const PIPES = {
-  tankL: 'M164 601 H204',
-  tankR: 'M296 601 H256',
-  trunk: 'M230 575 V276',
-  metered: 'M230 232 V136',
-  n1: 'M230 136 L62 92', n2: 'M230 136 L174 92', n3: 'M230 136 L286 92', n4: 'M230 136 L398 92'
+  tankL: ['M178 676 H198 V604 H210', 8],
+  tankR: ['M302 676 H282 V604 H270', 8],
+  trunk: ['M240 579 V150', 33],
+  n1: ['M240 150 L66 100', 14], n2: ['M240 150 L182 100', 6], n3: ['M240 150 L298 100', 6], n4: ['M240 150 L414 100', 14]
 };
-const pipesG = $('pipes'), P = {};
+const NOZ = ['n1', 'n2', 'n3', 'n4'], P = {};
 for (const k in PIPES) {
-  const d = PIPES[k];
-  const base = el('path', { d, class: 'pipe' }, pipesG);
-  const fuel = el('path', { d, class: 'fuel' }, pipesG);
-  const dots = el('path', { d, class: 'dots' }, pipesG);
-  P[k] = { base, fuel, dots, len: base.getTotalLength(), off: 0 };
+  const [d, n] = PIPES[k], g = $('pipes');
+  el('path', { d, class: 'pipe' }, g); el('path', { d, class: 'bore' }, g);
+  P[k] = { n, cells: new Array(n).fill(1), sig: '',
+    fuel: el('path', { d, class: 'fuel' }, g), water: el('path', { d, class: 'water' }, g),
+    dots: el('path', { d, class: 'dots' }, g), wdots: el('path', { d, class: 'wdots' }, g) };
 }
-const CYL_X = [62, 174, 286, 398], cylGlow = [], sprays = [];
-CYL_X.forEach(x => {
+const SERVO_I = 24, FT_I = 29;   // trunk cells at the servo and at the flow transducer
+const last = p => p.cells[p.n - 1];
+const anyCell = (keys, t) => keys.some(k => P[k].cells.includes(t));
+
+// stroke-dasharray for one layer of a pipe: solid runs of one cell type, or one dot per cell of that type
+function dashRuns(list, type) {
+  const a = [0]; let gap = 0, run = 0;
+  for (const c of list) { if (c === type) run += CELL; else { if (run) { a.push(gap, run); gap = 0; run = 0; } gap += CELL; } }
+  if (run) { a.push(gap, run); gap = 0; }
+  a.push(gap + 9999); return a.join(' ');
+}
+function dashDots(list, type) {
+  const a = [0]; let gap = CELL / 2;
+  for (const c of list) { if (c === type) { a.push(gap, 0); gap = CELL; } else gap += CELL; }
+  a.push(gap + 9999); return a.join(' ');
+}
+// draw one pipe. next: the cell about to come in at the upstream end. ph: how far the row has moved, 0 to 13 px.
+function paint(k, next, ph, moving) {
+  const p = P[k], sig = next + p.cells.join('') + (moving ? 'm' : 's');
+  if (sig !== p.sig) {
+    p.sig = sig;
+    const list = [next].concat(p.cells);
+    p.fuel.style.strokeDasharray = dashRuns(list, 1); p.water.style.strokeDasharray = dashRuns(list, 2);
+    p.dots.style.strokeDasharray = dashDots(list, moving ? 1 : -1); p.wdots.style.strokeDasharray = dashDots(list, moving ? 2 : -1);
+  }
+  const off = CELL - ph;
+  p.fuel.style.strokeDashoffset = p.water.style.strokeDashoffset = p.dots.style.strokeDashoffset = p.wdots.style.strokeDashoffset = off;
+}
+
+// ---------- Cylinders, nozzles, and the EGT bars ----------
+const CYL_X = [66, 182, 298, 414], FIRE_AT = [0, 0.5, 0.25, 0.75];   // firing order 1-3-2-4
+const cylGlow = [], sprays = [], egtBars = [];
+CYL_X.forEach((x, i) => {
   const g = el('g', {}, $('cyls'));
-  el('rect', { x: x - 44, y: 12, width: 88, height: 56, rx: 6, class: 'comp' }, g);
-  cylGlow.push(el('rect', { x: x - 42, y: 14, width: 84, height: 52, rx: 5, fill: 'var(--hot)', opacity: 0 }, g));
-  for (let i = 0; i < 6; i++) el('line', { x1: x - 36, x2: x + 36, y1: 20 + i * 8, y2: 20 + i * 8, class: 'fin' }, g);
+  for (let f = 0; f < 7; f++) el('line', { class: 'fin', x1: x - 37, x2: x + 37, y1: 27 + f * 8.6, y2: 27 + f * 8.6 }, g);
+  el('rect', { class: 'comp', x: x - 30, y: 22, width: 60, height: 62, rx: 5 }, g);
+  el('rect', { class: 'inner', x: x - 21, y: 31, width: 42, height: 42, rx: 3 }, g);
+  cylGlow.push(el('rect', { x: x - 21, y: 31, width: 42, height: 42, rx: 3, style: 'fill:var(--hot)', opacity: 0 }, g));
+  el('text', { x, y: 58, 'text-anchor': 'middle' }, g).textContent = i + 1;
   const n = el('g', {}, $('nozzles'));
-  el('rect', { x: x - 5, y: 74, width: 10, height: 18, rx: 2, class: 'comp' }, n);
+  el('rect', { class: 'comp', x: x - 5, y: 84, width: 10, height: 17, rx: 2 }, n);
   const sp = el('g', { opacity: 0 }, n);
-  for (let i = 0; i < 4; i++) el('circle', { cx: x + (i - 1.5) * 4, cy: 70, r: 1.9, fill: 'var(--fuel-hi)' }, sp);
+  for (let j = 0; j < 3; j++) el('circle', { cx: x + (j - 1) * 4, cy: 80, r: 1.7, style: 'fill:var(--fuel-hi)' }, sp);
   sprays.push(sp);
+  const gx = 186 + i * 20, G = $('egtBars');
+  el('rect', { class: 'slot', x: gx, y: 22, width: 12, height: 48, rx: 2 }, G);
+  egtBars.push(el('rect', { class: 'egtbar', x: gx, y: 70, width: 12, height: 0, rx: 2 }, G));
+  el('text', { class: 'gl', x: gx + 6, y: 83, 'text-anchor': 'middle' }, G).textContent = i + 1;
 });
 
 // ---------- Part descriptions and the follow-the-fuel tour ----------
@@ -524,16 +657,16 @@ const PARTS = {
   drains: ['Tank drains', 'A quick drain at the lowest inboard rear corner of each tank. Drain both before the first flight of the day and after each refueling, and check for water, sediment, and the right fuel: blue 100LL or green 100.'],
   selector: ['Fuel selector valve', 'Connects one tank to the engine: L, R, or OFF. There is no BOTH position. To select OFF you press a button on the selector and turn it counterclockwise, so you can\'t turn the fuel off by accident.'],
   firewall: ['Firewall', 'Separates the engine compartment from the cabin. Everything above it in this diagram is on or around the engine.'],
-  filter: ['Filter and drain (fuel strainer)', 'Catches dirt and water before they reach the pumps and the servo. Its quick drain is at the lower front of the firewall, reached through the lower left side of the nose. Drain it twice on the preflight, once with the selector on each tank.'],
+  filter: ['Fuel strainer (filter and drain)', 'Catches dirt and water before they reach the pumps and the servo. Its quick drain is at the lower front of the firewall, reached through the lower left side of the nose. Drain it twice on the preflight, once with the selector on each tank.'],
   elec: ['Electric fuel pump', 'The backup for the engine-driven pump, run by the FUEL PUMP switch left of the throttle quadrant. On for engine start, takeoff, landing, and switching tanks. Off in cruise, so you notice right away if the engine-driven pump fails. With the engine-driven pump failed, it can run the engine by itself.'],
   edp: ['Engine-driven fuel pump', 'The main fuel pump, a diaphragm pump turned by the engine. It works whenever the propeller turns, even when the propeller is only windmilling after the engine quits. The tanks are below the engine, so with no pump working, no fuel reaches it.'],
   servo: ['Fuel injector servo', 'Measures the air going into the engine and meters fuel in proportion to it. The throttle sets how much air goes in, and the mixture sets the ratio of fuel to air. At idle cutoff the servo sends no fuel at all, which is how you shut the engine down.'],
   air: ['Induction air', 'Air comes in through the filtered intake. More throttle lets in more air, and the servo adds fuel to match. If the intake gets blocked, the ALT. AIR lever opens a door for heated, unfiltered air.'],
   transducer: ['Fuel flow transducer', 'Measures how much fuel is going to the engine. The G3X shows it as fuel flow and uses it to count fuel used. That count is only as good as the fuel quantity you entered at startup.'],
   gea: ['GEA 24 and the G3X', 'The Garmin engine and airframe unit turns the float and flow sensor signals into the fuel quantity and fuel flow on the display. A tank at 3 gallons or less gives a chime and a flashing red quantity. This airplane has no fuel pressure gauge.'],
-  distributor: ['Fuel distributor (flow divider)', 'Takes the metered fuel from the servo and splits it evenly among the four cylinders, one line to each fuel nozzle.'],
+  distributor: ['Flow divider (fuel distributor)', 'Takes the metered fuel from the servo and splits it evenly among the four cylinders, one line to each fuel nozzle.'],
   nozzles: ['Fuel nozzles', 'One per cylinder. Each sprays fuel into its cylinder\'s intake port, where it mixes with the incoming air. A partly blocked nozzle starves one cylinder and makes the engine run rough.'],
-  cylinders: ['Cylinders', 'Where the fuel and air burn. The glow shows how much power they\'re making, and it flickers when the mixture is too rich or too lean to burn smoothly.']
+  cylinders: ['Cylinders', 'Where the fuel and air burn. The glow shows which cylinders are firing and how hard. Each one has its own EGT bar on the engine display, so a cylinder that runs differently from the others stands out.']
 };
 const TOUR = ['tanks', 'selector', 'firewall', 'filter', 'elec', 'edp', 'servo', 'transducer', 'distributor', 'nozzles', 'cylinders'];
 const info = $('info'), strip = document.querySelector('.strip');
@@ -542,7 +675,7 @@ function showInfo(k, scroll) {
   document.querySelectorAll('#schem .part.picked').forEach(x => x.classList.remove('picked'));
   if (!k) {
     info.classList.remove('open');
-    info.innerHTML = `<h3>Tap or click any part to see what it does</h3><p class="tip">Fuel is blue, and the moving dots show it flowing. Gray lines are empty.</p><div class="tour">${START}</div>`;
+    info.innerHTML = `<h3>Tap or click any part to see what it does</h3><p class="tip">Fuel is blue, and the moving dots show it flowing. An empty line is dark.</p><div class="tour">${START}</div>`;
     return;
   }
   document.querySelectorAll(`#schem .part[data-part="${k}"]`).forEach(x => x.classList.add('picked'));
@@ -583,9 +716,11 @@ info.parentNode.addEventListener('keydown', e => {   // Escape closes the descri
 showInfo(null);
 
 // ---------- Controls ----------
-const SEL_ANG = { L: -40, R: 80, OFF: -100 };
+const SEL_ANG = { L: -40, R: 80, OFF: -100 }, PLUG_ANG = { L: 0, R: 90, OFF: -90 };
+const SEL_NAME = { L: 'Left tank', R: 'Right tank', OFF: 'Off' };
 const SEL_HELP = 'Click L TANK or R TANK to switch tanks. OFF takes two clicks: the first presses the button on the selector, the second turns it.';
 const selBtns = document.querySelectorAll('.knob .lbl, .seg button'), segOff = document.querySelector('.seg [data-v="OFF"]');
+let curveDirty = true;
 function hint(t, warn) { const h = $('selHint'); h.textContent = t; h.classList.toggle('flash', !!warn); }
 function syncArm() {
   const on = S.armed > 0 && S.sel !== 'OFF';
@@ -605,11 +740,9 @@ function setSel(v) {
 }
 function syncSel() {
   $('selPtr').style.transform = `rotate(${SEL_ANG[S.sel]}deg)`;
+  $('selPlug').style.transform = `rotate(${PLUG_ANG[S.sel]}deg)`;
   selBtns.forEach(g => { const on = g.dataset.v === S.sel; g.classList.toggle('cur', on); g.setAttribute('aria-checked', on); });
-  $('passL').setAttribute('visibility', S.sel === 'L' ? 'visible' : 'hidden');
-  $('passR').setAttribute('visibility', S.sel === 'R' ? 'visible' : 'hidden');
-  $('passOff').setAttribute('visibility', S.sel === 'OFF' ? 'visible' : 'hidden');
-  $('selTxt').textContent = S.sel;
+  $('selTxt').textContent = SEL_NAME[S.sel];
   syncArm();
 }
 selBtns.forEach(g => {
@@ -619,12 +752,11 @@ selBtns.forEach(g => {
 $('pushBtn').addEventListener('click', arm);
 $('pushBtn').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); arm(); } });
 
-function setPump(on) { S.pump = on; syncPump(); }
 function syncPump() {
   $('pumpSw').setAttribute('aria-checked', S.pump); $('pumpState').textContent = S.pump ? 'ON' : 'OFF';
-  $('pumpTxt').textContent = S.pump ? 'ON' : 'OFF'; $('pumpTxt').classList.toggle('on', S.pump);
+  $('pumpTxt').textContent = S.pump ? 'On' : 'Off'; $('pumpTxt').classList.toggle('on', S.pump);
 }
-$('pumpSw').addEventListener('click', () => setPump(!S.pump));
+$('pumpSw').addEventListener('click', () => { S.pump = !S.pump; syncPump(); });
 
 function mixLabel(m) { return m < 0.04 ? 'Idle cutoff' : m > 0.995 ? 'Full rich' : `${Math.round(m * 100)}%`; }
 function syncSliders() {
@@ -633,14 +765,51 @@ function syncSliders() {
 }
 $('thr').addEventListener('input', e => { S.thr = e.target.value / 100; $('thrOut').textContent = `${e.target.value}%`; curveDirty = true; });
 $('mix').addEventListener('input', e => { S.mix = e.target.value / 100; $('mixOut').textContent = mixLabel(S.mix); });
-$('edpFail').addEventListener('change', e => { S.edpFail = e.target.checked; });
+
+// Failures
+const nozClog = el('circle', { class: 'clog', cx: CYL_X[2], cy: 93, r: 3, visibility: 'hidden' }, $('nozzles'));
+const FAILS = { edpFail: 'edpFail', clogFail: 'clog', nozFail: 'noz' };
+function syncFail() {
+  for (const id in FAILS) $(id).checked = S[FAILS[id]];
+  $('waterFail').checked = S.waterOn;
+  $('edpX').setAttribute('visibility', S.edpFail ? 'visible' : 'hidden');
+  $('clog').setAttribute('visibility', S.clog ? 'visible' : 'hidden');
+  nozClog.setAttribute('visibility', S.noz ? 'visible' : 'hidden');
+  const sump = $('sump'), hide = !(S.waterOn && S.water > 0);
+  if (hide && document.activeElement === sump) $('waterFail').focus({ preventScroll: true });
+  sump.hidden = hide;
+}
+for (const id in FAILS) $(id).addEventListener('change', e => { S[FAILS[id]] = e.target.checked; curveDirty = true; syncFail(); });
+function setWater(on) {
+  S.waterOn = on; S.water = on ? WATER_CELLS : 0; S.wc = 0;
+  if (!on) for (const k in P) P[k].cells = P[k].cells.map(c => c === 2 ? 1 : c);
+  syncFail();
+}
+$('waterFail').addEventListener('change', e => setWater(e.target.checked));
+$('sump').addEventListener('click', () => { S.water = 0; S.drip = 1.8; syncFail(); });
+
+// Fuel on board. The sliders follow the tanks as fuel burns, except just after you move one.
+let loadT = -1e9;
+function syncLoads() {
+  for (const side of ['L', 'R']) {
+    const q = S['q' + side], sl = $('load' + side);
+    $('load' + side + 'Out').textContent = `${q.toFixed(1)} gal`;
+    if (performance.now() - loadT > 1200 && +sl.value !== Math.round(q)) sl.value = Math.round(q);
+  }
+}
+for (const side of ['L', 'R']) $('load' + side).addEventListener('input', e => {
+  S['q' + side] = +e.target.value; loadT = performance.now(); $('load' + side + 'Out').textContent = `${S['q' + side].toFixed(1)} gal`;
+});
 
 // The part description sticks just above the controls on a phone, so it needs to know how tall they are.
-const dock = document.querySelector('.dock'), sim = $('simulator');
-const board = document.querySelector('.board');
+const dock = document.querySelector('.dock'), sim = $('simulator'), board = document.querySelector('.board');
 // --dock-h keeps an open description above the phone controls; --board-h lets a board taller than the window scroll before it sticks
 const setSizes = () => { sim.style.setProperty('--dock-h', dock.offsetHeight + 'px'); sim.style.setProperty('--board-h', board.offsetHeight + 'px'); };
 if ('ResizeObserver' in window) { const ro = new ResizeObserver(setSizes); ro.observe(dock); ro.observe(board); } else setSizes();
+
+// What the failures do to the engine model
+const flowCap = () => S.clog ? (S.pump && !S.edpFail ? 10 : 7.5) : null;   // gal/hr a partly blocked strainer lets through
+const opts = deliv => ({ cap: flowCap(), noz: S.noz ? NOZ_BLOCKED : ONES, deliv });
 
 // ---------- Mixture chart (x runs the same way as the mixture slider: idle cutoff left, full rich right) ----------
 const CW = 340, CH = 176, X0 = 34, X1 = 328, Y0 = 20, Y1 = 150;
@@ -652,212 +821,249 @@ const egtP = el('path', { class: 'egt' }, csvg), rpmP = el('path', { class: 'rpm
 const curL = el('line', { class: 'cur', y1: Y0 - 4, y2: Y1 }, csvg);
 const pkD = el('circle', { class: 'mk', r: 4 }, csvg), ropD = el('circle', { class: 'mk', r: 4 }, csvg);
 const pkT = el('text', { class: 'mklbl', 'text-anchor': 'middle' }, csvg), ropT = el('text', { class: 'mklbl', 'text-anchor': 'middle' }, csvg);
-const curD = el('circle', { r: 4.5, fill: 'var(--lever)' }, csvg);
+const curD = el('circle', { r: 4.5, style: 'fill:var(--lever)' }, csvg);
 const quitT = el('text', { 'text-anchor': 'middle', y: Y0 + 14 }, csvg);
 el('text', { x: X0, y: Y1 + 16 }, csvg).textContent = 'Idle cutoff';
 el('text', { x: X1, y: Y1 + 16, 'text-anchor': 'end' }, csvg).textContent = 'Full rich';
 el('text', { x: X0 - 6, y: Y0 + 4, 'text-anchor': 'end' }, csvg).textContent = 'Hot';
 el('text', { x: X0 - 6, y: Y1, 'text-anchor': 'end' }, csvg).textContent = 'Cool';
 const mx = m => X0 + (clamp(m, 0.04, 1) - 0.04) / 0.96 * (X1 - X0);
-let C = null, curveDirty = true;
+const line = (pts, y) => pts.map((p, i) => `${i ? 'L' : 'M'}${mx(p.m).toFixed(1)} ${y(p).toFixed(1)}`).join('');
+const show = (n, on) => on ? n.removeAttribute('visibility') : n.setAttribute('visibility', 'hidden');
+let C = null, curveKey = '';
 function computeCurve() {
   const pts = [];
-  for (let i = 0; i <= 192; i++) { const m = 1 - i * 0.005; pts.push({ m, e: engine(m, S.thr, S.alt, 1) }); }
+  for (let i = 0; i <= 192; i++) { const m = 1 - i * 0.005; pts.push({ m, e: engine(m, S.thr, 1, opts()) }); }
   const firing = pts.filter(p => p.e.fires);
+  const yR = v => Y1 - (v - 800) / 2000 * (Y1 - Y0);
+  rpmP.setAttribute('d', line(pts, p => yR(p.e.rpm)));
+  curveDirty = false;
+  if (!firing.length) {   // nothing burns at any mixture setting (a blocked strainer at high power)
+    egtP.setAttribute('d', ''); quitR.setAttribute('width', X1 - X0);
+    quitT.setAttribute('x', (X0 + X1) / 2); quitT.textContent = 'Too lean to run at this throttle';
+    show(pkD, false); show(ropD, false); pkT.textContent = ropT.textContent = '';
+    C = { mPeak: null, egtPeak: null, mROP: null, yE: null, yR, leanQuit: 1 };
+    return;
+  }
   let pk = firing[0];
   for (const p of firing) if (p.e.egt > pk.e.egt) pk = p;
   let rop = null;
   for (const p of firing) if (p.m > pk.m && p.e.egt <= pk.e.egt - 100) rop = p;
   const lo = Math.min(...firing.map(p => p.e.egt)) - 20, hi = pk.e.egt + 40;
   const yE = v => Y1 - (v - lo) / (hi - lo) * (Y1 - Y0);
-  const yR = v => Y1 - (v - 800) / (2800 - 800) * (Y1 - Y0);
-  egtP.setAttribute('d', firing.map((p, i) => `${i ? 'L' : 'M'}${mx(p.m).toFixed(1)} ${yE(p.e.egt).toFixed(1)}`).join(''));
-  rpmP.setAttribute('d', pts.map((p, i) => `${i ? 'L' : 'M'}${mx(p.m).toFixed(1)} ${yR(p.e.rpm).toFixed(1)}`).join(''));
+  egtP.setAttribute('d', line(firing, p => yE(p.e.egt)));
   const leanQuit = firing[firing.length - 1].m, qw = mx(leanQuit) - X0;
   quitR.setAttribute('width', Math.max(0, qw));
   quitT.setAttribute('x', X0 + qw / 2); quitT.textContent = qw > 34 ? 'Quits' : '';
-  pkD.setAttribute('cx', mx(pk.m)); pkD.setAttribute('cy', yE(pk.e.egt));
-  pkT.setAttribute('x', mx(pk.m)); pkT.setAttribute('y', yE(pk.e.egt) - 9); pkT.textContent = 'Peak EGT';
+  show(pkD, true); pkD.setAttribute('cx', mx(pk.m)); pkD.setAttribute('cy', yE(pk.e.egt));
+  pkT.setAttribute('x', clamp(mx(pk.m), X0 + 28, X1 - 28)); pkT.setAttribute('y', yE(pk.e.egt) - 9); pkT.textContent = 'Peak EGT';
+  show(ropD, !!rop);
   if (rop) {
-    ropD.setAttribute('cx', mx(rop.m)); ropD.setAttribute('cy', yE(rop.e.egt)); ropD.removeAttribute('visibility');
+    ropD.setAttribute('cx', mx(rop.m)); ropD.setAttribute('cy', yE(rop.e.egt));
     ropT.setAttribute('x', Math.min(mx(rop.m), X1 - 24)); ropT.setAttribute('y', yE(rop.e.egt) + 18); ropT.textContent = '100° rich';
-  } else { ropD.setAttribute('visibility', 'hidden'); ropT.textContent = ''; }
+  } else ropT.textContent = '';
   C = { mPeak: pk.m, egtPeak: pk.e.egt, mROP: rop ? rop.m : null, yE, yR, leanQuit };
-  curveDirty = false;
 }
 function drawCursor() {
-  const x = mx(S.mix);
+  const x = mx(S.mix), e = engine(S.mix, S.thr, 1, opts());
   curL.setAttribute('x1', x); curL.setAttribute('x2', x);
-  const e = engine(S.mix, S.thr, S.alt, 1);
-  if (e.fires) { curD.setAttribute('cx', x); curD.setAttribute('cy', C.yE(e.egt)); curD.removeAttribute('visibility'); }
-  else curD.setAttribute('visibility', 'hidden');
+  show(curD, e.fires && !!C.yE);
+  if (e.fires && C.yE) { curD.setAttribute('cx', x); curD.setAttribute('cy', C.yE(e.egt)); }
 }
 
 // ---------- Reset ----------
-const BASE = { sel: 'L', armed: 0, pump: false, edpFail: false, thr: 0.85, mix: 1, qL: 20, qR: 22, a: 1, b: 0, press: 1, supply: true };
+const BASE = { sel: 'L', armed: 0, pump: false, edpFail: false, clog: false, noz: false, waterOn: false, water: 0, wc: 0,
+  thr: 0.85, mix: 1, qL: 20, qR: 22, press: 1, supply: true, air: false, wet: false, v: 0, ph: 0, drip: 0 };
 function reset() {
   Object.assign(S, BASE);
-  const e = engine(S.mix, S.thr, S.alt, 1); S.e = e; S.rpm = e.rpm; S.egt = e.egt || 120; S.ff = e.ff; S.running = e.fires;
-  $('edpFail').checked = false;
-  syncSel(); syncPump(); syncSliders(); curveDirty = true;
+  for (const k in P) { P[k].cells.fill(1); P[k].sig = ''; }
+  S.deliv = [1, 1, 1, 1];
+  const e = engine(S.mix, S.thr, 1); S.e = e; S.rpm = e.rpm; S.egt = e.cyl.map(c => c.egt); S.ff = e.ff; S.running = true;
+  loadT = -1e9;
+  syncSel(); syncPump(); syncSliders(); syncFail(); syncLoads(); curveDirty = true;
   hint(SEL_HELP);
 }
 $('reset').addEventListener('click', reset);
 
 // ---------- Simulation ----------
+function tankCell(side, take) {   // what a tank sends down its line next
+  if (!(S['q' + side] > 0)) return 0;
+  if (side === 'L' && S.water > 0) { const w = S.wc % 3 < 2; if (take) { S.wc++; if (w) S.water--; } return w ? 2 : 1; }
+  return 1;
+}
+function shift(side) {   // move every cell one place toward the engine
+  const tk = side && P['tank' + side], into = tk ? last(tk) : 0, out = last(P.trunk);
+  for (const k of NOZ) { P[k].cells.pop(); P[k].cells.unshift(out); }
+  P.trunk.cells.pop(); P.trunk.cells.unshift(into);
+  if (tk) { tk.cells.pop(); tk.cells.unshift(tankCell(side, true)); }
+}
+const LINES = ['trunk'].concat(NOZ);
 function step(dt) {
   S.t += dt;
   if (S.armed > 0) { S.armed = Math.max(0, S.armed - dt); if (!S.armed) { syncArm(); hint(SEL_HELP); } }
-  const edpOK = !S.edpFail;                       // windmilling keeps it turning in flight
-  const pumping = S.pump || edpOK;
-  const tankQ = S.sel === 'L' ? S.qL : S.sel === 'R' ? S.qR : 0;
-  S.supply = S.sel !== 'OFF' && tankQ > 0 && pumping;
-  if (S.supply && S.a < 1) { S.b += (S.pump && edpOK ? 0.26 : 0.17) * dt; if (S.a + S.b >= 1) { S.a = 1; S.b = 0; } }
-  const target = pumping && S.a > 0.002 ? 1 : 0;
-  S.press += (target - S.press) * Math.min(1, dt / (target ? 0.4 : 0.6));
-  const e = engine(S.mix, S.thr, S.alt, S.press); S.e = e;
-  const gps = e.ff / 3600;
-  if (!(S.supply && S.a >= 1)) S.a = Math.max(0, S.a - gps / LINE_GAL * dt);
-  if (S.supply && S.a >= 1) {
-    const burn = gps * dt * 60;   // tanks drain 60 times faster than real, so you can watch one run dry
-    if (S.sel === 'L') S.qL = Math.max(0, S.qL - burn); else S.qR = Math.max(0, S.qR - burn);
+  const edpOK = !S.edpFail, pumping = S.pump || edpOK;   // windmilling keeps the engine-driven pump turning in flight
+  const side = S.sel === 'OFF' ? null : S.sel, tk = side && P['tank' + side], q = side ? S['q' + side] : 0;
+  S.supply = !!side && q > 0 && pumping;
+  for (const s of ['L', 'R']) {   // a line that isn't in use stays full while its tank has fuel
+    const p = P['tank' + s];
+    if (s !== side && S['q' + s] > 0 && p.cells.includes(0)) p.cells = p.cells.map(c => c || 1);
   }
+  S.press += ((pumping ? 1 : 0) - S.press) * Math.min(1, dt / (pumping ? 0.4 : 0.6));
+  NOZ.forEach((k, i) => { S.deliv[i] += ((last(P[k]) === 1 ? 1 : 0) - S.deliv[i]) * Math.min(1, dt / 0.4); });
+  const e = engine(S.mix, S.thr, S.press, opts(S.deliv)); S.e = e;
+  S.air = anyCell(LINES, 0); S.wet = anyCell(LINES, 2);
+  // cells per second: what the engine is using, or faster while the pumps refill empty lines
+  const vEng = e.ff / 3600 / LINE_GAL * NPATH;
+  let v = vEng;
+  if (S.supply && S.mix >= 0.04 && (S.air || tk.cells.includes(0))) v = Math.max(v, (S.pump && edpOK ? 0.26 : 0.17) * NPATH * S.press);
+  S.v = v;
+  if (side && q > 0 && v > 0)   // tanks drain 60 times faster than real, so you can watch one run dry
+    S['q' + side] = Math.max(0, q - (Math.min(v, vEng) * 60 + Math.max(0, v - vEng)) * dt * LINE_GAL / NPATH);
+  S.ph += v * CELL * dt;
+  while (S.ph >= CELL) { S.ph -= CELL; shift(side); }
   const jitter = e.rough ? (Math.random() - 0.5) * e.rough * 300 : 0;
   S.rpm += (e.rpm + jitter - S.rpm) * Math.min(1, dt / 0.5);
-  S.egt += ((e.fires ? e.egt : 120) - S.egt) * Math.min(1, dt / (e.fires ? 0.7 : 5));
-  S.ff += (e.ff - S.ff) * Math.min(1, dt / 0.3);
+  e.cyl.forEach((c, i) => { S.egt[i] += ((c.fires ? c.egt : 120) - S.egt[i]) * Math.min(1, dt / (c.fires ? 0.7 : 5)); });
+  S.ff += (e.ff * (P.trunk.cells[FT_I] ? 1 : 0) - S.ff) * Math.min(1, dt / 0.3);
   S.running = e.fires && e.p > 0.004;
+  if (S.drip > 0) S.drip = Math.max(0, S.drip - dt);
+  if (S.waterOn && S.water <= 0 && !anyCell(Object.keys(P), 2)) { S.waterOn = false; syncFail(); }   // the water is gone
 }
 
 // ---------- Drawing ----------
-function setFuel(k, from, to) {   // show fuel along the pipe between fractions [from, to]
-  const p = P[k], L = p.len;
-  if (to - from <= 0.002) { p.fuel.setAttribute('visibility', 'hidden'); return; }
-  p.fuel.removeAttribute('visibility');
-  p.fuel.style.strokeDasharray = `${(to - from) * L} ${L * 2}`;
-  p.fuel.style.strokeDashoffset = `${-from * L}`;
+function tankY(q) {   // fuel level in the drawn tank, which is a slanted box
+  const f = (q + 1) / 25;
+  return f <= 0.1452 ? 686 - Math.sqrt(f * 2232) : f > 0.8548 ? 606 + Math.sqrt((1 - f) * 2232) : 677 - 62 * f;
 }
-function setDots(k, on, speed, dt) {
-  const p = P[k];
-  if (!on) { p.dots.setAttribute('visibility', 'hidden'); return; }
-  p.dots.removeAttribute('visibility');
-  if (!reduceMotion) { p.off -= speed * dt; p.dots.style.strokeDashoffset = p.off; }
-}
-let edpAng = 0, airOff = 0, textT = 1;
+const setBar = (r, f, top, h) => { const hh = clamp(f, 0, 1) * h; r.setAttribute('y', top + h - hh); r.setAttribute('height', hh); };
+let edpAng = 0, elecAng = 0, ftAng = 0, airOff = 0, crank = 0, textT = 1;
 function draw(dt) {
-  const e = S.e, flowing = S.ff > 0.15, speed = 16 + 3.2 * S.ff;
-  // tank lines
-  for (const side of ['L', 'R']) {
-    const k = side === 'L' ? 'tankL' : 'tankR', q = side === 'L' ? S.qL : S.qR;
-    setFuel(k, 0, q > 0 ? 1 : 0);
-    setDots(k, q > 0 && S.sel === side && S.supply && (flowing || S.a < 1), speed, dt);
+  const e = S.e, side = S.sel === 'OFF' ? null : S.sel, flow = S.v > 0.05, ph = reduceMotion ? 0 : S.ph;
+  // pipes
+  for (const s of ['L', 'R']) { const k = 'tank' + s, sel = s === side; paint(k, sel ? tankCell(s) : P[k].cells[0], sel ? ph : 0, sel && flow); }
+  paint('trunk', side ? last(P['tank' + side]) : 0, ph, flow);
+  for (const k of NOZ) paint(k, last(P.trunk), ph, flow);
+  // tanks: fuel level, float, water
+  for (const s of ['L', 'R']) {
+    const Y = tankY(S['q' + s]), f = $('fill' + s), sf = $('surf' + s);
+    f.setAttribute('y', Y); f.setAttribute('height', 700 - Y); sf.setAttribute('y1', Y); sf.setAttribute('y2', Y);
+    const sn = clamp((Y - 646) / 46, -0.45, 0.45), cs = Math.sqrt(1 - sn * sn);
+    const bx = s === 'L' ? 172 - 46 * cs : 308 + 46 * cs, by = 646 + 46 * sn;
+    $('arm' + s).setAttribute('x2', bx); $('arm' + s).setAttribute('y2', by);
+    $('bob' + s).setAttribute('cx', bx); $('bob' + s).setAttribute('cy', by);
   }
-  // supply line: a = fuel still near the servo, b = new fuel coming up from the selector
-  const full = S.a >= 1, tr = P.trunk;
-  if (full) setFuel('trunk', 0, 1);
-  else if (S.b > 0.002) setFuel('trunk', 0, S.b);
-  else setFuel('trunk', 1 - S.a, 1);
-  if (!full && S.a > 0.002 && S.b > 0.002) {   // two slugs: draw the top one with the dots layer
-    tr.dots.removeAttribute('visibility');
-    tr.dots.style.stroke = 'var(--fuel)'; tr.dots.style.opacity = .6; tr.dots.style.strokeLinecap = 'butt'; tr.dots.style.strokeWidth = 8;
-    tr.dots.style.strokeDasharray = `${S.a * tr.len} ${tr.len * 2}`; tr.dots.style.strokeDashoffset = `${-(1 - S.a) * tr.len}`;
-  } else {
-    tr.dots.style.stroke = ''; tr.dots.style.opacity = ''; tr.dots.style.strokeLinecap = ''; tr.dots.style.strokeWidth = ''; tr.dots.style.strokeDasharray = '';
-    setDots('trunk', full && flowing, speed, dt);
+  $('waterL').setAttribute('y', S.water > 0 ? 686 - 12 * Math.sqrt(S.water / WATER_CELLS) : 700);
+  const dr = $('drip');
+  if (S.drip > 0) { const t = (1.8 - S.drip) % 0.6 / 0.6; dr.setAttribute('cy', 699 + 15 * t); dr.setAttribute('opacity', (1 - t).toFixed(2)); }
+  else dr.setAttribute('opacity', 0);
+  // selector, servo, pumps, transducer, air
+  $('passFuel').classList.toggle('flow', !!side && S['q' + side] > 0);
+  $('fly').setAttribute('transform', `rotate(${-(12 + 78 * S.thr).toFixed(1)} 182 265)`);
+  $('mixArm').setAttribute('transform', `rotate(${(35 - 70 * S.mix).toFixed(1)} 274 265)`);
+  if (!reduceMotion) {
+    if (!S.edpFail) edpAng += S.rpm * dt * 0.012;
+    if (S.pump) elecAng = (elecAng + 540 * dt) % 360;
+    ftAng = (ftAng + S.ff * 40 * dt) % 360;
+    airOff -= (10 + 70 * e.af) * dt;
+    crank = (crank + S.rpm / 1200 * dt) % 1;
   }
-  // metered fuel to the nozzles
-  const meteredFuel = S.a > 0.002 || flowing;
-  for (const k of ['metered', 'n1', 'n2', 'n3', 'n4']) { setFuel(k, 0, meteredFuel ? 1 : 0); setDots(k, flowing, speed, dt); }
-  // tanks
-  for (const side of ['L', 'R']) {
-    const q = side === 'L' ? S.qL : S.qR, h = 66 * (q + 1) / 25, y = 634 - h;
-    const r = $('fill' + side); r.setAttribute('y', y); r.setAttribute('height', h);
-    const fy = clamp(y, 582, 626);
-    $('float' + side).setAttribute('d', side === 'L' ? `M126 572 L146 ${fy}` : `M334 572 L314 ${fy}`);
-    $('float' + side + 'b').setAttribute('cy', fy);
-  }
-  $('passL').style.stroke = S.qL > 0 ? '' : 'var(--line)';
-  $('passR').style.stroke = S.qR > 0 ? '' : 'var(--line)';
-  // pumps
-  if (!S.edpFail && !reduceMotion) edpAng = (edpAng + S.rpm * dt * 0.6) % 360;
-  $('edpRot').setAttribute('transform', `rotate(${edpAng.toFixed(1)} 230 330)`);
-  $('edpX').setAttribute('visibility', S.edpFail ? 'visible' : 'hidden');
-  // air
-  if (!reduceMotion) airOff -= (10 + 70 * (e ? e.af : 0.5)) * dt;
+  const d = S.edpFail ? 0 : 6 * Math.sin(edpAng);
+  $('edpDia').setAttribute('d', `M223 346Q240 ${(346 + d).toFixed(1)} 257 346`);
+  $('edpRod').setAttribute('d', `M240 ${(346 + d / 2).toFixed(1)}V363`);
+  $('elecRot').setAttribute('transform', `rotate(${elecAng.toFixed(1)} 240 416)`);
+  $('ftRot').setAttribute('transform', `rotate(${ftAng.toFixed(1)} 240 198)`);
   $('airDots').style.strokeDashoffset = airOff;
-  // cylinders and spray
-  const so = clamp(S.ff / 10, 0, 1).toFixed(2);
+  // cylinders glow in firing order, and each nozzle sprays what reaches it
+  const so = clamp(S.ff / 10, 0, 1);
   cylGlow.forEach((g, i) => {
-    let o = S.running ? 0.12 + 0.5 * clamp(e.p, 0, 1) : 0;
-    if (S.running && e.rough > 0.05 && !reduceMotion) o *= 1 - e.rough * Math.random();
+    const c = e.cyl[i];
+    let o = S.running && c.fires ? 0.14 + 0.55 * clamp(e.af * c.pr, 0, 1) : 0;
+    if (o && !reduceMotion) {
+      o *= 0.5 + 0.5 * Math.exp(-5 * ((crank - FIRE_AT[i] + 1) % 1));
+      if (e.rough > 0.05) o *= 1 - e.rough * Math.random();
+    }
     g.setAttribute('opacity', o.toFixed(3));
-    sprays[i].setAttribute('opacity', so);
-    if (!reduceMotion) [...sprays[i].children].forEach((c, j) => c.setAttribute('cy', 70 - ((S.t * 30 + j * 4 + i * 3) % 10)));
+    sprays[i].setAttribute('opacity', (so * S.deliv[i]).toFixed(2));
+    if (!reduceMotion) [...sprays[i].children].forEach((c2, j) => c2.setAttribute('cy', 84 - ((S.t * 30 + j * 4 + i * 3) % 11)));
   });
   // chart
-  if (curveDirty) computeCurve();
+  const ck = S.thr + '|' + S.noz + '|' + flowCap();
+  if (curveDirty || ck !== curveKey) { curveKey = ck; computeCurve(); }
   drawCursor();
-  // text readouts at 8 Hz
+  // engine display
+  $('tachNeedle').setAttribute('transform', `rotate(${(135 + 270 * clamp(S.rpm, 0, 3000) / 3000).toFixed(1)} 52 54)`);
+  setBar($('ffBar'), S.ff / 20, 22, 50);
+  egtBars.forEach((b, i) => setBar(b, (S.egt[i] - 800) / 800, 22, 48));
+  setBar($('barL'), S.qL / 24, 22, 50); setBar($('barR'), S.qR / 24, 22, 50);
+  // text at 8 Hz
   textT += dt; if (dt && textT < 0.125) return; textT = 0;
   $('rRpm').textContent = fmt(Math.round(S.rpm / 10) * 10);
   $('rFf').textContent = S.ff.toFixed(1);
-  $('rEgt').textContent = fmt(S.egt);
-  const st = $('rEng'), starving = S.running && (S.sel === 'OFF' || !S.supply || S.a < 1);
-  if (!S.running) { st.textContent = 'Quit'; st.className = 'st-bad'; }
-  else if (starving) { st.textContent = 'Starving'; st.className = 'st-warn'; }
-  else if (e.rough > 0.15) { st.textContent = 'Rough'; st.className = 'st-warn'; }
-  else { st.textContent = 'Running'; st.className = 'st-ok'; }
-  for (const side of ['L', 'R']) {
-    const q = side === 'L' ? S.qL : S.qR, low = q <= 3;   // the G3X flashes the quantity red at 3 gallons or less
-    $('bar' + side).firstChild.style.width = `${q / 24 * 100}%`;
-    $('ro' + side).classList.toggle('low', low);
-    $('num' + side).textContent = q.toFixed(1);
-    const t = $('qty' + side); t.textContent = `${q.toFixed(1)} gal`; t.classList.toggle('lowq', low);
+  $('rEgt').textContent = fmt(Math.max(...S.egt));
+  const st = $('rEng'), starving = S.running && (!S.supply || S.air);
+  const [word, cls] = !S.running ? ['Quit', 'st-bad'] : starving ? ['Starving', 'st-warn'] : e.rough > 0.15 ? ['Rough', 'st-warn'] : ['Running', 'st-ok'];
+  if (st.textContent !== word) { st.textContent = word; st.setAttribute('class', 'gn ' + cls); }
+  for (const s of ['L', 'R']) {
+    const q = S['q' + s], low = q <= 3;   // the G3X flashes the quantity red at 3 gallons or less
+    $('num' + s).textContent = Math.round(q);
+    $('num' + s).classList.toggle('low', low); $('bar' + s).classList.toggle('lowbar', low);
+    const t = $('qty' + s); t.textContent = `${q.toFixed(1)} gal`; t.classList.toggle('lowq', low);
   }
-  syncArm();
+  syncLoads(); syncArm();
   const now = describe(e);
   if ($('now').textContent !== now) $('now').textContent = now;
 }
+
+// ---------- What's happening, in words ----------
 function describe(e) {
-  const tank = S.sel === 'L' ? 'left' : 'right', tankQ = S.sel === 'L' ? S.qL : S.qR;
-  const pumping = S.pump || !S.edpFail;
+  const side = S.sel === 'OFF' ? null : S.sel, tank = side === 'L' ? 'left' : 'right', q = side ? S['q' + side] : 0;
+  const pumping = S.pump || !S.edpFail, more = !S.pump && !S.edpFail, atNoz = NOZ.some(k => last(P[k]) === 2);
   if (!S.running) {
     if (S.mix < 0.04) return 'Idle cutoff. The servo is sending no fuel to the nozzles, so the engine has stopped. The propeller is windmilling.';
-    if (S.sel === 'OFF') return 'The selector is OFF. No fuel can leave the tanks, so the engine has stopped. The propeller is windmilling.';
+    if (!side) return 'The selector is OFF. No fuel can leave the tanks, so the engine has stopped. The propeller is windmilling.';
     if (!pumping) return 'Neither pump is working. The tanks are below the engine, so no fuel reaches it. Turn the fuel pump on.';
-    if (tankQ <= 0) return `The ${tank} tank is empty, so the engine has quit. Switch to a tank with fuel.`;
-    if (S.a < 1) return 'Fuel is refilling the empty lines. Power comes back once fuel reaches the nozzles.';
+    if (q <= 0) return `The ${tank} tank is empty, so the engine has quit. Switch to a tank with fuel.`;
+    if (S.wet) return 'Water has reached the nozzles, so the engine has quit. Power comes back once the water has passed through. The right tank has clean fuel.';
+    if (S.air) return 'Fuel is refilling the empty lines. Power comes back once fuel reaches the nozzles.';
+    if (S.clog && e.lam > 1.4) return 'The blocked strainer can\'t pass enough fuel for this much throttle, so the mixture is too lean to burn. ' + (more ? 'Turn the fuel pump on or pull the throttle back.' : 'Pull the throttle back.');
     if (e.lam > 1.4) return 'The mixture is too lean to burn. Push it forward.';
     return 'The engine has stopped.';
   }
-  if (S.sel === 'OFF') return 'The selector is OFF. The engine is running on the fuel left in the lines and will quit in a few seconds.';
+  if (!side) return 'The selector is OFF. The engine is running on the fuel left in the lines and will quit in a few seconds.';
   if (!pumping) return 'Neither pump is working, so fuel has stopped moving. The engine is about to quit.';
-  if (!S.supply && tankQ <= 0) return `The ${tank} tank is empty. The engine is running on the fuel left in the lines and will quit in a few seconds.`;
-  if (S.a < 1) return 'Fuel is refilling the lines.';
+  if (q <= 0) return `The ${tank} tank is empty. The engine is running on the fuel left in the lines and will quit in a few seconds.`;
+  if (atNoz) return 'Water is going through the nozzles with the fuel, so the engine is misfiring.';
+  if (S.wet) return 'Water from the left tank is in the fuel line and on its way to the engine.';
+  if (S.air) return 'Fuel is refilling the lines.';
   let s = `Feeding from the ${tank} tank on ${S.edpFail ? 'the electric pump alone' : S.pump ? 'both pumps' : 'the engine-driven pump'}. The servo is metering ${S.ff.toFixed(1)} gal/hr.`;
-  if (e.rough > 0.15) return s + ` The engine is running rough because the mixture is too ${e.lam > 1 ? 'lean' : 'rich'}.`;
-  if (tankQ <= 3) return s + ` The ${tank} tank is low. Switch to the fullest tank.`;
-  if (S.mix > 0.995 && Math.abs(S.qL - S.qR) > 10) return s + ' The tanks are more than 10 gallons apart, the POH limit with the autopilot on.';
-  if (C) {
+  const rough = e.rough > 0.15, capped = S.clog && e.ff < e.ff0 - 0.05;
+  if (capped) s += rough ? ' The blocked strainer is holding the fuel flow down, so the engine is running lean and rough. ' + (more ? 'Turn the fuel pump on or reduce power.' : 'Reduce power.')
+    : ' The blocked strainer is holding the fuel flow down, so the mixture is leaner than the lever setting.';
+  if (S.noz) s += rough && !capped ? ' The No. 3 nozzle is partly blocked, so that cylinder is running lean and the engine is rough. A richer mixture smooths it out.'
+    : ' The No. 3 nozzle is partly blocked. That cylinder runs leaner than the others, and its EGT bar shows it.';
+  if (rough && !capped && !S.noz) s += ` The engine is running rough because the mixture is too ${e.lam > 1 ? 'lean' : 'rich'}.`;
+  if (q <= 3) s += ` The ${tank} tank is low. Switch to the fullest tank.`;
+  else if (S.mix > 0.995 && Math.abs(S.qL - S.qR) > 10) s += ' The tanks are more than 10 gallons apart, the POH limit with the autopilot on.';
+  else if (!capped && !S.noz && C && C.mPeak != null) {
     const d = C.egtPeak - e.egt, rich = S.mix > C.mPeak;
     if (Math.abs(S.mix - C.mPeak) < 0.02) s += ' EGT is at its peak: best economy.';
     else if (rich && Math.abs(d - 100) < 15) s += ' EGT is about 100°F rich of peak: best power.';
-    else if (rich) s += ` EGT is ${fmt(Math.round(d / 5) * 5)}°F rich of peak.`;
-    else s += ' The mixture is lean of peak EGT.';
+    else if (rich && S.mix < 0.995) s += ` EGT is ${fmt(Math.round(d / 5) * 5)}°F rich of peak.`;
+    else if (!rich) s += ' The mixture is lean of peak EGT.';
   }
   return s;
 }
 
-// The simulation stops while the simulator is off the screen, so the tanks don't drain while you read.
-let last = performance.now(), paused = false, onScreen = true;
+// ---------- Run ----------
+let prevT = performance.now(), paused = false, onScreen = true;
 if ('IntersectionObserver' in window) new IntersectionObserver(es => { onScreen = es[es.length - 1].isIntersecting; }).observe(sim);
 function frame(now) {
-  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  const dt = Math.min(0.1, (now - prevT) / 1000); prevT = now;
   if (onScreen) { if (!paused) step(dt); draw(paused ? 0 : dt); }
   requestAnimationFrame(frame);
 }
 reset();
-if (/[?&]debug\b/.test(location.search)) window.__fuel = { S, engine, step, draw, get C() { return C; }, reset, pause(v) { paused = v; } };
+if (/[?&]debug\b/.test(location.search)) window.__fuel = { S, P, engine, step, draw, describe, get C() { return C; }, reset, pause(v) { paused = v; } };
 requestAnimationFrame(frame);
 })();
 </script>
