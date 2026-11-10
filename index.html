@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ground School</title>
-<meta name="description" content="The training airplanes and interactive study tools for flight students.">
+<title>Student pilot resources</title>
+<meta name="description" content="Aircraft references, study pages, and simulators for student pilots.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
@@ -12,7 +12,7 @@
 <style>
 .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
 .hero-in{position:relative;max-width:1200px;margin:0 auto;padding:clamp(56px,10vw,120px) 16px clamp(48px,8vw,96px)}
-.hero h1{position:relative;z-index:1;margin:0;font:700 clamp(3.6rem,13vw,9rem)/.88 var(--cond);letter-spacing:-.025em}
+.hero h1{position:relative;z-index:1;margin:0;font:700 clamp(3rem,10.5vw,7rem)/.9 var(--cond);letter-spacing:-.02em}
 .hero p{position:relative;z-index:1;margin:22px 0 0;max-width:34ch;font-size:clamp(1.1rem,2.2vw,1.35rem);line-height:1.45;color:var(--muted)}
 .rose{position:absolute;top:50%;right:-120px;width:min(620px,95vw);transform:translateY(-50%);color:var(--chart);pointer-events:none}
 .rose .faint{stroke:var(--chart-faint)}
@@ -28,7 +28,6 @@
 .tool svg{width:112px;height:112px;display:block}
 .tool h2{margin:0 0 6px;font:700 clamp(1.7rem,3.5vw,2.2rem)/1.05 var(--cond)}
 .tool p{margin:0;max-width:62ch;color:var(--muted)}
-.tool .open{display:inline-block;margin-top:12px;font:600 1rem/1 var(--cond);color:var(--accent);text-decoration:underline;text-underline-offset:3px}
 @media (max-width:520px){.tool{grid-template-columns:64px minmax(0,1fr);gap:16px}.tool svg{width:64px;height:64px}}
 
 .i-face{fill:#141617}.i-ring{fill:#2A2E32}.i-mark{fill:#F1F1F1}.i-mark-s{stroke:#F1F1F1}
@@ -43,7 +42,7 @@
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="index.html">Ground School</a>
+    <a class="wordmark" href="index.html">172 Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="aircraft/index.html">Aircraft</a>
@@ -73,8 +72,8 @@
   <section class="hero">
     <svg class="rose" id="rose" viewBox="-300 -300 600 600" aria-hidden="true"></svg>
     <div class="hero-in">
-      <h1>Ground<br>School</h1>
-      <p>Study tools I build for my students. Use them before a lesson, after one, or any time something didn't click in the airplane.</p>
+      <h1>Student pilot<br>resources</h1>
+      <p>Aircraft references, study pages, and simulators for private pilot training.</p>
     </div>
   </section>
 
@@ -87,8 +86,7 @@
           </svg>
           <div>
             <h2>Aircraft</h2>
-            <p>The Piper Pilot 100i, Cessna 172R, and Cessna 172K: specs, V-speeds, systems, avionics, and weight and balance for each.</p>
-            <span class="open">See the aircraft</span>
+            <p>Specs, V-speeds, systems, and weight and balance for the Piper Pilot 100i, Cessna 172R, and Cessna 172K.</p>
           </div>
         </a>
       </li>
@@ -103,8 +101,7 @@
           </svg>
           <div>
             <h2>Study</h2>
-            <p>The regulations and left-turning tendencies for the private pilot checkride, plus three simulators: a wing you can stall, an engine you can pull apart, and the Pilot 100i fuel system.</p>
-            <span class="open">See the study pages</span>
+            <p>Regulations, left-turning tendencies, and simulators for stalls, the engine, and the Pilot 100i fuel system.</p>
           </div>
         </a>
       </li>
@@ -123,8 +120,7 @@
           </svg>
           <div>
             <h2>VOR trainer</h2>
-            <p>Put the airplane anywhere, turn the OBS, and watch the needle on a CDI or an HSI. Work through reverse sensing, station passage, and intercepting a radial, then try the "Where am I?" quiz.</p>
-            <span class="open">Open the VOR trainer</span>
+            <p>Move the airplane, turn the OBS, and watch the needle on a CDI or an HSI.</p>
           </div>
         </a>
       </li>
@@ -139,8 +135,7 @@
           </svg>
           <div>
             <h2>Weight and balance</h2>
-            <p>What datum, arm, moment, and CG actually mean, and a step-by-step walkthrough of a loading problem: total the moments, find the CG, check it against the envelope, and see where it ends up after the fuel burns off.</p>
-            <span class="open">Read the walkthrough</span>
+            <p>The terms, and a loading problem worked step by step.</p>
           </div>
         </a>
       </li>
@@ -150,7 +145,6 @@
 
 <footer class="site-foot">
   <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
-  <p>Made by Colby Penn</p>
 </footer>
 
 <script>

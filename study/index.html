@@ -13,9 +13,7 @@
 .list-page{max-width:1200px;margin:0 auto;padding:48px 16px 72px}
 .list-page h1{font:700 clamp(2.8rem,8vw,5rem)/.92 var(--cond);margin:0;letter-spacing:-.02em}
 .list-page .intro{font-size:1.2rem;color:var(--muted);max-width:56ch;margin:16px 0 0}
-.group{display:grid;grid-template-columns:220px minmax(0,1fr);gap:8px 40px;margin-top:56px;padding-top:16px;border-top:3px solid var(--text)}
-@media (max-width:760px){.group{grid-template-columns:1fr}}
-.group h2{font:700 1.5rem/1.1 var(--cond);margin:0}
+.group{max-width:820px;margin-top:40px;padding-top:16px;border-top:3px solid var(--text)}
 .group ol{list-style:none;margin:0;padding:0}
 .group li a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 24px;padding:14px 0;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
 .group li:first-child a{padding-top:0}
@@ -29,7 +27,7 @@
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="../index.html">Ground School</a>
+    <a class="wordmark" href="../index.html">172 Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="../aircraft/index.html">Aircraft</a>
@@ -56,15 +54,13 @@
 </header>
 <main class="list-page">
   <h1>Study</h1>
-  <p class="intro">Topic-by-topic study pages for the private pilot checkride, written around the questions an examiner tends to ask.</p>
     <section class="group">
-      <h2>Checkride topics</h2>
       <ol>
         <li><a href="../study/regulations.html"><strong>Regulations</strong><span>Pilot currency, documents, inspections, required equipment, weather minimums, operating rules, and accident reporting.</span><em>14 CFR 61, 91; 49 CFR 830</em></a></li>
-        <li><a href="../study/left-turning-tendencies.html"><strong>Left-turning tendencies</strong><span>Torque, the spiraling slipstream, P-factor, and gyroscopic precession: why the airplane wants to go left and how right rudder fixes it.</span><em>PHAK Ch. 5</em></a></li>
-        <li><a href="../study/stall.html"><strong>Stall simulator</strong><span>A wing in a wind tunnel. Raise the angle of attack and watch the airflow over the top separate as the wing stalls.</span><em>Interactive</em></a></li>
-        <li><a href="../study/engine.html"><strong>Engine</strong><span>A 3D Lycoming you can turn, run, and pull apart to see the pistons, valves, camshaft, magnetos, and everything else.</span><em>Interactive</em></a></li>
-        <li><a href="../study/fuel-system.html"><strong>Pilot 100i fuel system</strong><span>The POH fuel system schematic, working. Switch tanks, run one dry, fail a pump, and lean the mixture while you watch the fuel and the engine.</span><em>Interactive</em></a></li>
+        <li><a href="../study/left-turning-tendencies.html"><strong>Left-turning tendencies</strong><span>Torque, the spiraling slipstream, P-factor, and gyroscopic precession.</span><em>PHAK Ch. 5</em></a></li>
+        <li><a href="../study/stall.html"><strong>Stall simulator</strong><span>Raise the angle of attack and watch the airflow separate.</span><em>Interactive</em></a></li>
+        <li><a href="../study/engine.html"><strong>Engine</strong><span>A 3D Lycoming you can turn, run, and pull apart.</span><em>Interactive</em></a></li>
+        <li><a href="../study/fuel-system.html"><strong>Pilot 100i fuel system</strong><span>The POH schematic, working. Switch tanks, fail a pump, and lean the mixture.</span><em>Interactive</em></a></li>
       </ol>
     </section>
 </main>

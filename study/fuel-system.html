@@ -19,11 +19,11 @@
 
 /* Simulator layout. Wide screens: schematic on the left, gauges and controls on the right.
    Narrow screens: gauges stick to the top, controls stick to the bottom, the schematic scrolls between them. */
-.sim{max-width:1200px;margin:24px auto 0;padding:0 16px;display:grid;grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:24px;align-items:start;scroll-margin-top:58px}
-.board{position:sticky;top:min(58px,calc(100vh - var(--board-h,0px) - 12px));background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:clip}
-.board svg{display:block;width:100%;height:auto;max-height:max(600px,calc(100vh - 215px))}
+.sim{max-width:1200px;margin:24px auto 0;padding:0 16px;display:grid;grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:24px;align-items:start}
+.board{position:sticky;top:min(12px,calc(100vh - var(--board-h,0px) - 12px));background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:clip}
+.board svg{display:block;width:100%;height:auto;max-height:max(600px,calc(100vh - 170px))}
 .side{display:flex;flex-direction:column;gap:14px;min-width:0}
-.strip{position:sticky;top:47px;z-index:8;background:var(--bg);padding:11px 0 8px;box-shadow:0 10px 10px -6px var(--bg)}
+.strip{position:sticky;top:0;z-index:8;background:var(--bg);padding:11px 0 8px;box-shadow:0 10px 10px -6px var(--bg)}
 
 .readouts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(0,1.35fr);gap:6px}
 .ro{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px 7px;min-width:0}
@@ -70,8 +70,7 @@
 #schem .lowq{fill:var(--red)!important}
 #schem .fail{stroke:var(--red);stroke-width:4;stroke-linecap:round}
 
-.dock{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:210px minmax(0,1fr);grid-template-areas:"practice practice" "sel mix" "sel thr" "sel pump";gap:14px 24px;align-items:start}
-.practice{grid-area:practice;border-bottom:1px solid var(--line);padding-bottom:12px}
+.dock{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:210px minmax(0,1fr);grid-template-areas:"sel mix" "sel thr" "sel pump";gap:14px 24px;align-items:start}
 .selbox{grid-area:sel}.pumpbox{grid-area:pump}.mixbox{grid-area:mix}.thrbox{grid-area:thr}
 .knob{display:block;width:100%;max-width:210px;height:auto;margin:0 auto}
 .knob text{font:700 12px var(--cond);fill:var(--text)}
@@ -112,21 +111,8 @@
 input[type=range]{width:100%;margin:0;accent-color:var(--muted)}
 #mix{accent-color:var(--lever)}
 
-.practice > label{display:block;font:700 1.1rem/1.2 var(--cond);margin-bottom:8px}
-select{width:100%;max-width:340px;font:600 1rem/1.2 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:9px 10px}
-.stepnow{display:none;margin:0}
-.checks{list-style:none;margin:10px 0 0;padding:0;counter-reset:ck}
-.checks li{counter-increment:ck;position:relative;padding:0 0 8px 32px;font-size:.95rem;color:var(--muted)}
-.checks li::before{content:counter(ck);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);font:700 .85rem/21px var(--cond);text-align:center;color:var(--muted)}
-.checks li.next{color:var(--text)}
-.checks li.next::before{border-color:var(--text);color:var(--text)}
-.checks li.done{color:var(--text)}
-.checks li.done::before{content:"✓";background:var(--ok);border-color:var(--ok);color:#0c1a12}
-.outro{margin:4px 0 0;padding:10px 12px;border-radius:6px;background:var(--surface-2);font-size:.95rem}
-
 .more{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px 24px;align-items:start}
-.more h2{font:700 1.1rem/1.2 var(--cond);margin:0 0 10px}
-.chart svg{display:block;width:100%;height:auto;margin-top:10px}
+.chart svg{display:block;width:100%;height:auto}
 .chart text{font:500 11px var(--cond);fill:var(--muted)}
 .chart .egt{fill:none;stroke:var(--chart);stroke-width:2.2}
 .chart .rpm{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:5 4}
@@ -138,17 +124,9 @@ select{width:100%;max-width:340px;font:600 1rem/1.2 var(--cond);color:var(--text
 .btn{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:9px 12px;cursor:pointer}
 .btn:hover{border-color:var(--muted)}
 .btn:disabled{opacity:.4;cursor:default}
-.chk{display:flex;gap:8px;align-items:center;font-size:.95rem;margin-top:8px;cursor:pointer}
+.chk{display:flex;gap:8px;align-items:center;font-size:.95rem;margin-bottom:12px;cursor:pointer}
 .chk input{width:18px;height:18px;accent-color:var(--accent)}
 
-article td,article th{text-align:left;vertical-align:top}
-article .flow-list li{margin-bottom:8px}
-.qa{background:var(--surface);border:1px solid var(--line);border-radius:6px;margin:10px 0}
-.qa summary{cursor:pointer;padding:12px 16px;font:600 1.08rem/1.35 var(--cond);list-style-position:outside;margin-left:18px}
-.qa summary:hover{color:var(--accent)}
-.qa[open] summary{border-bottom:1px solid var(--line)}
-.qa div{padding:12px 16px}
-.qa div p{margin:0}
 .page-single{padding-top:8px}
 
 @media (max-width:960px){
@@ -165,13 +143,7 @@ article .flow-list li{margin-bottom:8px}
   .board svg{max-height:none;min-height:0;max-width:480px;margin:0 auto}
   .part-info{min-height:0}
   .part-info.open{position:sticky;bottom:var(--dock-h,190px);z-index:7;border-bottom:1px solid var(--line);box-shadow:0 -8px 18px rgba(0,0,0,.4)}
-  .dock{order:4;position:sticky;bottom:0;z-index:8;border-width:1px 0 0;border-radius:0;padding:8px 16px calc(8px + env(safe-area-inset-bottom));grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-areas:"practice practice" "sel pump" "mix mix" "thr thr";gap:7px 8px;align-items:center;box-shadow:0 -8px 18px rgba(0,0,0,.4)}
-  .practice{border:0;padding:0;display:grid;grid-template-columns:8.6em minmax(0,1fr);gap:10px;align-items:center}
-  .practice > label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
-  .practice select{padding:8px 6px;font-size:.95rem}
-  .scnfull{display:none}
-  .stepnow{display:block;font-size:.86rem;line-height:1.3}
-  .stepnow b{font-family:var(--cond);color:var(--accent);margin-right:4px}
+  .dock{order:4;position:sticky;bottom:0;z-index:8;border-width:1px 0 0;border-radius:0;padding:8px 16px calc(8px + env(safe-area-inset-bottom));grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-areas:"sel pump" "mix mix" "thr thr";gap:7px 8px;align-items:center;box-shadow:0 -8px 18px rgba(0,0,0,.4)}
   .knob,#selHint{display:none}
   .seg{display:flex}
   .switch{min-height:40px;padding:0 10px;gap:6px;font-size:.95rem}
@@ -182,7 +154,6 @@ article .flow-list li{margin-bottom:8px}
   .ctl input{height:30px}
   .ctl .ends{display:none}
   .more{order:3;border-width:1px 0;border-radius:0;grid-template-columns:minmax(0,1fr);margin-top:0}
-  .more .ctl{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"label out" "input input"}
 }
 @media (max-width:960px) and (max-height:520px){.strip,.dock,.part-info.open{position:static}}
 @media (prefers-reduced-motion:reduce){.knob #selPtr,.switch .track::after{transition:none}.ro.low span{animation:none}}
@@ -191,7 +162,7 @@ article .flow-list li{margin-bottom:8px}
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="../index.html">Ground School</a>
+    <a class="wordmark" href="../index.html">172 Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="../aircraft/index.html">Aircraft</a>
@@ -216,32 +187,11 @@ article .flow-list li{margin-bottom:8px}
     </nav>
   </div>
 </header>
-<div class="jump">
-  <div class="jump-in">
-    <details class="jump-menu">
-      <summary><span class="jump-label">On this page</span><span class="jump-current">Jump to a section</span></summary>
-      <ol>
-      <li><a href="#simulator"><span>Simulator</span></a></li>
-      <li><a href="#path"><span>How fuel gets to the engine</span><small>7.19</small></a></li>
-      <li><a href="#selector"><span>The fuel selector</span><small>7.19, 4.5</small></a></li>
-      <li><a href="#pumps"><span>Two fuel pumps</span><small>7.19, 4.5</small></a></li>
-      <li><a href="#mixture"><span>Mixture and leaning</span><small>7.7, 7.9, 4.5k</small></a></li>
-      <li><a href="#starting"><span>Starting the engine</span><small>4.5d</small></a></li>
-      <li><a href="#indications"><span>What the G3X shows</span><small>7.19, 2.25</small></a></li>
-      <li><a href="#preflight"><span>Preflight</span><small>4.5, 8.21</small></a></li>
-      <li><a href="#emergencies"><span>When something goes wrong</span><small>3.5</small></a></li>
-      <li><a href="#test-yourself"><span>Test yourself</span></a></li>
-      <li><a href="#sources"><span>Sources</span></a></li>
-      </ol>
-    </details>
-  </div>
-</div>
-
 <main>
   <div class="sim-head">
     <p class="crumb"><a href="../study/index.html">Study</a></p>
     <h1>Pilot 100i fuel system</h1>
-    <p class="lede">How fuel gets from the wing tanks to the four cylinders of the <a href="../aircraft/piper-pilot-100i.html">Pilot 100i</a>'s fuel-injected IO-360, and what the fuel selector, the fuel pump switch, and the mixture do along the way. The diagram follows the fuel system schematic in the POH, Figure 7-13.</p>
+    <p class="lede">How fuel gets from the wing tanks to the cylinders, and what the fuel selector, the fuel pump, and the mixture do along the way.</p>
   </div>
 
   <section class="sim" id="simulator" aria-label="Fuel system simulator">
@@ -426,25 +376,6 @@ article .flow-list li{margin-bottom:8px}
       </div>
 
       <div class="dock" role="group" aria-label="Simulator controls">
-        <div class="practice">
-          <label for="scn">Practice</label>
-          <select id="scn">
-            <option value="free">Free play</option>
-            <option value="lean">Lean for cruise</option>
-            <option value="switch">Switch tanks</option>
-            <option value="dry">Run a tank dry</option>
-            <option value="edp">Pump failure</option>
-            <option value="off">Selector OFF</option>
-            <option value="cutoff">Idle cutoff</option>
-          </select>
-          <p class="stepnow" id="stepNow" aria-live="polite"></p>
-          <div class="scnfull">
-            <p class="small" id="scnIntro"></p>
-            <ol class="checks" id="scnSteps"></ol>
-            <div id="scnOutro"></div>
-          </div>
-        </div>
-
         <div class="selbox">
           <svg class="knob" viewBox="0 0 200 150" role="radiogroup" aria-label="Fuel selector">
             <circle cx="100" cy="90" r="54" fill="var(--surface-2)" stroke="var(--line)" stroke-width="2"/>
@@ -483,21 +414,12 @@ article .flow-list li{margin-bottom:8px}
 
       <div class="more">
         <div>
-          <h2>Mixture and EGT</h2>
-          <div class="ctl">
-            <label for="alt">Altitude</label>
-            <output id="altOut" for="alt">5,500 ft</output>
-            <input type="range" id="alt" min="1000" max="10000" step="500" value="5500">
-          </div>
           <div class="chart" id="chart"></div>
-          <p class="small">EGT (solid) and RPM (dashed) across the mixture range at this throttle and altitude. The red line is your mixture lever, and it moves the same way as the slider.</p>
+          <p class="small">EGT (solid) and RPM (dashed) across the mixture range. The red line is the mixture lever.</p>
         </div>
         <div>
-          <h2>Options</h2>
           <label class="chk"><input type="checkbox" id="edpFail"> Engine-driven pump failed</label>
-          <label class="chk"><input type="checkbox" id="fast" checked> Burn fuel 60 times faster</label>
-          <div style="margin-top:12px"><button type="button" class="btn" id="reset">Fill tanks and start over</button></div>
-          <p class="small">The simulated airplane is in level flight. If the engine quits, the propeller keeps windmilling, so the engine-driven pump keeps turning. RPM, EGT, and fuel flow are illustrative, tuned to match the POH's best-economy fuel flows at 55, 65, and 75% power. Always use the POH and the airplane's own gauges.</p>
+          <button type="button" class="btn" id="reset">Refill tanks and reset</button>
         </div>
       </div>
     </div>
@@ -505,158 +427,15 @@ article .flow-list li{margin-bottom:8px}
 
   <div class="page page-single">
     <article>
-      <h2 id="path">How fuel gets to the engine</h2>
-      <p>Fuel takes one path from the selected tank to the cylinders. These are the parts it passes through, in order (POH 7.19, Figure 7-13):</p>
-      <ol class="flow-list">
-        <li><strong>Wing tank.</strong> One 25-gallon tank in the leading edge of each wing, 24 gallons usable in each.</li>
-        <li><strong>Fuel selector valve.</strong> Connects the left or right tank to the engine, or shuts fuel off.</li>
-        <li><strong>Firewall.</strong> The supply line passes from the cabin into the engine compartment.</li>
-        <li><strong>Filter and drain.</strong> The fuel strainer. It catches dirt and water, and it has a quick drain at the lower front of the firewall.</li>
-        <li><strong>Electric fuel pump.</strong> The backup pump, run by the FUEL PUMP switch.</li>
-        <li><strong>Engine-driven fuel pump.</strong> The main pump. It runs whenever the engine turns.</li>
-        <li><strong>Fuel injector servo.</strong> Meters fuel in proportion to the air going into the engine. The throttle and mixture cables connect here.</li>
-        <li><strong>Fuel flow transducer.</strong> Measures the fuel flow and sends it to the G3X.</li>
-        <li><strong>Fuel distributor.</strong> Splits the fuel evenly among the four cylinders.</li>
-        <li><strong>Fuel nozzles.</strong> One per cylinder. Each sprays fuel into its cylinder's intake port.</li>
-      </ol>
-      <p>The two pumps sit one after the other in the same line. The POH schematic shows no return line, so all the fuel that leaves the selected tank goes to the engine.</p>
-      <div class="callout"><p><strong>Why a pump has to be working all the time.</strong> The tanks are in a low wing, below the engine, so fuel can't get there by gravity the way it does in a Cessna. If neither pump is working, the engine gets no fuel.</p></div>
-
-      <h2 id="selector">The fuel selector</h2>
-      <p>The selector has three positions: L, R, and OFF (POH 7.19, Figure 7-11). There's no BOTH position. The engine always feeds from one tank, so managing fuel means choosing a tank and switching to keep the tanks even.</p>
+      <h2>Key points</h2>
       <ul>
-        <li><strong>To select OFF</strong>, you press the button on the selector and turn it counterclockwise. Turning clockwise takes you to L or R, and the button pops back out so you can't land on OFF by accident.</li>
-        <li><strong>Use the tanks alternately</strong> in cruise to keep the airplane in lateral trim, and don't run a tank completely dry in flight (POH 4.5k).</li>
-        <li><strong>To switch tanks</strong>, turn the electric fuel pump on first, switch, leave the pump on for a short time, then turn it off.</li>
-        <li><strong>Before takeoff and landing</strong>, put the selector on the proper tank, normally the fullest one (POH 4.5h, 4.5m).</li>
-        <li><strong>With the autopilot on</strong>, the fuel imbalance between tanks can't be more than 10 gallons. That's a POH limitation.</li>
+        <li>The tanks sit below the engine, so a pump has to be working for fuel to reach it. The engine-driven pump is the main one, and the electric pump backs it up.</li>
+        <li>The selector feeds the engine from one tank at a time: L, R, or OFF. There's no BOTH. To select OFF, you press the button first.</li>
+        <li>The fuel pump goes on for engine start, takeoff, landing, and switching tanks. It's off in cruise, so a failed engine-driven pump shows up right away.</li>
+        <li>The mixture sets the ratio of fuel to air. Peak EGT is best economy, 100°F rich of peak is best power, and idle cutoff stops the fuel.</li>
+        <li>Each tank holds 24 gallons usable, or 17 when the fuel is at the bottom of the tab in the filler neck.</li>
       </ul>
-      <p>The checklists put the selector to OFF for an engine fire during start (if the fire keeps going), for an engine fire in flight, and once you're committed to a power-off landing.</p>
-
-      <h2 id="pumps">Two fuel pumps</h2>
-      <p>The <strong>engine-driven pump</strong> is a diaphragm pump on the engine. It's the main pump, and because the engine turns it, it works whenever the propeller turns, even if the propeller is just windmilling after the engine quits. The <strong>electric fuel pump</strong> is there in case the engine-driven pump fails (POH 7.19). Its FUEL PUMP switch is on the switch panel to the left of the throttle quadrant.</p>
-      <div class="table-wrap">
-        <table>
-          <caption>FUEL PUMP switch in the POH checklists</caption>
-          <thead><tr><th>Phase</th><th>Fuel pump</th><th>Why</th></tr></thead>
-          <tbody>
-            <tr><td>Engine start, cold or hot</td><td>ON</td><td>Supplies fuel for priming and starting</td></tr>
-            <tr><td>Engine start, flooded</td><td>OFF</td><td>You don't want more fuel</td></tr>
-            <tr><td>End of the run-up</td><td>OFF</td><td>Then verify the engine keeps running on the engine-driven pump alone</td></tr>
-            <tr><td>Before takeoff</td><td>ON</td><td>Backup during takeoff</td></tr>
-            <tr><td>Climb</td><td>OFF at the altitude you want</td><td></td></tr>
-            <tr><td>Cruise</td><td>Normally OFF</td><td>So a failing engine-driven pump shows up right away</td></tr>
-            <tr><td>Switching tanks</td><td>ON before, briefly after</td><td>Keeps fuel pressure up while the selector moves</td></tr>
-            <tr><td>Approach and landing</td><td>ON</td><td>Backup close to the ground</td></tr>
-            <tr><td>After landing, stopping the engine</td><td>OFF</td><td></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p>After an alternator failure, the POH limits fuel pump use to 2 minutes so the battery lasts about 30 minutes.</p>
-
-      <h2 id="mixture">Mixture and leaning</h2>
-      <p>The fuel injector servo measures the air going into the engine and meters fuel in proportion to it (POH 7.7). The <strong>throttle</strong> sets how much air goes in, and the servo sends fuel to match. The <strong>mixture</strong> lever sets the ratio of fuel to air. Full forward is full rich. Full aft is idle cutoff, where the servo sends no fuel at all. That's how you shut the engine down (POH 7.9).</p>
-      <p>As you climb, the air gets thinner, and the same mixture setting runs richer than the engine needs. You lose some power and burn extra fuel. Leaning brings the ratio back.</p>
-      <h3>When to lean</h3>
-      <ul>
-        <li>Lean in cruise above 5,000 feet. Below that, you can lean when you're using 75% power or less (POH 4.5k).</li>
-        <li>If you aren't sure how much power you're using, keep the mixture full rich below 5,000 feet.</li>
-        <li>Go full rich for the descent and keep it full rich for landing, so the engine accelerates right away if you have to go around (POH 4.5l, 4.5m).</li>
-        <li>Set the mixture before takeoff. At a high-elevation field, you may need to lean it for smooth running (POH 4.13).</li>
-      </ul>
-      <h3>How to lean</h3>
-      <ol>
-        <li><strong>Best economy:</strong> pull the mixture slowly aft until EGT peaks.</li>
-        <li><strong>Best power:</strong> lean to peak EGT, then push the mixture forward until EGT is 100°F rich of the peak.</li>
-        <li>If the engine runs rough before EGT peaks, use the EGT where the roughness started as your peak.</li>
-      </ol>
-      <p>The G3X Engine page has a Lean Assist button that does the watching for you. It finds the first cylinder to peak, which is the one that counts, and shows how far each EGT is from its peak (POH 7.15).</p>
-      <div class="table-wrap">
-        <table>
-          <caption>Fuel flow at best economy mixture (POH Section 5, Figures 5-21, 5-23, 5-25)</caption>
-          <thead><tr><th>Power</th><th>Fuel flow</th></tr></thead>
-          <tbody>
-            <tr><td>55%</td><td>8.2 gal/hr</td></tr>
-            <tr><td>65%</td><td>9.5 gal/hr</td></tr>
-            <tr><td>75%</td><td>11.0 gal/hr</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <h3>Fuel vapor on hot days</h3>
-      <p>During long idles in high temperatures, the fuel can form vapor bubbles in the lines (POH 4.13). You'll see the idle RPM and fuel flow wander, the engine respond poorly to the throttle or quit at idle, or the RPM drop more than 175 on the mag check. To clear it, run the engine at 1,800 to 2,000 RPM for 1 to 2 minutes and check that it idles smoothly. Then taxi with the mixture leaned and the power as high as practical, up to 1,200 RPM. Go back to full rich before takeoff and confirm the engine runs smoothly at full throttle before you start the takeoff roll.</p>
-
-      <h2 id="starting">Starting the engine</h2>
-      <p>A fuel-injected engine is primed with the mixture, not a primer. With the electric pump on, pushing the mixture forward lets fuel through the servo to the nozzles, which spray it into the intake ports. A few seconds is enough. Then the mixture goes back to idle cutoff so the engine doesn't flood before it starts (POH 4.5d).</p>
-      <div class="table-wrap">
-        <table>
-          <caption>The fuel steps in each start (POH 4.5d)</caption>
-          <thead><tr><th>Start</th><th>Throttle</th><th>Fuel pump</th><th>Mixture</th></tr></thead>
-          <tbody>
-            <tr><td>Cold (oil below 140°F)</td><td>Open ½ inch</td><td>ON</td><td>Prime 3 to 5 seconds, then idle cutoff. Engage the starter, then advance.</td></tr>
-            <tr><td>Hot (oil 140°F or above)</td><td>Open ½ inch</td><td>ON</td><td>Idle cutoff, no prime. Advance when the engine starts.</td></tr>
-            <tr><td>Flooded</td><td>Full open</td><td>OFF</td><td>Idle cutoff. Advance when the engine starts, then pull the throttle back.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p>Overpriming is the usual cause of an engine fire during start (POH 3.5a). If it happens, keep cranking to pull the fire into the engine, with the mixture at idle cutoff and the throttle open.</p>
-
-      <h2 id="indications">What the G3X shows</h2>
-      <ul>
-        <li><strong>Fuel quantity.</strong> A float in each tank sends its level to the GEA 24 engine interface, which feeds the display (POH 7.19). When either tank reads 3 gallons or less, you get a single chime and a flashing red fuel quantity (POH 3.5c).</li>
-        <li><strong>Fuel flow.</strong> The flow transducer between the servo and the distributor measures what the engine is using. This airplane has no fuel pressure gauge, so fuel flow is the number to watch if you suspect a fuel problem.</li>
-        <li><strong>Fuel used and remaining.</strong> The G3X counts fuel from the fuel flow, starting from what you enter on the Fuel Calc tab of the Engine page. The POH says not to use the fuel flow or the totalizer as your primary way of knowing what's in the tanks (POH 2.25). It only knows what you told it.</li>
-        <li><strong>EGT.</strong> Your guide for leaning.</li>
-      </ul>
-
-      <h2 id="preflight">Preflight</h2>
-      <ul>
-        <li><strong>Look in the tanks.</strong> Fuel at the bottom of the tab in the filler neck means 17 gallons usable in that tank (POH 7.19).</li>
-        <li><strong>Drain the tank sumps.</strong> Each tank has a quick drain at its lowest inboard rear corner. Check for water, sediment, and the right fuel: blue 100LL or green 100. Nothing lower is approved.</li>
-        <li><strong>Drain the fuel strainer twice,</strong> once with the selector on each tank, so you sample the line from both (POH 8.21). Drain the tank sumps first.</li>
-        <li><strong>Check that each drain closes</strong> completely and doesn't leak.</li>
-        <li><strong>Check that the tank vents are clear.</strong></li>
-        <li><strong>Drain before the first flight of the day and after every refueling.</strong></li>
-      </ul>
-      <p>If the fuel system has been completely drained, run the engine for at least 3 minutes at 1,000 RPM on each tank after refueling, so no air is left in the lines (POH 8.21).</p>
-
-      <h2 id="emergencies">When something goes wrong</h2>
-      <p>These are summaries. Use the POH checklist in the airplane.</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Problem</th><th>What you'll see</th><th>What to do</th></tr></thead>
-          <tbody>
-            <tr><td>Selected tank runs dry</td><td>Fuel flow drops, the engine sputters or quits</td><td>Fuel pump ON, selector to the other (fullest) tank. Turn the pump OFF once power is back. The empty lines can take up to 10 seconds to refill.</td></tr>
-            <tr><td>Engine-driven pump fails</td><td>Fuel flow drops, the engine loses power</td><td>Throttle closed, fuel pump ON, then bring the throttle back up and set the mixture. The electric pump can run the engine by itself.</td></tr>
-            <tr><td>Fuel flow doesn't come back, or the engine quits</td><td>No fuel flow even with the pump on</td><td>Turn the electric pump OFF. It could be a leak or fuel exhaustion. Land at the nearest suitable airport.</td></tr>
-            <tr><td>Engine power loss in flight</td><td>Partial or total loss of power</td><td>Hold 76 KIAS. Selector to a tank with fuel, fuel pump ON, mixture RICH, ALT. AIR OPEN, then each mag OFF and back ON one at a time. When power returns, close ALT. AIR and turn the pump OFF.</td></tr>
-            <tr><td>Engine roughness</td><td>Rough running</td><td>ALT. AIR OPEN. If it's still rough after a minute: mixture for the smoothest running, ALT. AIR CLOSE, fuel pump ON, switch tanks, check the gauges, then try each mag by itself.</td></tr>
-            <tr><td>Fuel quantity low</td><td>Chime, flashing red quantity</td><td>One tank low: switch to the fullest tank and land as soon as practical. Both low: alternate tanks and land as soon as possible. Avoid long slips toward the low tank.</td></tr>
-            <tr><td>Engine fire in flight</td><td>Smoke, heat, smell</td><td>Selector OFF, throttle closed, mixture idle cutoff, fuel pump OFF, heat and defrost OFF. Then a power-off landing.</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h2 id="test-yourself">Test yourself</h2>
-      <details class="qa"><summary>Name, in order, the parts fuel passes through from the tank to the cylinders.</summary><div><p>Tank, fuel selector valve, firewall, filter and drain (strainer), electric fuel pump, engine-driven fuel pump, fuel injector servo, fuel flow transducer, fuel distributor, and the four fuel nozzles.</p></div></details>
-      <details class="qa"><summary>Why does this airplane need a fuel pump working at all times?</summary><div><p>It's a low wing. The tanks are below the engine, so fuel can't reach it by gravity.</p></div></details>
-      <details class="qa"><summary>When does the electric fuel pump go on?</summary><div><p>For engine start (except a flooded start), takeoff, approach and landing, and switching tanks. It's normally off in cruise.</p></div></details>
-      <details class="qa"><summary>Why is the fuel pump normally off in cruise?</summary><div><p>So that if the engine-driven pump fails, you notice right away instead of having the electric pump quietly cover for it.</p></div></details>
-      <details class="qa"><summary>How do you turn the fuel selector to OFF, and why is it built that way?</summary><div><p>Press the button on the selector and turn it counterclockwise. The button keeps you from turning to OFF by accident when you mean to switch tanks.</p></div></details>
-      <details class="qa"><summary>Your engine quits in cruise and the fuel flow drops. What do you do first?</summary><div><p>Fly the airplane at 76 KIAS. Then fuel pump ON and the selector to the fullest tank. If a tank ran dry, give it up to 10 seconds for fuel to refill the lines.</p></div></details>
-      <details class="qa"><summary>What does the mixture lever control on this fuel-injected engine?</summary><div><p>The ratio of fuel to air. The servo meters fuel to match the airflow, and the mixture sets how rich or lean that match is. Idle cutoff stops the fuel entirely.</p></div></details>
-      <details class="qa"><summary>How do you lean for best economy? For best power?</summary><div><p>Best economy is at peak EGT. Best power is leaned to peak, then enriched until EGT is 100°F rich of the peak.</p></div></details>
-      <details class="qa"><summary>When does the POH say to keep the mixture full rich?</summary><div><p>Below 5,000 feet if you aren't sure of the power setting, for descent, and for approach and landing.</p></div></details>
-      <details class="qa"><summary>How do you prime this engine?</summary><div><p>Fuel pump ON, then the mixture forward for 3 to 5 seconds and back to idle cutoff. Skip the prime for a hot start.</p></div></details>
-      <details class="qa"><summary>How much usable fuel is in a tank filled to the bottom of the tab?</summary><div><p>17 gallons. Full is 24 usable per tank, 48 total.</p></div></details>
-      <details class="qa"><summary>Why do you drain the fuel strainer twice?</summary><div><p>Once with the selector on each tank, so you sample the fuel from both tanks' lines.</p></div></details>
-      <details class="qa"><summary>After a long idle on a hot day, the engine idles rough and the fuel flow wanders. What's happening, and what do you do?</summary><div><p>Fuel vapor in the lines. Run at 1,800 to 2,000 RPM for 1 to 2 minutes, taxi with the mixture leaned at up to 1,200 RPM, and go full rich and check full power before takeoff.</p></div></details>
-
-      <h2 id="sources">Sources</h2>
-      <ul>
-        <li>Piper Aircraft, PA-28-181 Piper Pilot Pilot's Operating Handbook and FAA Approved Airplane Flight Manual, report VB-2960, S/N 28020001 and up. Paragraphs 2.23 and 2.25 (fuel and G3X limitations), 3.5 (emergency procedures), 4.5 and 4.13 (normal procedures and fuel vapor), Section 5 cruise performance figures, 7.7 (induction system), 7.9 (engine controls), 7.15 (G3X Engine page and Lean Assist), 7.19 (fuel system, Figures 7-11 and 7-13), and 8.21 (fuel servicing and draining). <a href="https://www.tampabayaviation.com/wp-content/uploads/2023/11/Pilot-100i-e-POH.pdf">Online copy of the POH (PDF)</a>.</li>
-        <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 7, Aircraft Systems (fuel systems, fuel injection, and mixture control).</li>
-      </ul>
-      <p>The diagram is redrawn from the POH schematic. The simulator's engine numbers are a simplified model, not POH data.</p>
+      <p class="small">The diagram is redrawn from the fuel system schematic in the Pilot 100i <a href="https://www.tampabayaviation.com/wp-content/uploads/2023/11/Pilot-100i-e-POH.pdf">POH</a> (VB-2960, Figure 7-13). The simulator's RPM, EGT, and fuel flow are a simplified model, not POH data.</p>
     </article>
   </div>
 </main>
@@ -666,7 +445,6 @@ article .flow-list li{margin-bottom:8px}
   <p>Made by Colby Penn</p>
 </footer>
 
-<script src="../jump.js"></script>
 <script>
 (() => {
 'use strict';
@@ -708,8 +486,8 @@ function engine(mix, thr, alt, press) {
 
 // ---------- State ----------
 const S = { sel: 'L', armed: 0, pump: false, edpFail: false, thr: 0.85, mix: 1, alt: 5500,
-  qL: 20, qR: 22, a: 1, b: 0, press: 1, rpm: 2400, egt: 1300, ff: 9, fast: true,
-  running: true, supply: true, t: 0, failAt: 0, hold: 0, e: null };
+  qL: 20, qR: 22, a: 1, b: 0, press: 1, rpm: 2400, egt: 1300, ff: 9,
+  running: true, supply: true, t: 0, e: null };
 
 // ---------- Build pipes and engine parts ----------
 const PIPES = {
@@ -759,7 +537,7 @@ const PARTS = {
   cylinders: ['Cylinders', 'Where the fuel and air burn. The glow shows how much power they\'re making, and it flickers when the mixture is too rich or too lean to burn smoothly.']
 };
 const TOUR = ['tanks', 'selector', 'firewall', 'filter', 'elec', 'edp', 'servo', 'transducer', 'distributor', 'nozzles', 'cylinders'];
-const info = $('info'), strip = document.querySelector('.strip'), jump = document.querySelector('.jump');
+const info = $('info'), strip = document.querySelector('.strip');
 const START = '<button type="button" class="btn" data-go="0">Follow the fuel from the tank</button>';
 function showInfo(k, scroll) {
   document.querySelectorAll('#schem .part.picked').forEach(x => x.classList.remove('picked'));
@@ -779,7 +557,7 @@ function showInfo(k, scroll) {
 function reveal(k) {   // scroll just enough to bring the part into the open part of the screen
   const g = document.querySelector(`#schem .part[data-part="${k}"]`);
   const r = g.getBoundingClientRect();
-  const top = Math.max(0, (narrow.matches ? strip : jump).getBoundingClientRect().bottom) + 10;
+  const top = (narrow.matches ? Math.max(0, strip.getBoundingClientRect().bottom) : 0) + 10;
   const bottom = Math.min(innerHeight, narrow.matches ? info.getBoundingClientRect().top : innerHeight) - 10;
   let dy = 0;
   if (r.top < top) dy = r.top - top; else if (r.bottom > bottom) dy = Math.min(r.bottom - bottom, r.top - top);
@@ -851,15 +629,12 @@ $('pumpSw').addEventListener('click', () => setPump(!S.pump));
 
 function mixLabel(m) { return m < 0.04 ? 'Idle cutoff' : m > 0.995 ? 'Full rich' : `${Math.round(m * 100)}%`; }
 function syncSliders() {
-  $('thr').value = Math.round(S.thr * 100); $('mix').value = Math.round(S.mix * 100); $('alt').value = S.alt;
-  $('thrOut').textContent = `${Math.round(S.thr * 100)}%`; $('mixOut').textContent = mixLabel(S.mix); $('altOut').textContent = `${fmt(S.alt)} ft`;
+  $('thr').value = Math.round(S.thr * 100); $('mix').value = Math.round(S.mix * 100);
+  $('thrOut').textContent = `${Math.round(S.thr * 100)}%`; $('mixOut').textContent = mixLabel(S.mix);
 }
 $('thr').addEventListener('input', e => { S.thr = e.target.value / 100; $('thrOut').textContent = `${e.target.value}%`; curveDirty = true; });
 $('mix').addEventListener('input', e => { S.mix = e.target.value / 100; $('mixOut').textContent = mixLabel(S.mix); });
-$('alt').addEventListener('input', e => { S.alt = +e.target.value; $('altOut').textContent = `${fmt(S.alt)} ft`; curveDirty = true; });
-$('edpFail').addEventListener('change', e => { S.edpFail = e.target.checked; S.failAt = 0; });
-$('fast').addEventListener('change', e => { S.fast = e.target.checked; });
-$('reset').addEventListener('click', () => startScenario($('scn').value));
+$('edpFail').addEventListener('change', e => { S.edpFail = e.target.checked; });
 
 // The part description sticks just above the controls on a phone, so it needs to know how tall they are.
 const dock = document.querySelector('.dock'), sim = $('simulator');
@@ -919,112 +694,21 @@ function drawCursor() {
   else curD.setAttribute('visibility', 'hidden');
 }
 
-// ---------- Scenarios ----------
-const BASE = { sel: 'L', pump: false, edpFail: false, thr: 0.85, mix: 1, alt: 5500, qL: 20, qR: 22 };
-const SCN = {
-  free: { intro: 'Change anything and watch the fuel and the engine. Try switching tanks, turning the pump on, or leaning the mixture.', steps: [] },
-  lean: {
-    setup: { alt: 8000, thr: 1, mix: 1 },
-    intro: 'Full throttle at 8,000 ft is about 75% power. The mixture is still full rich from the climb, so the engine is running richer than it needs to.',
-    steps: [
-      ['Pull the mixture back slowly. Watch EGT and RPM rise.', () => S.mix < 0.9],
-      ['Stop at peak EGT, where EGT stops rising. That\'s best economy.', () => C && Math.abs(S.mix - C.mPeak) < 0.03 && S.running],
-      ['Push the mixture forward until EGT is 100°F below the peak. That\'s best power.', () => C && C.mROP && Math.abs(S.mix - C.mROP) < 0.03]
-    ],
-    outro: 'More RPM on less fuel than full rich. The POH says to lean like this in cruise above 5,000 ft.'
-  },
-  switch: {
-    setup: { qL: 12, qR: 20 },
-    intro: 'You\'re on the left tank and it\'s 8 gallons lower than the right. Switch tanks the way the POH says to.',
-    steps: [
-      ['Fuel pump ON.', () => S.pump],
-      ['Selector to R TANK.', () => S.pump && S.sel === 'R'],
-      ['Leave the pump on for a few seconds and check fuel flow.', () => S.sel === 'R' && S.pump && S.hold > 3],
-      ['Fuel pump OFF.', () => !S.pump && S.sel === 'R']
-    ],
-    outro: 'The pump keeps fuel moving while the selector is between tanks.'
-  },
-  dry: {
-    setup: { qL: 0.25, qR: 18 },
-    intro: 'The left tank is almost empty and you\'re feeding from it. Wait for the engine to sputter, then handle it.',
-    steps: [
-      ['Wait for the left tank to run dry.', () => S.qL <= 0],
-      ['Fuel pump ON.', () => S.pump],
-      ['Selector to the fullest tank (R TANK).', () => S.sel === 'R'],
-      ['Wait for power. The empty lines take a few seconds to refill.', () => S.running && S.sel === 'R' && S.a >= 1],
-      ['Fuel pump OFF once power is back.', () => !S.pump]
-    ],
-    outro: 'The POH says power can take up to 10 seconds to come back. Better yet, switch before a tank runs dry.'
-  },
-  edp: {
-    setup: { failIn: 4 },
-    intro: 'Cruise with the fuel pump off. In a few seconds, the engine-driven pump will fail.',
-    steps: [
-      ['Wait for the engine-driven pump to fail.', () => S.edpFail],
-      ['Throttle closed.', () => S.edpFail && S.thr < 0.05],
-      ['Fuel pump ON.', () => S.pump],
-      ['Throttle back up.', () => S.pump && S.thr > 0.5 && S.running]
-    ],
-    outro: 'The electric pump can run the engine by itself. If fuel flow hadn\'t come back, the POH says to turn the pump off and land at the nearest suitable airport.'
-  },
-  off: {
-    intro: 'The checklists use the selector OFF for an engine fire, and for a power-off landing once you\'re committed. See what it does.',
-    steps: [
-      ['Press OFF once. That pushes the button on the selector.', () => S.armed > 0 || S.sel === 'OFF'],
-      ['Press OFF again to turn the selector to OFF.', () => S.sel === 'OFF'],
-      ['Wait. The engine runs on the fuel still in the lines, then quits.', () => S.sel === 'OFF' && !S.running],
-      ['Select L TANK. The windmilling engine-driven pump refills the lines.', () => S.sel === 'L' && S.running]
-    ],
-    outro: 'Turning the fuel pump on as well refills the lines faster.'
-  },
-  cutoff: {
-    intro: 'On the ground, idle cutoff is how you shut the engine down. Here it shows what the mixture does at the servo.',
-    steps: [
-      ['Pull the mixture all the way back to idle cutoff.', () => S.mix < 0.04],
-      ['Watch fuel flow drop to zero and the engine stop.', () => S.mix < 0.04 && !S.running],
-      ['Push the mixture back in. The windmilling engine restarts.', () => S.running && S.mix > 0.5]
-    ],
-    outro: 'At idle cutoff the servo stops all fuel to the nozzles. The fuel up to the servo stays in the lines.'
-  }
-};
-let cur = { key: 'free', done: [] };
-function startScenario(key) {
-  const sc = SCN[key], set = Object.assign({}, BASE, sc.setup || {});
-  Object.assign(S, { sel: set.sel, pump: set.pump, edpFail: set.edpFail, thr: set.thr, mix: set.mix, alt: set.alt, qL: set.qL, qR: set.qR,
-    a: 1, b: 0, press: 1, armed: 0, hold: 0, failAt: set.failIn ? S.t + set.failIn : 0 });
+// ---------- Reset ----------
+const BASE = { sel: 'L', armed: 0, pump: false, edpFail: false, thr: 0.85, mix: 1, qL: 20, qR: 22, a: 1, b: 0, press: 1, supply: true };
+function reset() {
+  Object.assign(S, BASE);
   const e = engine(S.mix, S.thr, S.alt, 1); S.e = e; S.rpm = e.rpm; S.egt = e.egt || 120; S.ff = e.ff; S.running = e.fires;
-  $('edpFail').checked = S.edpFail;
+  $('edpFail').checked = false;
   syncSel(); syncPump(); syncSliders(); curveDirty = true;
   hint(SEL_HELP);
-  cur = { key, done: sc.steps.map(() => false) };
-  $('scnIntro').textContent = sc.intro;
-  const ol = $('scnSteps'); ol.innerHTML = '';
-  sc.steps.forEach(s => { const li = document.createElement('li'); li.textContent = s[0]; ol.appendChild(li); });
-  $('scnOutro').innerHTML = '';
-  renderSteps();
 }
-function renderSteps() {
-  const sc = SCN[cur.key], lis = $('scnSteps').children, n = sc.steps.length;
-  const next = cur.done.indexOf(false), finished = n > 0 && next === -1;
-  for (let i = 0; i < lis.length; i++) { lis[i].classList.toggle('done', cur.done[i]); lis[i].classList.toggle('next', i === next); }
-  if (finished && !$('scnOutro').innerHTML) $('scnOutro').innerHTML = `<p class="outro">${sc.outro}</p>`;
-  // phones show one step at a time beside the menu
-  $('stepNow').innerHTML = !n ? 'Change any control and watch the fuel.'
-    : finished ? `<b>Done.</b>${sc.outro}`
-    : `<b>Step ${next + 1} of ${n}</b>${sc.steps[next][0]}`;
-}
-function checkSteps() {
-  const sc = SCN[cur.key]; if (!sc.steps.length) return;
-  const i = cur.done.indexOf(false); if (i < 0) return;
-  if (sc.steps[i][1]()) { cur.done[i] = true; renderSteps(); }
-}
-$('scn').addEventListener('change', e => startScenario(e.target.value));
+$('reset').addEventListener('click', reset);
 
 // ---------- Simulation ----------
 function step(dt) {
   S.t += dt;
   if (S.armed > 0) { S.armed = Math.max(0, S.armed - dt); if (!S.armed) { syncArm(); hint(SEL_HELP); } }
-  if (S.failAt && S.t >= S.failAt) { S.edpFail = true; S.failAt = 0; $('edpFail').checked = true; }
   const edpOK = !S.edpFail;                       // windmilling keeps it turning in flight
   const pumping = S.pump || edpOK;
   const tankQ = S.sel === 'L' ? S.qL : S.sel === 'R' ? S.qR : 0;
@@ -1036,7 +720,7 @@ function step(dt) {
   const gps = e.ff / 3600;
   if (!(S.supply && S.a >= 1)) S.a = Math.max(0, S.a - gps / LINE_GAL * dt);
   if (S.supply && S.a >= 1) {
-    const burn = gps * dt * (S.fast ? 60 : 1);
+    const burn = gps * dt * 60;   // tanks drain 60 times faster than real, so you can watch one run dry
     if (S.sel === 'L') S.qL = Math.max(0, S.qL - burn); else S.qR = Math.max(0, S.qR - burn);
   }
   const jitter = e.rough ? (Math.random() - 0.5) * e.rough * 300 : 0;
@@ -1044,8 +728,6 @@ function step(dt) {
   S.egt += ((e.fires ? e.egt : 120) - S.egt) * Math.min(1, dt / (e.fires ? 0.7 : 5));
   S.ff += (e.ff - S.ff) * Math.min(1, dt / 0.3);
   S.running = e.fires && e.p > 0.004;
-  S.hold = (S.sel === 'R' && S.pump && S.a >= 1 && S.running) ? S.hold + dt : 0;
-  checkSteps();
 }
 
 // ---------- Drawing ----------
@@ -1175,8 +857,8 @@ function frame(now) {
   if (onScreen) { if (!paused) step(dt); draw(paused ? 0 : dt); }
   requestAnimationFrame(frame);
 }
-startScenario('free');
-if (/[?&]debug\b/.test(location.search)) window.__fuel = { S, engine, step, draw, get C() { return C; }, startScenario, pause(v) { paused = v; } };
+reset();
+if (/[?&]debug\b/.test(location.search)) window.__fuel = { S, engine, step, draw, get C() { return C; }, reset, pause(v) { paused = v; } };
 requestAnimationFrame(frame);
 })();
 </script>

@@ -20,13 +20,12 @@
 .chart .pt{fill:var(--accent)}
 .chart .pt-open{fill:var(--surface);stroke:var(--accent);stroke-width:2.5}
 .chart .ptlab{fill:var(--text);font-size:14px;font-weight:600}
-.chart-cap{color:var(--muted);font-size:.95rem;margin:0}
 </style>
 </head>
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="index.html">Ground School</a>
+    <a class="wordmark" href="index.html">172 Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="aircraft/index.html">Aircraft</a>
@@ -52,66 +51,51 @@
   </div>
 </header>
 
-<main class="page">
-  <nav class="toc" aria-label="On this page">
-    <h2>On this page</h2>
-    <ol>
-      <li><a href="#why">Why it matters</a></li>
-      <li><a href="#terms">The terms</a></li>
-      <li><a href="#walkthrough">Walkthrough</a></li>
-      <li><a href="#shift">Moving weight around</a></li>
-      <li><a href="#real">Doing it for real</a></li>
-      <li><a href="#sources">Sources</a></li>
-    </ol>
-  </nav>
-
+<main class="page page-single">
   <article>
     <h1>Weight and balance</h1>
-    <p class="lede">Every flight has two questions to answer before you start the engine: is the airplane too heavy, and is the weight in the right place? Here's how to answer both.</p>
+    <p class="lede">How to check that the airplane isn't too heavy and that the weight is in the right place.</p>
 
     <h2 id="why">Why it matters</h2>
-    <p>The airplane was certificated to fly safely within a weight limit and a center of gravity (CG) range. Outside either one, you're a test pilot.</p>
     <h3>Too heavy</h3>
     <ul>
-      <li>Higher takeoff speed and a longer takeoff roll</li>
-      <li>Slower, shallower climb and a lower service ceiling</li>
+      <li>Longer takeoff roll and a slower, shallower climb</li>
       <li>Higher stall speed and higher approach and landing speeds</li>
-      <li>Longer landing roll and more load on the structure, especially in turbulence</li>
+      <li>Longer landing roll and more load on the structure</li>
     </ul>
     <h3>CG too far forward</h3>
     <ul>
-      <li>The tail has to push down harder to hold the nose up, so the wing carries more load and the stall speed goes up.</li>
-      <li>You may run out of elevator to rotate on takeoff or to flare on landing.</li>
-      <li>Cruise is a little slower because of the extra tail-down force.</li>
+      <li>Higher stall speed, because the tail has to push down harder to hold the nose up</li>
+      <li>You may run out of elevator to rotate on takeoff or to flare on landing</li>
     </ul>
     <h3>CG too far aft</h3>
     <ul>
-      <li>The airplane gets less stable in pitch and the controls get lighter, so it's easy to over-control.</li>
-      <li>Stall and spin recovery get harder. Far enough aft, recovery may not be possible.</li>
+      <li>Less stable in pitch, with lighter controls that are easy to over-control</li>
+      <li>Stall and spin recovery get harder, and far enough aft may not be possible</li>
     </ul>
 
     <h2 id="terms">The terms</h2>
     <dl class="terms">
       <dt>Datum</dt>
-      <dd>The reference point the manufacturer picked for measuring everything. It's often the firewall, the wing's leading edge, or a point ahead of the nose. The POH tells you where it is.</dd>
+      <dd>The reference point every distance is measured from. The POH says where it is.</dd>
       <dt>Arm (or station)</dt>
-      <dd>The distance in inches from the datum to an item. Behind the datum is positive, ahead of it is negative. Seats, fuel tanks, and baggage areas each have a fixed arm listed in the POH.</dd>
+      <dd>The distance in inches from the datum to an item. Behind the datum is positive.</dd>
       <dt>Moment</dt>
-      <dd>Weight times arm, in pound-inches. It's how much that item tries to rotate the airplane around the datum. Many POHs divide moments by 100 or 1,000 to keep the numbers small. That's called a moment index.</dd>
+      <dd>Weight times arm, in pound-inches. Some POHs divide it by 100 or 1,000 and call it a moment index.</dd>
       <dt>Center of gravity (CG)</dt>
-      <dd>The point where the airplane would balance. You find it by dividing the total moment by the total weight, and it comes out as an arm in inches from the datum.</dd>
+      <dd>The point where the airplane would balance, given as an arm.</dd>
       <dt>CG envelope</dt>
-      <dd>The allowed range of CG at each weight, usually drawn as a graph in the POH. The forward limit often moves aft as the airplane gets heavier.</dd>
+      <dd>The allowed range of CG at each weight, drawn as a graph in the POH.</dd>
       <dt>Basic empty weight</dt>
-      <dd>The airplane with its installed equipment, unusable fuel, and full engine oil. It comes from the airplane's own weight and balance record, and it changes whenever equipment is added or removed. Some older POHs use licensed empty weight instead, which leaves out the oil, so the oil has to be added as its own line.</dd>
+      <dd>The airplane with its installed equipment, unusable fuel, and full oil. It comes from that airplane's own weight and balance record. Some older POHs use licensed empty weight, which leaves out the oil.</dd>
       <dt>Useful load</dt>
-      <dd>Maximum weight minus basic empty weight. It's everything you can add: people, bags, and usable fuel.</dd>
+      <dd>Maximum weight minus basic empty weight: people, bags, and usable fuel.</dd>
     </dl>
     <div class="formula">CG = total moment ÷ total weight</div>
 
     <h2 id="walkthrough">Walkthrough</h2>
     <div class="example-note">
-      <strong>Made-up airplane.</strong> Every number in this walkthrough belongs to an imaginary trainer so the math is easy to follow. Never use them to load a real airplane.
+      <strong>Made-up airplane.</strong> For a real one, use the POH, Section 6, and that airplane's own weight and balance record.
     </div>
 
     <div class="table-wrap">
@@ -134,11 +118,11 @@
     <ol class="steps">
       <li>
         <h3>Start with the airplane's empty weight and moment</h3>
-        <p>Take these from the airplane's current weight and balance record, not the sample page in the POH. Here it's 1,650 lb at an arm of 39.0 in, for a moment of 64,350 lb-in.</p>
+        <p>Here it's 1,650 lb at an arm of 39.0 in, for a moment of 64,350 lb-in.</p>
       </li>
       <li>
         <h3>Weigh everything you're adding</h3>
-        <p>Use real weights for people and bags. Fuel weighs 6 lb per gallon for 100LL, so 40 gallons is 240 lb.</p>
+        <p>Use real weights for people and bags. 100LL weighs 6 lb per gallon, so 40 gallons is 240 lb.</p>
       </li>
       <li>
         <h3>Multiply each weight by its arm</h3>
@@ -160,20 +144,20 @@
       </li>
       <li>
         <h3>Check the weight</h3>
-        <p>2,420 lb is under the 2,550 lb maximum, with 130 lb to spare.</p>
+        <p>2,420 lb is under the 2,550 lb maximum.</p>
       </li>
       <li>
         <h3>Find the CG</h3>
-        <p>103,200 ÷ 2,420 = 42.6 in aft of the datum.</p>
+        <p>103,200 ÷ 2,420 = 42.6 in.</p>
       </li>
       <li>
         <h3>Check the CG against the envelope</h3>
-        <p>At 2,420 lb the forward limit works out to about 39.7 in, and the aft limit is 47.3 in. 42.6 is between them.</p>
+        <p>At 2,420 lb the limits are about 39.7 in and 47.3 in. 42.6 is between them.</p>
         <p class="answer">Takeoff: 2,420 lb at 42.6 in. Within limits.</p>
       </li>
       <li>
         <h3>Do it again for landing</h3>
-        <p>The fuel you burn changes both the weight and the CG. Three hours at 8 gallons per hour, with taxi and climb, is about 24 gallons, or 144 lb. Take that weight and its moment back out:</p>
+        <p>Three hours at 8 gallons per hour, with taxi and climb, burns about 24 gallons, or 144 lb. Take that weight and its moment back out:</p>
         <div class="table-wrap">
           <table>
             <caption>Landing</caption>
@@ -185,34 +169,22 @@
             <tfoot><tr><td>Landing total</td><td>2,276</td><td>42.3</td><td>96,288</td></tr></tfoot>
           </table>
         </div>
-        <p>96,288 ÷ 2,276 = 42.3 in. The CG moved forward, because the fuel sits aft of the CG. In an airplane whose tanks are ahead of the CG, it moves aft instead, so always check where you'll land as well as where you'll take off.</p>
+        <p>96,288 ÷ 2,276 = 42.3 in. The CG moved forward because the fuel sits aft of it.</p>
         <p class="answer">Landing: 2,276 lb at 42.3 in. Within limits.</p>
       </li>
     </ol>
 
     <svg class="chart" id="envChart" viewBox="0 0 620 400" role="img" aria-label="CG envelope for the example airplane, with the takeoff point at 2,420 pounds and 42.6 inches and the landing point at 2,276 pounds and 42.3 inches, both inside the envelope."></svg>
-    <p class="chart-cap">The example airplane's envelope. The filled dot is takeoff, the open dot is landing, and the dashed line is the CG moving as fuel burns.</p>
 
     <h2 id="shift">Moving weight around</h2>
-    <p>If the CG is out of limits, you can often fix it by moving something instead of leaving it behind. You don't have to redo the whole table:</p>
+    <p>If the CG is out of limits, you can move something instead of leaving it behind:</p>
     <div class="formula">CG change = weight moved × distance moved ÷ total weight</div>
-    <p>Say you move the 40 lb bag from the baggage area (95.0 in) to the empty rear seat (73.0 in). That's 22 inches forward:</p>
-    <p>40 × 22 ÷ 2,420 = 0.36 in forward, so the takeoff CG goes from 42.6 to about 42.3 in. The total weight doesn't change.</p>
-    <p>To add or remove weight, add or subtract its moment and its weight, then divide again, the same way you did for the fuel burn.</p>
-
-    <h2 id="real">Doing it for real</h2>
-    <ul>
-      <li>Use the empty weight and moment from that tail number's current weight and balance record. Two airplanes of the same model can differ by a lot.</li>
-      <li>Use the arms, limits, and envelope from that airplane's POH, Section 6.</li>
-      <li>Use real weights for people and bags, including headsets, flight bags, and anything in the seat pockets.</li>
-      <li>Check both takeoff and landing, and check the per-seat and baggage limits as well as the totals.</li>
-      <li>If the POH gives a loading graph or moment index, it's the same math in a different form. Learn the table first and the graph will make sense.</li>
-    </ul>
+    <p>Moving the 40 lb bag from the baggage area (95.0 in) to the rear seat (73.0 in) is 22 inches forward. 40 × 22 ÷ 2,420 = 0.36 in, so the takeoff CG goes from 42.6 to about 42.3 in.</p>
 
     <h2 id="sources">Sources</h2>
     <ul>
       <li>FAA-H-8083-1B, Aircraft Weight and Balance Handbook</li>
-      <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 10, Weight and Balance</li>
+      <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 10</li>
     </ul>
   </article>
 </main>

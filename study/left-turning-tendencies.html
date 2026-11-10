@@ -11,12 +11,6 @@
 <link rel="stylesheet" href="../site.css">
 <style>
 article td,article th{text-align:left}
-.qa{background:var(--surface);border:1px solid var(--line);border-radius:6px;margin:10px 0}
-.qa summary{cursor:pointer;padding:12px 16px;font:600 1.08rem/1.35 var(--cond);list-style-position:outside;margin-left:18px}
-.qa summary:hover{color:var(--accent)}
-.qa[open] summary{border-bottom:1px solid var(--line)}
-.qa div{padding:12px 16px}
-.qa div p{margin:0}
 figure{margin:20px 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 12px 4px}
 figure svg{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
 figcaption{font-size:.92rem;color:var(--muted);padding:6px 4px 8px}
@@ -38,7 +32,7 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="../index.html">Ground School</a>
+    <a class="wordmark" href="../index.html">172 Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="../aircraft/index.html">Aircraft</a>
@@ -63,28 +57,11 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
     </nav>
   </div>
 </header>
-<div class="jump">
-  <div class="jump-in">
-    <details class="jump-menu">
-      <summary><span class="jump-label">On this page</span><span class="jump-current">Jump to a section</span></summary>
-      <ol>
-      <li><a href="#overview"><span>The short version</span></a></li>
-      <li><a href="#torque"><span>Torque reaction</span></a></li>
-      <li><a href="#slipstream"><span>Spiraling slipstream</span></a></li>
-      <li><a href="#p-factor"><span>P-factor</span></a></li>
-      <li><a href="#precession"><span>Gyroscopic precession</span></a></li>
-      <li><a href="#flying"><span>In the airplane</span></a></li>
-      <li><a href="#test-yourself"><span>Test yourself</span></a></li>
-      <li><a href="#sources"><span>Sources</span></a></li>
-      </ol>
-    </details>
-  </div>
-</div>
 <main class="page page-single">
   <article>
     <p class="crumb"><a href="../study/index.html">Study</a></p>
     <h1>Left-turning tendencies</h1>
-    <p class="lede">Our airplanes' propellers turn clockwise as seen from the cockpit. That one fact is why the airplane wants to turn left at high power and low airspeed, and why you need right rudder on the takeoff roll and in the climb.</p>
+    <p class="lede">The propeller turns clockwise as seen from the cockpit. That's why the airplane pulls left at high power and low airspeed, and why you need right rudder on takeoff and in the climb.</p>
 
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <defs>
@@ -93,7 +70,7 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
       </defs>
     </svg>
 
-    <h2 id="overview">The short version</h2>
+    <h2 id="overview">The four tendencies</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Tendency</th><th>What causes it</th><th>Strongest when</th></tr></thead>
@@ -105,10 +82,10 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
         </tbody>
       </table>
     </div>
-    <p>Put together, the rule of thumb is simple: the more power, the slower the airspeed, and the higher the angle of attack, the more right rudder you need. The airplane's designers offset most of it for cruise, which is why you hardly feel it in level flight.</p>
+    <p>The more power, the slower the airspeed, and the higher the angle of attack, the more right rudder you need.</p>
 
     <h2 id="torque">Torque reaction</h2>
-    <p>For every action there's an equal and opposite reaction. The engine spins the propeller clockwise, so the propeller pushes back on the engine and tries to roll the airplane to the left, around its longitudinal axis.</p>
+    <p>The engine spins the propeller clockwise, so the propeller pushes back on the engine and tries to roll the airplane left.</p>
     <figure>
       <svg viewBox="0 0 420 230" role="img" aria-label="Rear view: the propeller turns clockwise and the airplane tends to roll left">
         <circle cx="210" cy="130" r="72" class="thin" stroke-dasharray="5 5"/>
@@ -124,10 +101,10 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
       </svg>
       <figcaption>The propeller's reaction rolls the airplane left.</figcaption>
     </figure>
-    <p>On the takeoff roll, the same reaction presses the left main wheel into the runway harder than the right. That adds friction on the left side and pulls the nose left. In flight, designers offset torque for cruise power with things like aileron trim tabs and how the wings and engine are rigged. At full power and low airspeed, that built-in correction isn't enough, and you hold it off with the controls.</p>
+    <p>On the takeoff roll, that presses the left main wheel into the runway harder than the right. The extra friction pulls the nose left.</p>
 
     <h2 id="slipstream">Spiraling slipstream</h2>
-    <p>The propeller doesn't just push air straight back. It throws it backward in a corkscrew that wraps around the fuselage in the same direction the propeller turns. On its way back, the spiral strikes the left side of the vertical fin, which pushes the tail right and yaws the nose left. The handbook calls this the corkscrew effect.</p>
+    <p>The propeller throws air backward in a corkscrew that wraps around the fuselage. The spiral strikes the left side of the vertical fin, which pushes the tail right and yaws the nose left.</p>
     <figure>
       <svg viewBox="0 0 420 300" role="img" aria-label="Top view: the slipstream spirals around the fuselage and hits the left side of the vertical fin">
         <g transform="translate(0 0)" class="air">
@@ -148,7 +125,7 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
     </figure>
 
     <h2 id="p-factor">P-factor</h2>
-    <p>P-factor, or asymmetric loading, shows up when the airplane flies at a high angle of attack, like in a climb or slow flight. The propeller disc is tilted nose-up into the relative wind, so the blade coming down on the right side meets the air at a greater angle of attack than the blade going up on the left. The descending blade takes the bigger bite and makes more thrust. That moves the center of thrust to the right of the propeller hub, and the nose yaws left.</p>
+    <p>P-factor, also called asymmetric loading, shows up at a high angle of attack, like in a climb or slow flight. The propeller disc is tilted into the relative wind, so the descending blade on the right takes a bigger bite of air than the ascending blade on the left and makes more thrust. The center of thrust moves right of the hub, and the nose yaws left.</p>
     <figure>
       <svg viewBox="0 0 420 322" role="img" aria-label="Top view at high angle of attack: the right blade makes more thrust than the left, so the nose yaws left">
         <g transform="translate(0 30)" class="air">
@@ -170,7 +147,7 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
     </figure>
 
     <h2 id="precession">Gyroscopic precession</h2>
-    <p>A spinning propeller is a gyroscope. When something tilts its plane of rotation, the reaction doesn't show up where the force was applied. It shows up 90° later, in the direction the propeller is turning.</p>
+    <p>A spinning propeller is a gyroscope. A force that tilts it takes effect 90° later, in the direction the propeller is turning.</p>
     <figure>
       <svg viewBox="0 0 480 250" role="img" aria-label="A force at the top of the clockwise propeller disc acts 90 degrees later, at the right side">
         <circle cx="210" cy="128" r="84" class="thin"/>
@@ -197,40 +174,29 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
         </tbody>
       </table>
     </div>
-    <p>You'll feel it most in a tailwheel airplane when you raise the tail on the takeoff roll: the nose pitches down and swings left. In our tricycle-gear trainers the pitch changes are gentle, so precession is small.</p>
+    <p>You feel it most in a tailwheel airplane when the tail comes up on the takeoff roll. In a tricycle-gear trainer it's small.</p>
 
     <h2 id="flying">In the airplane</h2>
     <dl class="terms">
       <dt>Takeoff roll</dt>
-      <dd>Full power at low airspeed. Torque and the spiraling slipstream pull left, so add right rudder as the airplane accelerates and keep it on the centerline.</dd>
+      <dd>Full power at low airspeed. Add right rudder as the airplane accelerates to stay on the centerline.</dd>
       <dt>Climb</dt>
-      <dd>High power, high angle of attack, and slower airspeed: all four are working. Hold right rudder and keep the ball centered. If the nose keeps drifting left in the climb, you need more right rudder, not more aileron.</dd>
+      <dd>All four are working. Hold right rudder and keep the ball centered. If the nose drifts left, add rudder, not aileron.</dd>
       <dt>Slow flight and power-on stalls</dt>
-      <dd>The angle of attack is highest here, so P-factor is at its strongest. Expect to hold a lot of right rudder, and keep the ball centered so the airplane doesn't stall in a skid.</dd>
+      <dd>P-factor is at its strongest. Expect a lot of right rudder, and keep the ball centered so the airplane doesn't stall in a skid.</dd>
       <dt>Cruise</dt>
       <dd>The airplane is rigged for this. You'll need little or no rudder.</dd>
       <dt>Reducing power</dt>
-      <dd>The left-turning forces fade, so ease off the right rudder. At idle in a descent you may need a touch of left rudder.</dd>
+      <dd>The forces fade, so ease off the right rudder. At idle you may need a touch of left rudder.</dd>
       <dt>Go-around</dt>
       <dd>Full power, slow, nose coming up: the left turn arrives all at once. Be ready with right rudder as you add power.</dd>
     </dl>
-    <div class="callout"><p>Fix yaw with rudder. Using aileron to stop the nose from swinging left just cross-controls the airplane. "Step on the ball": if the ball in the inclinometer is off to the right, add right rudder.</p></div>
-    <p>See which way the propeller turns on the <a href="../study/engine.html">engine page</a>, with the propeller turned on.</p>
-
-    <h2 id="test-yourself">Test yourself</h2>
-    <details class="qa"><summary>Name the four left-turning tendencies.</summary><div><p>Torque reaction, the spiraling slipstream (corkscrew effect), P-factor (asymmetric loading), and gyroscopic precession.</p></div></details>
-    <details class="qa"><summary>Which way does the propeller turn, seen from the cockpit, and why does that matter?</summary><div><p>Clockwise. Every one of the four tendencies comes from that direction of rotation, and they all push the nose left.</p></div></details>
-    <details class="qa"><summary>You're climbing at Vy with full power. Which tendencies are the biggest, and what do you do?</summary><div><p>P-factor (high angle of attack) and the spiraling slipstream (high power, low airspeed), with torque adding to it. Hold right rudder and keep the ball centered.</p></div></details>
-    <details class="qa"><summary>Why does the airplane pull left on the takeoff roll?</summary><div><p>Torque presses the left wheel down harder, adding friction on that side, and the spiraling slipstream hits the left side of the fin. In a tailwheel airplane, P-factor (tail down, high angle of attack) and precession (raising the tail) add to it.</p></div></details>
-    <details class="qa"><summary>Where does P-factor move the center of thrust, and why?</summary><div><p>To the right of the hub. At a high angle of attack the descending blade on the right meets the air at a greater angle and makes more thrust than the ascending blade on the left.</p></div></details>
-    <details class="qa"><summary>A tailwheel pilot raises the tail on the takeoff roll. Which tendency kicks in, and which way?</summary><div><p>Gyroscopic precession. Pitching the propeller disc nose-down acts 90° later in the direction of rotation, so the nose yaws left.</p></div></details>
-    <details class="qa"><summary>Why don't you need much rudder in cruise?</summary><div><p>The angle of attack is low, the airspeed is high, and the airplane is rigged to cancel the left-turning forces at cruise power.</p></div></details>
-    <details class="qa"><summary>You pull the power back to start a descent. What happens to the rudder you need?</summary><div><p>The left-turning forces drop off, so you need less right rudder. At idle you may need a little left rudder to keep the ball centered.</p></div></details>
+    <div class="callout"><p>Step on the ball: if the ball is off to the right, add right rudder.</p></div>
 
     <h2 id="sources">Sources</h2>
     <ul>
-      <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 5, Aerodynamics of Flight (left turning tendencies)</li>
-      <li>FAA-H-8083-3C, Airplane Flying Handbook (takeoffs, climbs, and slow flight)</li>
+      <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 5</li>
+      <li>FAA-H-8083-3C, Airplane Flying Handbook</li>
     </ul>
   </article>
 </main>
@@ -238,6 +204,5 @@ svg .ah-f{fill:var(--accent)} svg .ah-c{fill:var(--chart)}
   <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
   <p>Made by Colby Penn</p>
 </footer>
-<script src="../jump.js"></script>
 </body>
 </html>
