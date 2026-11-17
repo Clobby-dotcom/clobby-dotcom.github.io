@@ -1,7 +1,7 @@
 // Weight and balance data for the three airplanes. Arms, limits, and envelopes are from the FAA type
 // certificate data sheets and the manuals listed under each airplane's sources. Basic empty weight and
-// moment are different for every airplane. The 172K entry is from that airplane's record and the Pilot 100i
-// entry is the POH's sample problem value, each labeled as such. The rest stay null: never make one up.
+// moment are different for every airplane. The 172R and 172K entries are from those airplanes' records and
+// the Pilot 100i entry is the POH's sample problem value, each labeled as such. Never make one up.
 window.WB_DATA = {
  "units": {
   "weight": "lb",
@@ -303,10 +303,11 @@ window.WB_DATA = {
   {
    "n_number": null,
    "aircraft": "c172r",
-   "bew": null,
-   "bew_moment": null,
-   "bew_arm": null,
-   "record_date": null
+   "bew": 1673.94,
+   "bew_moment": 67477.3,
+   "bew_arm": 40.31046,
+   "record_date": "2018-03-29",
+   "note": "The basic empty weight is from the airplane's weight and balance change sheet dated March 29, 2018. Check that it is still the current record."
   },
   {
    "n_number": null,
