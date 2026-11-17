@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maneuvers</title>
+<meta name="description" content="Private pilot maneuvers for the Piper Pilot 100i, Cessna 172R, and Cessna 172K: how to fly each one, the airplane's numbers, and the checkride standards.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../site.css">
+<style>
+.mv-head{max-width:1200px;margin:0 auto;padding:40px 16px 22px}
+.mv-head h1{font:700 clamp(2.6rem,7vw,4.2rem)/.95 var(--cond);margin:0;letter-spacing:-.02em}
+.mv-head .lede{font-size:1.2rem;color:var(--muted);margin:16px 0 0;max-width:62ch}
+.jump-in{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg);flex:none}
+.seg button{font:600 .98rem/1.1 var(--cond);color:var(--muted);background:none;border:0;border-right:1px solid var(--line);padding:9px 13px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--text);box-shadow:inset 0 -3px 0 var(--accent)}
+.seg button:focus-visible{outline-offset:-3px}
+.seg .long{display:inline}
+.mv-wrap{max-width:1200px;margin:0 auto;padding:0 16px 64px}
+.group{font:700 clamp(1.7rem,3.6vw,2.2rem)/1.1 var(--cond);margin:44px 0 0;padding-top:18px;border-top:3px solid var(--text)}
+.mv{padding:26px 0 30px;border-bottom:1px solid var(--line);scroll-margin-top:64px}
+.mv h3{font:700 1.5rem/1.15 var(--cond);margin:0}
+.mv .what{color:var(--muted);margin:6px 0 0;max-width:70ch}
+.mv-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px 40px;align-items:start;margin-top:18px}
+.mv h4{font:700 1.02rem/1.2 var(--cond);margin:0 0 8px;color:var(--muted)}
+.how ol{margin:0;padding:0;list-style:none;counter-reset:s}
+.how ol > li{counter-increment:s;position:relative;padding:0 0 12px 40px;max-width:62ch}
+.how ol > li::before{content:counter(s);position:absolute;left:0;top:0;width:27px;height:27px;border-radius:50%;border:2px solid var(--line);font:700 .95rem/23px var(--cond);text-align:center;color:var(--text)}
+.how details{margin-top:6px;border-top:1px solid var(--line);padding-top:10px}
+.how summary{font:600 1rem/1.2 var(--cond);cursor:pointer;color:var(--text)}
+.how details ul{margin:10px 0 0;padding-left:1.2em;color:var(--muted)}
+.how details li{margin-bottom:5px;max-width:60ch}
+.cards{display:grid;gap:14px}
+.card{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:14px 16px}
+.card.plane{border-left:4px solid var(--accent)}
+.card.std{border-left:4px solid var(--chart)}
+.card ul{margin:0;padding-left:1.15em}
+.card li{margin-bottom:6px}
+.card li:last-child{margin-bottom:0}
+.card .src{margin:10px 0 0;font-size:.88rem;color:var(--muted)}
+.ac{display:none}
+main[data-ac="pa28-100i"] .ac-pa28-100i,main[data-ac="c172r"] .ac-c172r,main[data-ac="c172k"] .ac-c172k{display:block}
+.fig{display:block;width:100%;max-width:520px;height:auto;margin:14px 0 4px;font-family:var(--cond)}
+.fig .trk{fill:none;stroke:var(--chart);stroke-width:2.5}
+.fig .ref{fill:none;stroke:var(--muted);stroke-width:2}
+.fig .fld{fill:var(--chart-faint);stroke:var(--line)}
+.fig text{fill:var(--muted);font-size:16px}
+.fig .wind{fill:var(--text);font-weight:600}
+.fig .arr{fill:none;stroke:var(--text);stroke-width:2}
+.sources{margin-top:36px;color:var(--muted);font-size:.95rem;max-width:95ch}
+.sources p{margin:0 0 8px}
+@media (max-width:900px){
+  .mv-grid{grid-template-columns:minmax(0,1fr);gap:16px}
+  .cards{display:contents}
+  .card.plane{order:-1}
+  .card.std{order:1}
+}
+@media (max-width:520px){
+  .jump-label{display:none}
+  .seg .long{display:none}
+  .seg button{padding:9px 11px}
+}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="site-head-in">
+    <a class="wordmark" href="../index.html">172 Captain</a>
+    <nav class="site-nav" aria-label="Main">
+      <div class="nav-drop">
+        <a href="../aircraft/index.html">Aircraft</a>
+        <ul class="nav-menu">
+          <li><a href="../aircraft/piper-pilot-100i.html">Piper Pilot 100i</a></li>
+          <li><a href="../aircraft/cessna-172r.html">Cessna 172R</a></li>
+          <li><a href="../aircraft/cessna-172k.html">Cessna 172K</a></li>
+        </ul>
+      </div>
+      <div class="nav-drop">
+        <a href="../study/index.html" aria-current="true">Study</a>
+        <ul class="nav-menu">
+          <li><a href="../study/maneuvers.html" aria-current="page">Maneuvers</a></li>
+          <li><a href="../study/regulations.html">Regulations</a></li>
+          <li><a href="../study/left-turning-tendencies.html">Left-turning tendencies</a></li>
+          <li><a href="../study/stall.html">Stall simulator</a></li>
+          <li><a href="../study/engine.html">Engine</a></li>
+          <li><a href="../study/fuel-system.html">Pilot 100i fuel system</a></li>
+        </ul>
+      </div>
+      <a href="../vor-trainer.html">VOR trainer</a>
+      <a href="../weight-and-balance.html">Weight and balance</a>
+    </nav>
+  </div>
+</header>
+
+<main data-ac="c172r">
+<div class="mv-head">
+  <p class="crumb"><a href="../study/index.html">Study</a></p>
+  <h1>Maneuvers</h1>
+  <p class="lede">How to fly each private pilot maneuver, the numbers for your airplane, and the standards the checkride uses.</p>
+</div>
+
+<div class="jump">
+  <div class="jump-in">
+    <details class="jump-menu">
+      <summary><span class="jump-label">On this page</span><span class="jump-current">Jump to a maneuver</span></summary>
+      <ol>
+      <li><a href="#slow-flight"><span>Slow flight</span></a></li>
+      <li><a href="#power-off-stall"><span>Power-off stall</span></a></li>
+      <li><a href="#power-on-stall"><span>Power-on stall</span></a></li>
+      <li><a href="#steep-turns"><span>Steep turns</span></a></li>
+      <li><a href="#ground-reference"><span>Ground reference maneuvers</span></a></li>
+      <li><a href="#normal-takeoff"><span>Normal takeoff and climb</span></a></li>
+      <li><a href="#short-field-takeoff"><span>Short-field takeoff</span></a></li>
+      <li><a href="#soft-field-takeoff"><span>Soft-field takeoff</span></a></li>
+      <li><a href="#normal-landing"><span>Normal approach and landing</span></a></li>
+      <li><a href="#short-field-landing"><span>Short-field landing</span></a></li>
+      <li><a href="#soft-field-landing"><span>Soft-field landing</span></a></li>
+      <li><a href="#forward-slip"><span>Forward slip to a landing</span></a></li>
+      <li><a href="#go-around"><span>Go-around</span></a></li>
+      <li><a href="#sources"><span>Sources</span></a></li>
+      </ol>
+    </details>
+    <div class="seg" id="acSeg" role="group" aria-label="Airplane">
+      <button type="button" data-ac="c172r" aria-pressed="true"><span class="long">Cessna </span>172R</button>
+      <button type="button" data-ac="c172k" aria-pressed="false"><span class="long">Cessna </span>172K</button>
+      <button type="button" data-ac="pa28-100i" aria-pressed="false"><span class="long">Pilot </span>100i</button>
+    </div>
+  </div>
+</div>
+
+<div class="mv-wrap">
+<h2 class="group">Airwork</h2>
+
+<section class="mv" id="slow-flight">
+  <h3>Slow flight</h3>
+  <p class="what">Flying just above the stall warning, in full control, without setting it off.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Clear the area. Pick an altitude that keeps you at or above 1,500 ft AGL.</li>
+        <li>Reduce power gradually from cruise. Raise the nose to hold altitude as the airplane slows.</li>
+        <li>If you're using flaps, extend them as you slow below each flap speed.</li>
+        <li>Near your target speed, add power to hold altitude, trim, and add right rudder.</li>
+        <li>Hold straight and level by looking outside and cross-checking the instruments.</li>
+        <li>Practice turns, climbs, and descents. Add power in a turn to hold altitude, and keep every control movement smooth.</li>
+        <li>To recover, add power and ease the nose down to hold altitude as the speed builds. Level the wings, bring the flaps up in steps, and retrim.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Not clearing the area first</li>
+        <li>Too little back pressure as power comes off, so the airplane sinks, or too much, so it climbs and slows too fast</li>
+        <li>Not enough right rudder</li>
+        <li>Staring at the instruments instead of looking outside</li>
+        <li>Not responding to a stall warning</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>The stall horn sounds 5 to 10 knots above the stall in every configuration.</li>
+          <li>Power-off stall at 2,450 lb: 44 KIAS flaps up, 33 KIAS flaps 30°. The indicator reads low this slow: 33 KIAS is 47 KCAS.</li>
+          <li>Flaps: 10° below 110 KIAS, more than 10° below 85 KIAS.</li>
+        </ul><p class="src">172R POH, Sections 2, 4, and 5</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>The stall horn sounds 5 to 10 MPH before the stall.</li>
+          <li>Power-off stall at 2,300 lb: 57 MPH CAS flaps up (50 knots), 49 MPH CAS flaps 40° (43 knots). The indicator reads lower than that near the stall.</li>
+          <li>Flaps below 100 MPH (87 knots).</li>
+        </ul><p class="src">1970 Owner's Manual and TCDS 3A12</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>The stall warning tone comes on 5 to 10 knots above the stall.</li>
+          <li>Power-off stall at 2,550 lb: 50 KIAS flaps up, 45 KIAS full flaps.</li>
+          <li>Flaps (10°, 25°, or 40°) below 102 KIAS.</li>
+        </ul><p class="src">Pilot 100i POH, Sections 2 and 4.7</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Finish no lower than 1,500 ft AGL.</li>
+        <li>Hold a speed where any more angle of attack, load factor, or power reduction would set off the stall warning.</li>
+        <li>Fly straight and level, turns, climbs, and descents in the configuration the examiner asks for, with no stall warning.</li>
+        <li>Altitude ±100 ft, heading ±10°, airspeed +10/−0 knots, bank ±10°.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="power-off-stall">
+  <h3>Power-off stall</h3>
+  <p class="what">A stall from a power-off descent in the landing configuration, like one that could happen on final.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Clear the area. Pick an altitude that lets you recover at or above 1,500 ft AGL.</li>
+        <li>Reduce power and hold altitude while you slow to normal approach speed.</li>
+        <li>Extend the flaps, lower the nose to an approach attitude, and bring the power to idle. Let the descent stabilize.</li>
+        <li>Smoothly raise the nose to an attitude that will bring on a stall. Keep the wings level and the ball centered.</li>
+        <li>Hold that attitude until the airplane stalls.</li>
+        <li>Recover: lower the nose until the stall warning stops, level the wings, and add power as needed, staying coordinated.</li>
+        <li>Go around. Once you have a positive rate of climb, bring the flaps up and climb at V<sub>X</sub> or V<sub>Y</sub>.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Pulling back too fast and stalling at a higher speed than you meant to</li>
+        <li>Letting the ball slide out during the entry or the recovery</li>
+        <li>Leveling the wings or adding power before lowering the nose</li>
+        <li>Pulling up too soon in the recovery and stalling a second time</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Approach at 60 to 70 KIAS with flaps 30°, or 65 to 75 with flaps up.</li>
+          <li>Power-off stall at 2,450 lb: 33 KIAS flaps 30°, 44 KIAS flaps up. The horn sounds 5 to 10 knots before.</li>
+          <li>Go-around: full power, flaps to 20° right away, then 10°, then up once you're past 60 KIAS at a safe altitude.</li>
+          <li>V<sub>X</sub> 60, V<sub>Y</sub> 79 KIAS at sea level.</li>
+        </ul><p class="src">172R POH, Sections 4 and 5</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Approach at 65 to 75 MPH with flaps down, or 70 to 80 with flaps up.</li>
+          <li>Power-off stall at 2,300 lb: 49 MPH CAS flaps 40°, 57 MPH CAS flaps up. The horn sounds 5 to 10 MPH before.</li>
+          <li>Go-around: full power and flaps to 20° right away. Retract the rest once you're clear of obstacles and accelerating.</li>
+          <li>V<sub>X</sub> 68, V<sub>Y</sub> 82 MPH at sea level.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>Final approach at 66 KIAS with flaps 40°.</li>
+          <li>Power-off stall at 2,550 lb: 45 KIAS full flaps, 50 KIAS flaps up. The tone comes on 5 to 10 knots before.</li>
+          <li>The POH says a stall costs 100 to 350 ft of altitude, depending on configuration and power.</li>
+          <li>Go-around: mixture full rich, full throttle, nose up to a climb attitude, flaps up in steps.</li>
+          <li>V<sub>X</sub> 64, V<sub>Y</sub> 76 KIAS.</li>
+        </ul><p class="src">Pilot 100i POH, 4.5m, 4.5n, and 4.7</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Finish no lower than 1,500 ft AGL.</li>
+        <li>Approach or landing configuration, as the examiner specifies, from a stabilized descent.</li>
+        <li>Heading ±10° in straight flight. In a turn, no more than 20° of bank, held ±10°.</li>
+        <li>Call out the cues of the coming stall, then recover promptly after the full stall.</li>
+        <li>Recover the way the POH says, clean up as the manufacturer recommends, and accelerate to V<sub>X</sub> or V<sub>Y</sub>.</li>
+        <li>Return to the altitude, heading, and airspeed the examiner gives you.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="power-on-stall">
+  <h3>Power-on stall</h3>
+  <p class="what">A stall from a climb with power on, like one that could happen just after takeoff.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Clear the area. Pick an altitude that lets you recover at or above 1,500 ft AGL.</li>
+        <li>In the takeoff configuration, slow to normal liftoff speed. Keep clearing the area as you slow.</li>
+        <li>Set takeoff or climb power and establish a climb attitude.</li>
+        <li>Smoothly raise the nose and hold that attitude. Add right rudder to stay coordinated as the airplane slows.</li>
+        <li>Keep easing the elevator back until the airplane stalls.</li>
+        <li>Recover at once: lower the nose until the stall warning stops, level the wings with aileron, keep the ball centered, and add any power you don't already have.</li>
+        <li>Return to the climb, then to the altitude and heading you were given.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Pulling back too fast and stalling at a higher speed than you meant to</li>
+        <li>Letting the ball slide out during the entry or the recovery</li>
+        <li>Leveling the wings before lowering the nose</li>
+        <li>Pulling up too soon in the recovery and stalling a second time</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Takeoff configuration: flaps 0° to 10°.</li>
+          <li>Normal liftoff: nose wheel up at 55 KIAS.</li>
+          <li>Power-off stall, flaps up, at 2,450 lb: 44 KIAS.</li>
+          <li>V<sub>X</sub> 60, V<sub>Y</sub> 79 KIAS at sea level.</li>
+        </ul><p class="src">172R POH, Sections 4 and 5</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Takeoff configuration: flaps up.</li>
+          <li>Normal liftoff: nosewheel up at 60 MPH.</li>
+          <li>Power-off stall at 2,300 lb: 57 MPH CAS flaps up, 52 MPH CAS flaps 10°.</li>
+          <li>V<sub>X</sub> 68, V<sub>Y</sub> 82 MPH at sea level.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>Takeoff configuration: flaps up for a normal takeoff, 25° for a short field.</li>
+          <li>Rotation at maximum weight: 60 KIAS flaps up, 55 KIAS flaps 25°.</li>
+          <li>Power-off stall, flaps up, at 2,550 lb: 50 KIAS.</li>
+          <li>V<sub>X</sub> 64, V<sub>Y</sub> 76 KIAS.</li>
+        </ul><p class="src">Pilot 100i POH, 4.5i, 4.5j, and 4.7</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Finish no lower than 1,500 ft AGL.</li>
+        <li>Takeoff, departure, or cruise configuration, as the examiner specifies.</li>
+        <li>Power as assigned, no less than 65 percent.</li>
+        <li>Heading ±10° in straight flight. In a turn, no more than 20° of bank, held ±10°.</li>
+        <li>Call out the cues of the coming stall, then recover promptly after the full stall.</li>
+        <li>Recover the way the POH says, accelerate to V<sub>X</sub> or V<sub>Y</sub>, and return to the altitude, heading, and airspeed the examiner gives you.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="steep-turns">
+  <h3>Steep turns</h3>
+  <p class="what">A full circle at about 45° of bank, holding altitude and airspeed, then another the opposite way.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Clear the area. Note your heading and pick a landmark on the horizon to roll out on.</li>
+        <li>Set your entry speed, no faster than maneuvering speed.</li>
+        <li>Roll smoothly into a 45° bank.</li>
+        <li>As the bank passes about 30°, add back pressure and a little power to hold altitude and airspeed.</li>
+        <li>Keep the nose and wingtips steady against the horizon. Fix altitude with the elevator and bank with the ailerons.</li>
+        <li>If the nose drops, shallow the bank first, then raise the nose.</li>
+        <li>Start rolling out half your bank angle before the entry heading (about 22° early at 45° of bank), easing off the back pressure and power.</li>
+        <li>Do it again in the other direction.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Gaining or losing altitude</li>
+        <li>Letting the bank angle wander</li>
+        <li>Poor coordination</li>
+        <li>Letting the airspeed get away</li>
+        <li>Missing the rollout heading</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Maneuvering speed (V<sub>A</sub>): 99 KIAS at 2,450 lb, 92 KIAS at 2,000 lb, 82 KIAS at 1,600 lb.</li>
+          <li>Use the speed for your weight as the most you enter at.</li>
+        </ul><p class="src">172R POH, Section 2</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Maneuvering speed (V<sub>A</sub>): 122 MPH CAS (106 knots). It's the only value given, with no lower speeds for lighter weights.</li>
+          <li>The manual's maneuver list also gives 122 MPH as the highest entry speed for steep turns.</li>
+        </ul><p class="src">1970 Owner's Manual and TCDS 3A12</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>The POH calls maneuvering speed V<sub>O</sub>: 113 KIAS at 2,550 lb and 98 KIAS at 1,917 lb.</li>
+          <li>Between those weights, interpolate in a straight line.</li>
+        </ul><p class="src">Pilot 100i POH, Section 2</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Clear the area first.</li>
+        <li>Use the manufacturer's recommended speed. If there isn't one, don't exceed V<sub>A</sub>.</li>
+        <li>A coordinated 360° turn at about 45° of bank, then the other direction as the examiner specifies.</li>
+        <li>Altitude ±100 ft, airspeed ±10 knots, bank ±5°.</li>
+        <li>Roll out on the entry heading, ±10°.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="ground-reference">
+  <h3>Ground reference maneuvers</h3>
+  <p class="what">Flying a set path over the ground while the wind tries to push you off it. On the checkride the examiner picks at least one of the three.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>Before any of them</h4>
+      <ol>
+        <li>Clear the area with two 90° clearing turns.</li>
+        <li>Fly 600 to 1,000 ft AGL, no faster than maneuvering speed. Stay at least 500 ft above any obstruction and 2,000 ft to the side of it.</li>
+        <li>Work out the wind and enter downwind, where your groundspeed is highest.</li>
+        <li>The rule for all three: the faster you're moving over the ground, the steeper the bank. Never more than 45°.</li>
+      </ol>
+
+      <h4 style="margin-top:22px">Rectangular course</h4>
+      <svg class="fig" viewBox="0 0 520 250" role="img" aria-label="Rectangular course: a track flown counterclockwise around a field with the wind blowing from the top. The left leg is downwind, the bottom leg is base, the right leg is upwind, and the top leg is crosswind.">
+        <path class="arr" d="M40 72V168M33 156L40 170L47 156"/><text class="wind" x="40" y="60" text-anchor="middle">Wind</text>
+        <rect class="fld" x="176" y="74" width="208" height="102"/>
+        <rect class="trk" x="140" y="38" width="280" height="174" rx="26"/>
+        <path class="arr" d="M134 119L140 131L146 119M274 206L286 212L274 218M414 131L420 119L426 131M286 32L274 38L286 44"/>
+        <text x="130" y="129" text-anchor="end">Downwind</text><text x="280" y="236" text-anchor="middle">Base</text>
+        <text x="432" y="129">Upwind</text><text x="280" y="26" text-anchor="middle">Crosswind</text>
+      </svg>
+      <ol>
+        <li>Pick a field with clear edges. Fly outside it, about a half to three-quarters of a mile from the boundary, and enter on the downwind leg.</li>
+        <li>Downwind to base is the steepest turn, and more than 90°, so you roll out angled in toward the field.</li>
+        <li>Base to upwind is a medium bank that you shallow as you go. It's less than 90° of turn.</li>
+        <li>Upwind to crosswind is the shallowest turn and less than 90°. Roll out angled away from the field.</li>
+        <li>Crosswind to downwind is a medium bank and more than 90° of turn.</li>
+      </ol>
+
+      <h4 style="margin-top:22px">S-turns</h4>
+      <svg class="fig" viewBox="0 0 520 230" role="img" aria-label="S-turns: with the wind blowing from the top, the track crosses a road heading downwind, flies a half circle on the downwind side, crosses the road again heading upwind, and flies a second half circle on the upwind side. The bank is steepest where the airplane heads downwind and shallowest where it heads upwind.">
+        <path class="arr" d="M40 62V158M33 146L40 160L47 146"/><text class="wind" x="40" y="50" text-anchor="middle">Wind</text>
+        <path class="ref" d="M84 115H500"/><text x="500" y="133" text-anchor="end">Road</text>
+        <path class="trk" d="M120 40V115A70 70 0 0 0 260 115A70 70 0 0 1 400 115V170"/>
+        <path class="arr" d="M114 70L120 82L126 70M254 127L260 115L266 127M394 150L400 162L406 150"/>
+        <text x="136" y="140">Steepest bank</text><text x="270" y="150">Shallowest bank</text><text x="410" y="100">Steepest bank</text>
+      </svg>
+      <ol>
+        <li>Pick a road or other straight line that runs across the wind.</li>
+        <li>Cross it at 90°, heading downwind, with the wings level.</li>
+        <li>Roll straight into the steepest bank of the maneuver.</li>
+        <li>Shallow the bank as you turn into the wind and your groundspeed drops.</li>
+        <li>Time the rollout so the wings come level just as you cross the line again.</li>
+        <li>Roll the other way with a shallow bank, then steepen it as you turn downwind and speed up over the ground.</li>
+        <li>Cross the line again as the second half circle ends.</li>
+      </ol>
+
+      <h4 style="margin-top:22px">Turns around a point</h4>
+      <svg class="fig" viewBox="0 0 520 230" role="img" aria-label="Turns around a point: a circle flown counterclockwise around a point with the wind blowing from the top. The bank is steepest on the side where the airplane heads downwind and shallowest on the side where it heads upwind.">
+        <path class="arr" d="M40 62V158M33 146L40 160L47 146"/><text class="wind" x="40" y="50" text-anchor="middle">Wind</text>
+        <circle class="trk" cx="270" cy="115" r="78"/><circle cx="270" cy="115" r="5" style="fill:var(--muted)"/>
+        <path class="arr" d="M186 109L192 121L198 109M342 121L348 109L354 121"/>
+        <text x="182" y="106" text-anchor="end">Downwind:</text><text x="182" y="123" text-anchor="end">steepest bank</text>
+        <text x="360" y="106">Upwind:</text><text x="360" y="123">shallowest bank</text>
+      </svg>
+      <ol>
+        <li>Pick a point that's small but easy to see.</li>
+        <li>Enter downwind at the distance you want to hold.</li>
+        <li>Roll into the steepest bank of the maneuver.</li>
+        <li>Shallow the bank as you come around into the wind. It's shallowest when you're headed straight upwind.</li>
+        <li>Steepen it again through the other side until you're back where you entered.</li>
+        <li>Fly at least one full circle. If the wing hides the point, change your altitude or your distance.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Not clearing the area first</li>
+        <li>Gaining or losing altitude while watching the ground</li>
+        <li>Misjudging the wind direction</li>
+        <li>Too little or too much wind correction, so the track drifts</li>
+        <li>Slipping or skidding to hold the track</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Maneuvering speed (V<sub>A</sub>): 99 KIAS at 2,450 lb, 92 KIAS at 2,000 lb, 82 KIAS at 1,600 lb.</li>
+        </ul><p class="src">172R POH, Section 2</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Maneuvering speed (V<sub>A</sub>): 122 MPH CAS (106 knots).</li>
+        </ul><p class="src">1970 Owner's Manual and TCDS 3A12</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>Maneuvering speed (V<sub>O</sub>): 113 KIAS at 2,550 lb and 98 KIAS at 1,917 lb.</li>
+        </ul><p class="src">Pilot 100i POH, Section 2</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Clear the area and pick a suitable field, line, or point.</li>
+        <li>Enter at 600 to 1,000 ft AGL: the rectangular course at 45° to the downwind leg, S-turns perpendicular to the line.</li>
+        <li>Correct for wind drift to hold a constant track around the field, or a constant radius on each side of the line or around the point.</li>
+        <li>In S-turns, reverse the turn directly over the line. Turns around a point go in either direction, as the examiner specifies.</li>
+        <li>Divide your attention between flying, watching for traffic, and the ground track, and stay coordinated.</li>
+        <li>Altitude ±100 ft, airspeed ±10 knots.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<h2 class="group">Takeoffs</h2>
+
+<section class="mv" id="normal-takeoff">
+  <h3>Normal takeoff and climb</h3>
+  <p class="what">Into the wind, from a firm runway with plenty of length.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Line up on the centerline with the controls set for the wind.</li>
+        <li>Release the brakes and bring the throttle smoothly up to takeoff power.</li>
+        <li>Check the engine instruments as you roll. Steer with the rudder, and hold aileron into any crosswind.</li>
+        <li>As the controls come alive, ease the nose up to the takeoff attitude and hold it there until the airplane lifts off.</li>
+        <li>Accelerate to V<sub>Y</sub> and climb with the wings level.</li>
+        <li>Keep takeoff power until you're at least 500 ft above the ground and anything around you. Then set climb power and trim.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Not checking the POH's takeoff performance charts beforehand</li>
+        <li>Shoving the throttle in abruptly</li>
+        <li>Not being ready for the pull to the left</li>
+        <li>Never reaching a proper liftoff attitude</li>
+        <li>Not holding V<sub>Y</sub> in the climb</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Flaps 0° to 10°.</li>
+          <li>Lift the nose wheel at 55 KIAS. Climb at 70 to 80 KIAS. V<sub>Y</sub> is 79 KIAS at sea level.</li>
+          <li>If you used 10° of flaps, leave them down until obstacles are cleared and you're at 60 KIAS.</li>
+          <li>Above 3,000 ft, lean for maximum RPM before takeoff.</li>
+        </ul><p class="src">172R POH, Section 4</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Flaps up.</li>
+          <li>Lift the nosewheel at 60 MPH. Climb at 80 to 90 MPH. V<sub>Y</sub> is 82 MPH at sea level.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>Flaps up, trim set, fuel pump on.</li>
+          <li>The POH's normal technique: hold the brakes, set full power, then release. With plenty of runway and no obstacles, it allows a rolling takeoff.</li>
+          <li>Rotate at 60 KIAS at maximum weight. Climb at 76 KIAS (V<sub>Y</sub>), or 87 KIAS enroute.</li>
+        </ul><p class="src">Pilot 100i POH, 4.5i and 4.5j</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Checklist complete, radio calls made, correct runway verified.</li>
+        <li>Note the wind and position the controls for it.</li>
+        <li>Rotate and lift off at the recommended airspeed and accelerate to V<sub>Y</sub>.</li>
+        <li>Hold the manufacturer's recommended speed or V<sub>Y</sub>, +10/−5 knots, to a safe maneuvering altitude.</li>
+        <li>Configure the airplane the way the manufacturer says.</li>
+        <li>Keep directional control and correct for wind drift throughout.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="short-field-takeoff">
+  <h3>Short-field takeoff</h3>
+  <p class="what">Getting off a short runway and over an obstacle at the end of it.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Use all the runway there is: line up at the very beginning. Set the flaps the POH calls for.</li>
+        <li>Hold the brakes, add full power, check the engine instruments, then release.</li>
+        <li>Let the airplane accelerate with its weight on the main wheels. Don't force it off early or hold it on.</li>
+        <li>Rotate at the POH's speed and pitch for the obstacle clearance speed, or V<sub>X</sub>.</li>
+        <li>Hold that speed, wings level, until you're clear of the obstacle. With no obstacle, hold it to at least 50 ft above the runway.</li>
+        <li>Lower the nose a little and accelerate to V<sub>Y</sub>.</li>
+        <li>Once you're clear and climbing at V<sub>Y</sub>, bring the flaps up in steps and set climb power.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Not using all the runway available</li>
+        <li>Lifting off too early</li>
+        <li>Holding the airplane on the ground with forward pressure</li>
+        <li>Not holding V<sub>X</sub>. Even 5 knots off the recommended speed can cut the climb a lot.</li>
+        <li>Raising the flaps too soon</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Flaps 10°. More than 10° is not approved for takeoff.</li>
+          <li>Brakes held, full power, release.</li>
+          <li>Hold 57 KIAS until the obstacle is cleared.</li>
+          <li>Flaps up slowly once you're past 60 KIAS, then climb at V<sub>Y</sub> (79 KIAS at sea level).</li>
+        </ul><p class="src">172R POH, Section 4</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Flaps up. The manual says 10° shortens the ground roll by about 10 percent, but the gain is gone by the time you clear a 50 ft obstacle.</li>
+          <li>Climb over the obstacle at 68 MPH (V<sub>X</sub>), flaps up. If you took off with 10°, hold 65 MPH until you're clear.</li>
+          <li>Then climb at 80 to 90 MPH. V<sub>Y</sub> is 82 MPH at sea level.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>Flaps 25° (second notch). Trim slightly aft of neutral.</li>
+          <li>Hold the brakes, set full power, release.</li>
+          <li>Rotate at 55 KIAS and cross the obstacle at 60 KIAS. Both are for maximum weight.</li>
+          <li>After the obstacle, and at a safe altitude, retract the flaps slowly. The POH lists 64 KIAS for the initial climb with flaps up, then 76 KIAS.</li>
+        </ul><p class="src">Pilot 100i POH, 4.5i</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Line up using the maximum available takeoff area.</li>
+        <li>Hold the brakes while setting power, and confirm takeoff power before releasing them.</li>
+        <li>Rotate and lift off at the recommended airspeed.</li>
+        <li>Hold the recommended obstacle clearance speed or V<sub>X</sub>, +10/−5 knots, until the obstacle is cleared or you're 50 ft above the surface.</li>
+        <li>Then V<sub>Y</sub>, +10/−5 knots, to a safe maneuvering altitude.</li>
+        <li>Clean up after a positive rate of climb, the way the manufacturer says.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="soft-field-takeoff">
+  <h3>Soft-field takeoff</h3>
+  <p class="what">Getting the weight off the wheels and onto the wings as soon as possible, on grass, mud, sand, or snow.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Set the flaps the POH calls for. Taxi onto the runway with the elevator back, and don't stop.</li>
+        <li>Add takeoff power smoothly as you line up.</li>
+        <li>Hold enough back pressure to keep the weight off the nose wheel.</li>
+        <li>Keep that nose-high attitude and let the airplane fly itself off.</li>
+        <li>Lower the nose gently and stay in ground effect until you reach at least V<sub>X</sub>.</li>
+        <li>Climb at V<sub>X</sub> if there's an obstacle, then V<sub>Y</sub>. Bring the flaps up once you have a positive rate of climb.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Too little back pressure at the start of the roll</li>
+        <li>Poor directional control</li>
+        <li>Climbing too high right after liftoff</li>
+        <li>Letting the airplane settle back onto the runway</li>
+        <li>Leaving ground effect before reaching climb speed</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Flaps 10°.</li>
+          <li>The POH says to lift off as soon as practical in a slightly tail-low attitude. With no obstacle ahead, level off right away to accelerate to a higher climb speed.</li>
+          <li>Flaps up once you're past 60 KIAS. V<sub>X</sub> 60, V<sub>Y</sub> 79 KIAS at sea level.</li>
+        </ul><p class="src">172R POH, Section 4, Wing Flap Settings</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>The manual says to use 10° of flaps for soft or rough fields. It never recommends 30° or 40° for takeoff.</li>
+          <li>V<sub>X</sub> 68, V<sub>Y</sub> 82 MPH at sea level.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>The POH has no soft-field takeoff procedure. Its two takeoffs are flaps up (normal) and flaps 25° (short field), so ask your instructor which setting to use.</li>
+          <li>V<sub>X</sub> 64, V<sub>Y</sub> 76 KIAS.</li>
+        </ul><p class="src">Pilot 100i POH, 4.5i and 4.5j</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Taxi into position and line up without stopping, while bringing the throttle smoothly to takeoff power.</li>
+        <li>Hold a pitch attitude that moves the weight from the wheels to the wings as quickly as possible.</li>
+        <li>Lift off at the lowest possible airspeed and stay in ground effect while accelerating to V<sub>X</sub> or V<sub>Y</sub>.</li>
+        <li>Climb at V<sub>X</sub> or V<sub>Y</sub>, +10/−5 knots, to a safe maneuvering altitude.</li>
+        <li>Clean up after a positive rate of climb, or the way the manufacturer says.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<h2 class="group">Landings</h2>
+
+<section class="mv" id="normal-landing">
+  <h3>Normal approach and landing</h3>
+  <p class="what">A steady approach to a touchdown on the main wheels, at the spot you picked.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Finish the before-landing checklist. On base, reduce power, add flaps, and descend, correcting for the wind.</li>
+        <li>On final, line up with the centerline, set your landing flaps, hold the approach speed, and trim.</li>
+        <li>Hold a steady glide path to your aiming point, using pitch and power together.</li>
+        <li>If the approach isn't stable by 500 ft above the airport, go around.</li>
+        <li>About 10 to 20 ft above the runway, start the round out with gradual back pressure. Look well down the runway, not just over the nose.</li>
+        <li>Keep raising the nose as the airplane slows, so it touches down on the main wheels at about stalling speed.</li>
+        <li>Hold the back pressure, let the nose wheel down gently, then brake as needed and keep it straight.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>An unstable approach</li>
+        <li>Not trimming on final</li>
+        <li>Trying to stretch the glide with the elevator alone</li>
+        <li>Looking too close or too far ahead, so the round out is too high or too low</li>
+        <li>Touching down before the airplane is in the landing attitude</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Any flap setting. 10° below 110 KIAS, more than 10° below 85 KIAS.</li>
+          <li>Approach at 65 to 75 KIAS with flaps up, or 60 to 70 KIAS with flaps 30°.</li>
+          <li>Touch down with the power off, main wheels first, then lower the nose wheel gently.</li>
+          <li>In a strong crosswind, use the least flap the runway length allows. Demonstrated crosswind is 15 knots.</li>
+        </ul><p class="src">172R POH, Section 4</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Any flap setting, below 100 MPH (87 knots).</li>
+          <li>Approach at 70 to 80 MPH with flaps up, or 65 to 75 MPH with flaps down.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>Fuel pump on, proper tank, mixture full rich. Flaps below 102 KIAS.</li>
+          <li>Initial approach at 75 to 95 KIAS. Final at 66 KIAS with flaps 40°.</li>
+          <li>The POH's normal technique is full flaps with enough power to hold speed and path, touching down close to stalling speed on the main wheels, then lowering the nose gently.</li>
+          <li>In a strong crosswind it may be better to use partial or no flaps and a higher speed.</li>
+        </ul><p class="src">Pilot 100i POH, 4.5m</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Checklist complete, radio calls made, lined up with the correct runway.</li>
+        <li>Pick a touchdown point that suits the wind, surface, and obstructions.</li>
+        <li>A stabilized approach in the recommended configuration, trimmed.</li>
+        <li>The manufacturer's approach speed, or without one no more than 1.3 V<sub>SO</sub>, held +10/−5 knots with the gust factor applied.</li>
+        <li>Touch down at a proper pitch attitude, on or within 400 ft beyond your point, with no side drift and the airplane lined up over the centerline.</li>
+        <li>Go around if you can't stay inside those limits.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="short-field-landing">
+  <h3>Short-field landing</h3>
+  <p class="what">A steeper approach over an obstacle, a touchdown with almost no float, and a short stop.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Fly a wider pattern with a longer final if you can. Start final at least 500 ft above the touchdown area.</li>
+        <li>Fly a power-on approach at the POH's short-field speed. Hold the descent angle and the speed with pitch and power together.</li>
+        <li>Once you're over the obstacle, reduce power a little and keep the speed.</li>
+        <li>Round out without chopping the power, so the airplane doesn't drop in.</li>
+        <li>Touch down at the slowest speed you can control, nose high, with as little float as possible.</li>
+        <li>Lower the nose wheel, then brake as hard as you need to with the yoke held full back.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>An unstable approach</li>
+        <li>Too slow on final, ending in a hard landing</li>
+        <li>Too fast on final, ending in a long float</li>
+        <li>Pulling the power to idle too early in the round out</li>
+        <li>Braking harder than the stop needs</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>62 KIAS with flaps 30°, using power to control the glide path. Fly a little faster in turbulence.</li>
+          <li>After the obstacle, reduce power bit by bit and hold the speed by lowering the nose.</li>
+          <li>Touch down with the power off, main wheels first. Lower the nose wheel right away and brake heavily.</li>
+          <li>For the most braking, retract the flaps and hold the control wheel full back.</li>
+        </ul><p class="src">172R POH, Section 4, Short Field Landing</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Flaps 40°.</li>
+          <li>The manual's short-field approach is 69 MPH indicated (60 knots), power off.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>The POH has no separate short-field landing procedure. Its final approach speed is 66 KIAS with flaps 40°.</li>
+          <li>It says braking works best with the flaps up and back pressure on the control wheel, which puts the weight on the main wheels.</li>
+        </ul><p class="src">Pilot 100i POH, 4.5m</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>A stabilized approach in the recommended configuration, trimmed.</li>
+        <li>The manufacturer's approach speed, or without one no more than 1.3 V<sub>SO</sub>, held +10/−5 knots with the gust factor applied.</li>
+        <li>Touch down at a proper pitch attitude, on or within 200 ft beyond the point, with no side drift, minimum float, and the airplane lined up over the centerline.</li>
+        <li>Use the manufacturer's recommended configuration and braking.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="soft-field-landing">
+  <h3>Soft-field landing</h3>
+  <p class="what">The gentlest touchdown you can make, with the weight kept off the nose wheel.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Fly a normal approach with flaps, at the same speed you'd use for a short field.</li>
+        <li>Keep a little power on through the round out.</li>
+        <li>Hold the airplane 1 to 2 ft off the surface, in ground effect, while the speed bleeds away.</li>
+        <li>Touch down as slowly as possible in a nose-high attitude.</li>
+        <li>Hold the nose wheel off with back pressure, then let it down gently. A touch of power helps.</li>
+        <li>Stay off the brakes, and keep enough power on to keep rolling until you're on firm ground.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Too fast or sinking too quickly on final</li>
+        <li>Rounding out too high</li>
+        <li>Poor use of power in the round out and touchdown</li>
+        <li>Letting the nose wheel drop after touchdown</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Approach at 60 to 70 KIAS with flaps 30°. The short-field speed is 62 KIAS.</li>
+          <li>The POH says to land on the main wheels first and lower the nose wheel gently once the speed is down, and calls that especially important on rough or soft fields.</li>
+        </ul><p class="src">172R POH, Section 4, Normal Landing</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Approach at 65 to 75 MPH with flaps down. The short-field speed is 69 MPH indicated with flaps 40°.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>The POH has no soft-field landing procedure. Final is 66 KIAS with flaps 40°.</li>
+          <li>Its normal technique already has you hold the nose wheel off as long as possible after touchdown.</li>
+        </ul><p class="src">Pilot 100i POH, 4.5m</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>A stabilized approach at the manufacturer's speed, or without one no more than 1.3 V<sub>SO</sub>, held +10/−5 knots with the gust factor applied.</li>
+        <li>Touch down at a proper pitch attitude with minimum sink rate, no side drift, and the airplane lined up with the center of the runway.</li>
+        <li>Keep the nose wheel off the surface until the elevator stops being effective.</li>
+        <li>Hold the elevator as the manufacturer recommends during the rollout, and leave the soft area fast enough not to sink in.</li>
+        <li>Keep the controls positioned and enough speed to taxi while you're on the soft surface.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="forward-slip">
+  <h3>Forward slip to a landing</h3>
+  <p class="what">Losing altitude quickly without gaining speed, by flying a little sideways through the air.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Plan the approach so you're high on final and need the slip. Bring the power to idle.</li>
+        <li>Lower one wing. If there's a crosswind, lower the wing on the upwind side.</li>
+        <li>Add opposite rudder to keep the airplane tracking straight down the extended centerline.</li>
+        <li>Control airspeed with pitch. More bank, with more rudder to match, gives a steeper descent.</li>
+        <li>Don't rely on the airspeed indicator: in some airplanes it reads well off in a slip. Fly by attitude, sound, and feel.</li>
+        <li>As you start the round out, take the slip out, line the nose up with the runway, and land normally.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Chasing the airspeed with pitch</li>
+        <li>Reacting to an airspeed reading that the slip has thrown off</li>
+        <li>Leaving too much power on</li>
+        <li>Slipping with the downwind wing lowered in a crosswind</li>
+        <li>Landing with the nose not lined up with the runway</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Avoid steep slips with more than 20° of flaps. The elevator can oscillate at some combinations of airspeed, slip angle, and CG.</li>
+          <li>With one fuel tank dry, a slip or skid can last no more than 30 seconds.</li>
+        </ul><p class="src">172R POH, Sections 2 and 4</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Avoid slips with more than 30° of flaps. The nose can pitch down at some combinations of airspeed, sideslip, and CG.</li>
+          <li>Keep the fuel selector on BOTH for long slips or skids.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>The POH's cautions about slips are about fuel. Avoid a prolonged slip or skid that loses more than 2,000 ft when the tank you're using isn't full, because it can uncover the fuel outlet.</li>
+          <li>With a low fuel alert, avoid long slips toward the low tank.</li>
+        </ul><p class="src">Pilot 100i POH, Sections 3 and 10</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Plan and fly a path to the landing area that allows for altitude, wind, terrain, and obstructions.</li>
+        <li>Fly downwind parallel to the runway, and configure the airplane correctly.</li>
+        <li>Slip in the direction the crosswind calls for, and change to a side slip before touchdown as needed.</li>
+        <li>Keep the ground track lined up with the runway centerline.</li>
+        <li>Touch down at a proper pitch attitude, on or within 400 ft beyond your point, with no side drift and the airplane lined up over the centerline.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="mv" id="go-around">
+  <h3>Go-around</h3>
+  <p class="what">Giving up the landing and climbing away. Decide early, then do it in this order: power, attitude, configuration.</p>
+  <div class="mv-grid">
+    <div class="how">
+      <h4>How to fly it</h4>
+      <ol>
+        <li>Decide early. If the approach or landing isn't working, go around.</li>
+        <li>Power: add full power smoothly. Carburetor heat off, if the airplane has it.</li>
+        <li>Attitude: stop the descent and set a safe climb attitude. Expect to push forward against the trim, and add right rudder.</li>
+        <li>Configuration: once the descent has stopped, bring the flaps up part way, in small steps, the way the POH says.</li>
+        <li>Climb at V<sub>X</sub> or V<sub>Y</sub> and trim. Don't climb out of ground effect before you have the speed.</li>
+        <li>Move to the side of the runway if you need to, so you can see and avoid traffic.</li>
+      </ol>
+      <details><summary>Common errors</summary><ul>
+        <li>Indecision, or starting the go-around late</li>
+        <li>Adding power late or abruptly</li>
+        <li>The wrong pitch attitude</li>
+        <li>Not cleaning up the airplane the way the POH says</li>
+      </ul></details>
+    </div>
+    <div class="cards">
+      <div class="card plane">
+        <div class="ac ac-c172r"><h4>Cessna 172R</h4><ul>
+          <li>Full power, then flaps to 20° immediately. Climb at 55 KIAS.</li>
+          <li>If there are obstacles, go to 10° and hold a safe speed until you're clear.</li>
+          <li>Flaps up once you're at a safe altitude and 60 KIAS.</li>
+          <li>Above 3,000 ft, lean for maximum RPM.</li>
+        </ul><p class="src">172R POH, Section 4, Balked Landing</p></div>
+        <div class="ac ac-c172k"><h4>Cessna 172K</h4><ul>
+          <li>Full power and flaps to 20° right away.</li>
+          <li>Retract the rest once you're clear of obstacles and accelerating.</li>
+        </ul><p class="src">1970 Owner's Manual, Section II</p></div>
+        <div class="ac ac-pa28-100i"><h4>Piper Pilot 100i</h4><ul>
+          <li>Mixture full rich, throttle full open, back pressure for a positive climb attitude, then flaps up in steps.</li>
+          <li>The POH keeps the mixture full rich and alternate air closed on approach so full power is there if you need it.</li>
+          <li>V<sub>X</sub> 64, V<sub>Y</sub> 76 KIAS.</li>
+        </ul><p class="src">Pilot 100i POH, 4.5m and 4.5n</p></div>
+      </div>
+      <div class="card std"><h4>Checkride standards</h4><ul>
+        <li>Make a timely decision to go around.</li>
+        <li>Takeoff power immediately, and a climb attitude for V<sub>X</sub> or V<sub>Y</sub>, +10/−5 knots.</li>
+        <li>Clean up after a positive rate of climb, or the way the manufacturer says.</li>
+        <li>Move to the side of the runway when you need to, to clear traffic.</li>
+        <li>V<sub>Y</sub>, +10/−5 knots, to a safe maneuvering altitude, with directional control and wind drift correction.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<div class="sources" id="sources">
+  <p>The steps are summarized from the FAA <a href="https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook">Airplane Flying Handbook</a> (FAA-H-8083-3C), chapters 5, 6, 7, 9, and 10. The checkride standards are shortened from the <a href="https://www.faa.gov/training_testing/testing/acs/private_airplane_acs_6.pdf">Private Pilot Airplane ACS</a> (FAA-S-ACS-6C, November 2023), so read the full task before a checkride.</p>
+  <p>Airplane numbers are from the <a href="https://www.tampabayaviation.com/wp-content/uploads/2023/11/Pilot-100i-e-POH.pdf">Pilot 100i POH</a> (VB-2960), the <a href="https://www.manualslib.com/manual/1384562/Cessna-172r.html">Cessna 172R POH</a> (Revision 7 pages), and the <a href="https://www.manualslib.com/manual/2001030/Cessna-Skyhawk-1970.html">1970 Cessna 172 Owner's Manual</a> with TCDS 3A12. More of each airplane's numbers are on its <a href="../aircraft/index.html">aircraft page</a>.</p>
+  <p>Where a manual gives no procedure for a maneuver, this page says so. Your instructor's procedures and the POH for the airplane you're flying come first.</p>
+</div>
+</div>
+</main>
+
+<footer class="site-foot">
+  <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
+</footer>
+<script src="../jump.js"></script>
+<script>
+// Airplane picker: shows one airplane's numbers on every maneuver. Add ?plane=c172k to a link to open on that airplane.
+(function () {
+  const main = document.querySelector('main'), seg = document.getElementById('acSeg');
+  const ids = [...seg.querySelectorAll('button')].map(b => b.dataset.ac);
+  function pick(id, save) {
+    if (!ids.includes(id)) return;
+    // keep the reader's place: the cards change height from one airplane to the next
+    const near = [...document.querySelectorAll('.mv')].find(s => s.getBoundingClientRect().bottom > 90), top = near ? near.getBoundingClientRect().top : 0;
+    main.dataset.ac = id;
+    seg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ac === id)));
+    if (near) scrollBy(0, near.getBoundingClientRect().top - top);
+    if (save) { try { localStorage.setItem('plane', id); } catch (e) { /* private window */ } }
+  }
+  let start = new URLSearchParams(location.search).get('plane');
+  if (!start) { try { start = localStorage.getItem('plane'); } catch (e) { /* private window */ } }
+  if (start) pick(start, false);
+  seg.addEventListener('click', e => { const b = e.target.closest('button'); if (b) pick(b.dataset.ac, true); });
+})();
+</script>
+</body>
+</html>
