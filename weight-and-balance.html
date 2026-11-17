@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Weight and balance</title>
-<meta name="description" content="What datum, arm, moment, and CG mean, and a step-by-step weight and balance walkthrough.">
+<meta name="description" content="Weight and balance calculator for the Piper Pilot 100i, Cessna 172R, and Cessna 172K, with each CG envelope and the method behind it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
@@ -20,6 +20,107 @@
 .chart .pt{fill:var(--accent)}
 .chart .pt-open{fill:var(--surface);stroke:var(--accent);stroke-width:2.5}
 .chart .ptlab{fill:var(--text);font-size:14px;font-weight:600}
+:root{--bad:#B3261E;--bad-soft:#FBE9E7}
+:root[data-theme="dark"]{--bad:#F2836B;--bad-soft:#3B211C}
+.wb-head{max-width:1200px;margin:0 auto;padding:40px 16px 0}
+.wb-head h1{font:700 clamp(2.6rem,7vw,4.2rem)/.95 var(--cond);margin:0;letter-spacing:-.02em}
+.wb-head .lede{font-size:1.2rem;color:var(--muted);margin:16px 0 0;max-width:62ch}
+.wb{max-width:1200px;margin:0 auto;padding:28px 16px 0}
+.wb-main{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:24px 40px;align-items:start;margin-top:22px}
+.wb-bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{font:600 1rem/1.15 var(--cond);color:var(--muted);background:none;border:0;border-right:1px solid var(--line);padding:11px 16px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--text);box-shadow:inset 0 -3px 0 var(--accent)}
+.seg button:focus-visible{outline-offset:-3px}
+.tick{display:inline-flex;align-items:center;gap:9px;font:600 1rem/1.2 var(--cond);cursor:pointer}
+.tick input{width:19px;height:19px;margin:0;accent-color:var(--accent)}
+
+.load{width:100%;min-width:0;table-layout:fixed;border:0;border-collapse:collapse;background:none;font-family:var(--cond)}
+table.load:has(thead){min-width:0}
+.load .ci{width:auto}.load .co{width:22px}.load .cw{width:21%}.load .ca{width:17%}.load .cm{width:24%}
+.load th,.load td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle;text-align:right;font-variant-numeric:tabular-nums}
+.load thead th{background:none;color:var(--muted);font:600 .92rem/1.2 var(--cond);border-bottom:3px solid var(--text);padding-bottom:9px}
+.load thead th small{font:500 .82rem/1 var(--cond);margin-left:5px}
+.load .item{text-align:left;font:600 1.04rem/1.2 var(--cond);padding-left:0}
+.load .item small{display:block;font:500 .86rem/1.3 var(--cond);color:var(--muted);margin-top:2px}
+.load .op{text-align:center;color:var(--muted);padding:0;font-weight:600}
+.load input[type="text"]{width:100%;font:600 1rem/1.1 var(--cond);font-variant-numeric:tabular-nums;text-align:right;padding:8px 7px;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:5px}
+.load input[type="text"]::placeholder{color:var(--muted);opacity:.7;font-weight:500}
+.load input[type="text"]:focus{outline:2px solid var(--focus);outline-offset:0;border-color:transparent}
+.load input.err{border-color:var(--bad)}
+.load input.good{border-color:var(--ok)}
+.load .gal{display:flex;align-items:center;gap:6px;margin-top:5px;font:500 .9rem/1 var(--cond);color:var(--muted)}
+.load .gal input[type="text"]{width:64px}
+.load tr.sum th,.load tr.sum td{border-top:3px solid var(--text);font-weight:700;font-size:1.1rem;padding-top:11px;padding-bottom:11px}
+.load tr.sum .cgv small{font:600 .8rem/1 var(--cond);color:var(--muted);margin-right:5px}
+.load td.calc{color:var(--text)}
+.load td.dim{color:var(--muted)}
+.load tr.over td.w,.load tr.over td.cgv{color:var(--bad)}
+.load tr.rec td{text-align:left;padding:10px 0}
+.load tr.rec label{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font:600 1rem/1.2 var(--cond)}
+.load select{flex:1 1 220px;min-width:0;font:600 1rem/1.2 var(--cond);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:9px 8px}
+.load .tick{font-size:.9rem;font-weight:500;color:var(--muted);margin-top:5px;gap:7px}
+.load .tick input{width:16px;height:16px}
+.sheet-foot{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px}
+.btn{font:600 .98rem/1 var(--cond);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.sheet-foot p{margin:0;font-size:.92rem;color:var(--muted)}
+
+.side{display:grid;gap:14px}
+@media (min-width:901px) and (min-height:780px){.side{position:sticky;top:12px}}
+.verdict{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:6px;background:var(--surface);padding:12px 16px}
+.verdict b{display:block;font:700 1.45rem/1.1 var(--cond)}
+.verdict span{display:block;margin-top:3px;font-size:.95rem;color:var(--muted)}
+.verdict.ok{border-left-color:var(--ok)}.verdict.ok b{color:var(--ok)}
+.verdict.bad{border-left-color:var(--bad);background:var(--bad-soft)}.verdict.bad b{color:var(--bad)}
+.envbox{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:12px 12px 10px}
+.env-chart{display:block;width:100%;height:auto;font-family:var(--cond)}
+.env-chart .g{stroke:var(--line);stroke-width:1;fill:none}
+.env-chart .ax{fill:var(--muted);font-size:12.5px}
+.env-chart .cap{fill:var(--muted);font-size:12.5px;font-weight:600}
+.env-chart .halo{paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
+.env-chart .ttl{fill:var(--text);font-size:13px;font-weight:700}
+.env-chart .env{fill:var(--chart-faint);stroke:var(--chart);stroke-width:2.5;stroke-linejoin:round}
+.env-chart .util{fill:var(--chart-faint);stroke:var(--chart);stroke-width:1.8;stroke-linejoin:round}
+.env-chart .off{fill:none;stroke-dasharray:5 4;stroke-width:1.5}
+.env-chart .lab{fill:var(--chart);font-size:13px;font-weight:600}
+.env-chart .trail{stroke:var(--text);stroke-width:1.5;stroke-dasharray:4 4;fill:none;opacity:.7}
+.env-chart .pt{fill:var(--text);stroke:var(--surface);stroke-width:2}
+.env-chart .pt.hollow{fill:var(--surface);stroke:var(--text);stroke-width:2.5}
+.env-chart .pt.out{fill:var(--bad)}.env-chart .pt.hollow.out{fill:var(--surface);stroke:var(--bad)}
+.pts{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px;font:500 .95rem/1.3 var(--cond);font-variant-numeric:tabular-nums}
+.pts li{display:grid;grid-template-columns:20px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:3px 2px}
+.pts svg{width:16px;height:16px}
+.pts .out{color:var(--bad);font-weight:600}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.wb [hidden]{display:none}
+.checks li{border-left:4px solid var(--bad);background:var(--bad-soft);border-radius:0 6px 6px 0;padding:9px 14px;font-size:.98rem;line-height:1.4}
+.checks li.note{border-left-color:var(--muted);background:var(--surface)}
+.notes{margin-top:26px;border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font-size:.95rem;max-width:none}
+.notes p{margin:0 0 8px;max-width:95ch}
+.notes strong{color:var(--text);font-weight:600}
+.formulas{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 40px}
+.formulas ul{margin:0}
+@media (max-width:900px){
+  .wb{padding-top:20px}
+  .wb-main{grid-template-columns:minmax(0,1fr);gap:18px;margin-top:16px}
+  .side{display:contents}
+  .verdict{order:1;position:sticky;top:0;z-index:5;margin:0 -16px;border-radius:0;border-width:0 0 1px 0;border-left:5px solid var(--muted);padding:9px 16px 9px 11px;box-shadow:0 6px 14px rgba(0,0,0,.25)}
+  .verdict b{font-size:1.2rem}.verdict span{font-size:.9rem;margin-top:1px}
+  .sheet{order:2}.checks{order:3}.envbox{order:4}
+  .formulas{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:520px){
+  .seg{display:flex;width:100%}.seg button{flex:1;padding:11px 6px}
+  .load th,.load td{padding:6px 3px}
+  .load .co{width:16px}.load .cw{width:22%}.load .ca{width:17%}.load .cm{width:25%}
+  .load input[type="text"]{padding:8px 5px}
+  .load .item{font-size:1rem}
+  .load thead th small{display:block;margin:2px 0 0}
+  .load tr.sum th,.load tr.sum td{font-size:1.04rem}
+}
 </style>
 </head>
 <body>
@@ -51,10 +152,73 @@
   </div>
 </header>
 
-<main class="page page-single">
+<main>
+<div class="wb-head">
+  <h1>Weight and balance</h1>
+  <p class="lede">Load the airplane, then check its weights and CG against the limits.</p>
+</div>
+
+<section class="wb" id="tool" aria-label="Weight and balance calculator">
+  <div class="wb-bar">
+    <div class="seg" id="acSeg" role="group" aria-label="Airplane"></div>
+    <div class="seg" id="catSeg" role="group" aria-label="Category" hidden>
+      <button type="button" data-cat="normal">Normal category</button><button type="button" data-cat="utility">Utility category</button>
+    </div>
+    <label class="tick"><input type="checkbox" id="fill" checked> Fill in the arms for me</label>
+  </div>
+
+  <div class="wb-main">
+  <div class="sheet">
+    <table class="load">
+      <colgroup><col class="ci"><col class="co"><col class="cw"><col class="ca"><col class="cm"></colgroup>
+      <thead><tr><th class="item" scope="col">Item</th><th></th><th scope="col">Weight<small>lb</small></th><th scope="col">Arm<small>in</small></th><th scope="col">Moment<small>lb-in</small></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="sheet-foot"><button type="button" class="btn" id="clear">Clear the table</button><p id="room"></p></div>
+  </div>
+
+  <div class="side">
+    <div class="verdict" id="verdict" role="status" aria-live="polite"><b></b><span></span></div>
+    <ul class="checks" id="checks" aria-label="Problems found"></ul>
+    <div class="envbox">
+      <svg class="env-chart" id="env" role="img" aria-label="CG envelope"></svg>
+      <ul class="pts" id="pts"></ul>
+    </div>
+  </div>
+  </div>
+
+  <div class="notes" id="notes"></div>
+</section>
+
+<div class="page page-single">
   <article>
-    <h1>Weight and balance</h1>
-    <p class="lede">How to check that the airplane isn't too heavy and that the weight is in the right place.</p>
+    <h2 id="formulas">Formulas</h2>
+    <div class="formulas">
+      <div>
+        <h3>Weight and balance</h3>
+        <ul>
+          <li>Weight × arm = moment</li>
+          <li>Total moment ÷ total weight = CG</li>
+          <li>Maximum ramp weight − zero fuel weight = usable fuel weight</li>
+          <li>Useful load = maximum weight − basic empty weight</li>
+          <li>Fuel weighs 6 lb per gallon. Oil weighs 7.5 lb per gallon, or 1.875 lb per quart.</li>
+          <li>Takeoff weight − fuel burn = landing weight</li>
+          <li>Weight shift: CG change = (weight moved × distance moved) ÷ total weight</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Performance</h3>
+        <ul>
+          <li>Pressure altitude = field elevation + (29.92 − altimeter setting) × 1,000</li>
+          <li>Standard temperature (°C) = 15 − (2 × pressure altitude in thousands of feet)</li>
+          <li>Density altitude ≈ pressure altitude + 120 × (OAT − standard temperature)</li>
+          <li>V<sub>A</sub> at weight ≈ V<sub>A</sub> at maximum weight × √(actual weight ÷ maximum weight). When the POH publishes a value, use that.</li>
+          <li>Headwind = wind speed × cos(angle between the wind and the runway)</li>
+          <li>Crosswind = wind speed × sin(angle between the wind and the runway)</li>
+          <li>Crosswind rule of thumb: 30° is 0.5 of the wind, 45° is 0.7, and 60° is 0.9.</li>
+        </ul>
+      </div>
+    </div>
 
     <h2 id="why">Why it matters</h2>
     <h3>Too heavy</h3>
@@ -187,12 +351,394 @@
       <li>FAA-H-8083-25C, Pilot's Handbook of Aeronautical Knowledge, Chapter 10</li>
     </ul>
   </article>
+</div>
 </main>
 
 <footer class="site-foot">
   <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
 </footer>
 
+<script src="wb-data.js"></script>
+<script>
+// Weight and balance calculator. Every arm, limit, and envelope point comes from wb-data.js.
+(function () {
+'use strict';
+const D = window.WB_DATA, $ = id => document.getElementById(id);
+const GAL = D.fuel_lb_per_gal;
+const fmt = (v, d) => v.toLocaleString('en-US', { maximumFractionDigits: d || 0 }).replace('-', '−');
+const num = s => { s = String(s == null ? '' : s).replace(/,/g, '').trim(); if (!s) return null; const v = Number(s); return Number.isFinite(v) ? v : NaN; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sentence = s => s.charAt(0) + s.slice(1).toLowerCase();
+const shortName = a => a.name.replace(/ Skyhawk$/, '');
+const loadSt = a => a.stations.filter(s => s.id !== 'fuel');
+const fuelSt = a => a.stations.find(s => s.id === 'fuel');
+const narrow = matchMedia('(max-width: 520px)');
+const tailsOf = a => D.tails.map((t, i) => Object.assign({ i: String(i) }, t)).filter(t => t.aircraft === a.id && t.bew);
+const dateText = iso => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+
+// One loading per airplane, kept while the page is open
+const ST = {};
+let fill = true, cur = D.aircraft.find(a => '#' + a.id === location.hash) || D.aircraft[0];
+const tailLabel = t => t.label || (t.n_number ? t.n_number + ', record' : 'Airplane record') + (t.record_date ? ' dated ' + dateText(t.record_date) : '');
+// Fills the basic empty weight from a stored record, or blanks it for typing
+function useTail(s, t) {
+  s.tail = t ? t.i : ''; s.bew = s.bewArm = s.bewMom = ''; s.bewBy = '';
+  if (!t) return;
+  s.bew = String(t.bew);
+  if (t.bew_moment) { s.bewMom = fmt(t.bew_moment, 2); s.bewArm = t.bew_arm ? String(+t.bew_arm.toFixed(2)) : (t.bew_moment / t.bew).toFixed(2); s.bewBy = 'mom'; }
+  else if (t.bew_arm) { s.bewArm = String(t.bew_arm); s.bewMom = fmt(t.bew * t.bew_arm, 1); s.bewBy = 'arm'; }
+}
+function st(a) {
+  if (!ST[a.id]) {
+    ST[a.id] = { cat: 'normal', tail: '', bew: '', bewArm: '', bewMom: '', bewBy: '', w: {}, arm: {}, seat: '',
+      fuel: '', taxi: a.taxi_fuel_lb == null ? '' : String(a.taxi_fuel_lb), burn: '', oilIn: false };
+    useTail(ST[a.id], tailsOf(a)[0]);
+  }
+  return ST[a.id];
+}
+
+// The arm in use for a row, and whether a typed arm is acceptable.
+// state: ok, blank, bad (not a number), wrong (does not match the data), range (outside the seat travel)
+function armOf(a, s, k) {
+  const sta = k === 'oil' ? a.oil : a.stations.find(x => x.id === k);
+  const seat = k === 'front' && sta.range;
+  if (fill) {
+    if (!seat || s.seat === '') return { v: sta.arm, state: 'ok' };
+    const v = num(s.seat);
+    if (v === null) return { v: sta.arm, state: 'ok' };
+    if (Number.isNaN(v)) return { v: null, state: 'bad' };
+    return { v, state: v < sta.range[0] || v > sta.range[1] ? 'range' : 'ok' };
+  }
+  const v = num(s.arm[k]);
+  if (v === null) return { v: null, state: 'blank' };
+  if (Number.isNaN(v)) return { v: null, state: 'bad' };
+  const match = seat ? v >= sta.range[0] && v <= sta.range[1] : Math.abs(v - sta.arm) < 0.051;
+  return { v, state: match ? 'ok' : 'wrong' };
+}
+
+// Forward and aft CG limits at a weight, read off the envelope polygon ([cg, weight] points)
+function limitsAt(poly, w) {
+  const ys = poly.map(p => p[1]), y = Math.min(Math.max(w, Math.min(...ys)), Math.max(...ys)), xs = [];
+  poly.forEach((p, i) => {
+    const q = poly[(i + 1) % poly.length];
+    if (p[1] === q[1]) { if (p[1] === y) xs.push(p[0], q[0]); }
+    else if ((y - p[1]) * (y - q[1]) <= 0) xs.push(p[0] + (y - p[1]) * (q[0] - p[0]) / (q[1] - p[1]));
+  });
+  return [Math.min(...xs), Math.max(...xs)];
+}
+
+const input = (k, label, val, ph) => `<input type="text" inputmode="decimal" autocomplete="off" data-k="${k}" aria-label="${esc(label)}" value="${esc(val)}"${ph ? ` placeholder="${ph}"` : ''}>`;
+
+function armCell(a, s, k, label) {
+  const sta = k === 'oil' ? a.oil : a.stations.find(x => x.id === k);
+  if (!fill) return `<td>${input('arm:' + k, label + ' arm, inches', s.arm[k] || '')}</td>`;
+  if (k === 'front' && sta.range) return `<td>${input('seat', label + ' arm, inches', s.seat === '' ? String(sta.arm) : s.seat)}</td>`;
+  return `<td class="calc">${fmt(sta.arm, 1)}</td>`;
+}
+
+function buildRows() {
+  const a = cur, s = st(a), F = fuelSt(a), tails = tailsOf(a);
+  let h = '';
+  if (tails.length) h += `<tr class="rec"><td colspan="5"><label>Empty weight from <select data-k="tail">${tails.map(t =>
+    `<option value="${t.i}"${s.tail === t.i ? ' selected' : ''}>${esc(tailLabel(t))}</option>`).join('')}<option value=""${s.tail === '' ? ' selected' : ''}>My own numbers</option></select></label></td></tr>`;
+  h += `<tr data-row="bew"><th class="item" scope="row">Basic empty weight<small data-bewsub></small></th><td class="op"></td>
+    <td>${input('bew', 'Basic empty weight, pounds', s.bew)}</td><td>${input('bewArm', 'Basic empty weight arm, inches', s.bewArm)}</td><td>${input('bewMom', 'Basic empty weight moment, pound-inches', s.bewMom)}</td></tr>`;
+  if (!a.oil.in_bew) h += `<tr data-row="oil"><th class="item" scope="row">Oil<small>${fmt(a.oil.weight / (D.oil_lb_per_gal / 4), 1)} qt</small>
+    <label class="tick"><input type="checkbox" data-k="oilIn"${s.oilIn ? ' checked' : ''}> Already in the empty weight</label></th><td class="op">+</td>
+    <td class="calc w" data-w="oil"></td>${armCell(a, s, 'oil', 'Oil')}<td class="calc" data-m="oil"></td></tr>`;
+  loadSt(a).forEach(x => {
+    const label = sentence(x.label);
+    h += `<tr data-row="${x.id}"><th class="item" scope="row">${esc(label)}${x.max ? `<small>${x.max} lb max</small>` : ''}</th><td class="op">+</td>
+      <td>${input('w:' + x.id, label + ' weight, pounds', s.w[x.id] || '')}</td>${armCell(a, s, x.id, label)}<td class="calc" data-m="${x.id}"></td></tr>`;
+  });
+  const sum = (k, label, cg) => `<tr class="sum" data-row="${k}"><th class="item" scope="row">${label}</th><td class="op">=</td><td class="w" data-w="${k}"></td><td class="cgv" data-cg="${cg ? k : ''}"></td><td data-m="${k}"></td></tr>`;
+  h += sum('zfw', 'Zero fuel weight', true);
+  h += `<tr data-row="fuel"><th class="item" scope="row">Usable fuel<small>${F.max_gal} gal max</small><span class="gal">${input('fuel', 'Usable fuel, gallons', s.fuel)} gal</span></th><td class="op">+</td>
+    <td class="calc w" data-w="fuel"></td>${armCell(a, s, 'fuel', 'Fuel')}<td class="calc" data-m="fuel"></td></tr>`;
+  h += sum('ramp', 'Ramp weight', false);
+  h += `<tr data-row="taxi"><th class="item" scope="row">Taxi fuel${a.taxi_fuel_lb == null ? '<small>If you allow for it</small>' : ''}</th><td class="op">−</td>
+    <td>${input('taxi', 'Taxi fuel, pounds', s.taxi)}</td><td class="dim" data-fa></td><td class="calc" data-m="taxi"></td></tr>`;
+  h += sum('to', 'Takeoff weight', true);
+  h += `<tr data-row="burn"><th class="item" scope="row">Fuel burn<span class="gal">${input('burn', 'Fuel burn, gallons', s.burn)} gal</span></th><td class="op">−</td>
+    <td class="calc w" data-w="burn"></td><td class="dim" data-fa></td><td class="calc" data-m="burn"></td></tr>`;
+  h += sum('ldg', 'Landing weight', true);
+  $('rows').innerHTML = h;
+}
+
+// Works the loading table. Returns the row weights and moments, the three points, and every problem found.
+function compute(a, s) {
+  const F = fuelSt(a), r = { w: {}, m: {}, arm: {}, pts: [], bad: [], entry: [], notes: [], miss: [], badInput: false };
+  const val = (k, raw) => { const v = num(raw); if (Number.isNaN(v) || v < 0) { r.badInput = true; return 0; } return v || 0; };
+  const cat = a.limits[s.cat] ? s.cat : 'normal', L = a.limits[cat], poly = a.envelope[cat];
+  r.cat = cat;
+
+  // Basic empty weight: the weight plus whichever of arm or moment was typed
+  const bw = num(s.bew), ba = num(s.bewArm), bm = num(s.bewMom);
+  if ([bw, ba, bm].some(Number.isNaN)) r.badInput = true;
+  let bewM = null;
+  if (bw > 0) bewM = s.bewBy === 'arm' ? (ba > 0 ? bw * ba : null) : (bm > 0 ? bm : (ba > 0 ? bw * ba : null));
+  r.bewReady = bw > 0 && bewM != null;
+
+  // Rows that add to the zero fuel weight
+  let W = r.bewReady ? bw : 0, M = r.bewReady ? bewM : 0;
+  const add = (k, label, w) => {
+    const ar = armOf(a, s, k); r.arm[k] = ar; r.w[k] = w;
+    if (ar.state === 'bad') r.badInput = true;
+    if (ar.state === 'wrong') r.entry.push(`The arm you entered for ${label} doesn't match the POH.`);
+    if (ar.state === 'range') { const g = a.stations.find(x => x.id === k).range; r.entry.push(`The ${label} arm has to be between ${g[0]} and ${g[1]} in, the seat travel.`); }
+    if (ar.v == null) { r.m[k] = null; if (w > 0) r.miss.push(label); return; }
+    r.m[k] = w * ar.v; W += w; M += w * ar.v;
+  };
+  if (!a.oil.in_bew) add('oil', 'oil', s.oilIn ? 0 : a.oil.weight);
+  loadSt(a).forEach(x => add(x.id, sentence(x.label).toLowerCase(), val(x.id, s.w[x.id])));
+  const zf = { w: W, m: M };
+
+  // Fuel on, taxi fuel off, fuel burn off, all at the fuel arm
+  const gal = val('fuel', s.fuel), taxiIn = val('taxi', s.taxi), taxi = gal > 0 ? taxiIn : 0, burnGal = val('burn', s.burn);
+  const fa = armOf(a, s, 'fuel'); r.arm.fuel = fa;
+  if (fa.state === 'bad') r.badInput = true;
+  if (fa.state === 'wrong') r.entry.push("The arm you entered for fuel doesn't match the POH.");
+  if (fa.v == null && (gal > 0 || taxi > 0 || burnGal > 0)) r.miss.push('fuel');
+  const fArm = fa.v == null ? 0 : fa.v;
+  r.w.fuel = gal * GAL; r.w.taxi = taxi; r.w.burn = burnGal * GAL;
+  r.m.fuel = fa.v == null ? null : r.w.fuel * fArm; r.m.taxi = fa.v == null ? null : taxi * fArm; r.m.burn = fa.v == null ? null : r.w.burn * fArm;
+  const ramp = { w: zf.w + r.w.fuel, m: zf.m + r.w.fuel * fArm };
+  const to = { w: ramp.w - taxi, m: ramp.m - taxi * fArm };
+  const ld = { w: to.w - r.w.burn, m: to.m - r.w.burn * fArm };
+  r.tot = { zfw: zf, ramp, to, ldg: ld };
+  r.ready = r.bewReady && !r.miss.length;
+
+  // Problems that don't need the totals
+  loadSt(a).forEach(x => { if (x.max && r.w[x.id] > x.max) r.bad.push(`${sentence(x.label)} has ${fmt(r.w[x.id], 1)} lb. Its maximum is ${x.max} lb.`); });
+  a.combined_limits.forEach(c => { const t = c.stations.reduce((n, id) => n + (r.w[id] || 0), 0); if (t > c.max) r.bad.push(`${sentence(c.label)}: ${fmt(t, 1)} lb is more than the ${c.max} lb maximum.`); });
+  if (gal > F.max_gal) r.bad.push(`${fmt(gal, 1)} gal of fuel is more than the ${F.max_gal} gal of usable fuel the tanks hold.`);
+  if (cat === 'utility' && loadSt(a).some(x => x.id !== 'front' && r.w[x.id] > 0)) r.bad.push('In the utility category the rear seat and the baggage area have to be empty.');
+  if (taxi + r.w.burn > r.w.fuel + 1e-9) r.entry.push(`Taxi fuel and fuel burn add up to ${fmt(taxi + r.w.burn, 1)} lb, which is more than the ${fmt(r.w.fuel, 1)} lb of fuel on board.`);
+  if (r.badInput) r.entry.push('One of the entries isn\'t a number the table can use.');
+
+  if (r.ready) {
+    // Weights
+    const over = (name, w, max) => { if (max != null && w > max + 1e-9) r.bad.push(`${name} weight is ${fmt(w, 1)} lb, which is ${fmt(w - max, 1)} lb over the ${fmt(max)} lb maximum${cat === 'utility' ? ' for the utility category' : ''}.`); };
+    over('Ramp', ramp.w, L.max_ramp); over('Takeoff', to.w, L.max_takeoff); if (r.w.burn > 0) over('Landing', ld.w, L.max_landing != null ? L.max_landing : L.max_takeoff);
+    // CG at the three points
+    [['zfw', 'Zero fuel', zf], ['to', 'Takeoff', to], ['ldg', 'Landing', ld]].forEach(([k, name, t]) => {
+      const cg = t.m / t.w, cgr = Math.round(cg * 10) / 10, lim = limitsAt(poly, t.w);
+      const side = v => v < lim[0] - 1e-9 ? 'fwd' : v > lim[1] + 1e-9 ? 'aft' : '';
+      const out = side(cgr), raw = side(cg);
+      r.pts.push({ k, name, w: t.w, cg, lim, out });
+      if (k === 'ldg' && !(r.w.burn > 0)) return;
+      if (!out && raw) r.notes.push(`${name} CG ${cg.toFixed(2)} in is checked as ${cgr.toFixed(1)} in, because CG is rounded to the nearest 0.1 in, as the POH does. That puts it just inside the ${fmt(lim[raw === 'fwd' ? 0 : 1], 2)} in ${raw === 'fwd' ? 'forward' : 'aft'} limit.`);
+      if (out === 'fwd') r.bad.push(`${name} CG is ${cg.toFixed(2)} in, forward of the ${fmt(lim[0], 2)} in forward limit at ${fmt(t.w)} lb.`);
+      if (out === 'aft') r.bad.push(`${name} CG is ${cg.toFixed(2)} in, aft of the ${fmt(lim[1], 2)} in aft limit.`);
+    });
+    const cap = L.max_ramp != null ? L.max_ramp : L.max_takeoff;
+    r.room = cap - zf.w;
+  }
+  return r;
+}
+
+// Point markers: zero fuel is a diamond, takeoff a filled dot, landing a ring
+function marker(k, x, y, out) {
+  const c = out ? ' out' : '';
+  if (k === 'zfw') return `<path class="pt hollow${c}" d="M${x} ${y - 7}L${x + 7} ${y}L${x} ${y + 7}L${x - 7} ${y}Z"/>`;
+  return `<circle class="pt${k === 'ldg' ? ' hollow' : ''}${c}" cx="${x}" cy="${y}" r="${k === 'ldg' ? 5.5 : 6.5}"/>`;
+}
+function plotPoints(pts, xy) {
+  if (!pts.length) return '';
+  const order = ['zfw', 'ldg', 'to'].map(k => pts.find(p => p.k === k)).map(p => xy(p.cg, p.w));
+  return `<polyline class="trail" points="${order.map(p => p.join(',')).join(' ')}"/>` + pts.map(p => { const q = xy(p.cg, p.w); return marker(p.k, q[0], q[1], p.out); }).join('');
+}
+const pathOf = (poly, xy) => 'M' + poly.map(p => xy(p[0], p[1]).map(n => n.toFixed(1)).join(' ')).join('L') + 'Z';
+
+// Cessna charts: CG across, weight up, with the utility category box inside the normal envelope
+function chartLinear(a, cat, pts) {
+  const ax = a.envelope.chart_axes, W = narrow.matches ? 390 : 520, H = narrow.matches ? 400 : 440, L = 54, R = W - 12, T = 12, B = H - 48;
+  const cl = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+  const x = cg => L + (cl(cg, ax.cg_min, ax.cg_max) - ax.cg_min) / (ax.cg_max - ax.cg_min) * (R - L);
+  const y = w => B - (cl(w, ax.wt_min, ax.wt_max) - ax.wt_min) / (ax.wt_max - ax.wt_min) * (B - T);
+  const xy = (cg, w) => [x(cg), y(w)];
+  let s = '';
+  for (let c = ax.cg_min; c <= ax.cg_max; c++) s += `<path class="g" d="M${x(c)} ${T}V${B}"/><text class="ax" x="${x(c)}" y="${B + 17}" text-anchor="middle">${c}</text>`;
+  for (let w = ax.wt_min; w <= ax.wt_max; w += 100) s += `<path class="g" d="M${L} ${y(w)}H${R}"/><text class="ax" x="${L - 8}" y="${y(w)}" text-anchor="end" dominant-baseline="central">${fmt(w)}</text>`;
+  s += `<text class="cap" x="${(L + R) / 2}" y="${H - 8}" text-anchor="middle">CG, inches aft of datum</text>`;
+  s += `<text class="cap" transform="translate(11 ${(T + B) / 2}) rotate(-90)" text-anchor="middle">Weight, lb</text>`;
+  const N = a.envelope.normal, U = a.envelope.utility;
+  s += `<path class="env${cat === 'utility' ? ' off' : ''}" d="${pathOf(N, xy)}"/>`;
+  if (U) s += `<path class="${cat === 'utility' ? 'env' : 'util'}" d="${pathOf(U, xy)}"/>`;
+  const nAft = Math.max(...N.map(p => p[0])), nTop = Math.max(...N.map(p => p[1]));
+  const uAft = U ? Math.max(...U.map(p => p[0])) : Math.min(...N.map(p => p[0])), uTop = U ? Math.max(...U.map(p => p[1])) : nTop;
+  s += `<text class="lab" x="${x((uAft + nAft) / 2)}" y="${B - 12}" text-anchor="middle">Normal category</text>`;
+  if (U) s += `<text class="lab" x="${x((Math.min(...U.map(p => p[0])) + uAft) / 2)}" y="${B - 12}" text-anchor="middle">Utility category</text>`;
+  s += plotPoints(pts, xy);
+  return { w: W, h: H, html: s };
+}
+
+// Pilot 100i chart, laid out like POH Figure 6-15: the constant-CG lines fan out as weight goes up
+function chartFan(a, pts) {
+  const ax = a.envelope.chart_axes, f = a.envelope.fan, P = a.envelope.normal, W = narrow.matches ? 400 : 520, H = narrow.matches ? 480 : 520, T = 64, B = H - 56, left = 30, right = W - 84;
+  const wMin = ax.wt_min, wTop = Math.max(...P.map(p => p[1]));
+  const u = (cg, w) => (w - f.w0) * (cg - f.pivot), us = P.map(p => u(p[0], p[1]));
+  const K = (right - left) / (Math.max(...us) - Math.min(...us)), xc = left - K * Math.min(...us);
+  const y = w => B - (Math.min(Math.max(w, ax.wt_min), ax.wt_max) - ax.wt_min) / (ax.wt_max - ax.wt_min) * (B - T);
+  const xy = (cg, w) => [Math.min(Math.max(xc + K * u(cg, Math.min(Math.max(w, ax.wt_min), ax.wt_max)), 6), W - 6), y(w)];
+  const pt = (cg, w) => xy(cg, w).map(n => n.toFixed(1)).join(' ');
+  // Highest weight at which a CG is still on or behind the forward limit
+  const topOf = c => { let lo = wMin, hi = wTop; if (limitsAt(P, hi)[0] <= c + 1e-9) return hi; for (let i = 0; i < 40; i++) { const mid = (lo + hi) / 2; if (limitsAt(P, mid)[0] <= c + 1e-9) lo = mid; else hi = mid; } return lo; };
+  let s = '';
+  for (let w = wMin; w < wTop; w += 100) { const lim = limitsAt(P, w); s += `<path class="g" d="M${pt(lim[0], w)}L${pt(lim[1], w)}"/>`; }
+  for (let c = Math.ceil(ax.cg_min); c <= ax.cg_max; c++) {
+    const top = topOf(c), b = xy(c, wMin), t = xy(c, top);
+    s += `<path class="g" d="M${pt(c, wMin)}L${pt(c, top)}"/><text class="ax" x="${b[0]}" y="${B + 16}" text-anchor="middle">${c}</text>`;
+    s += top < wTop - 1 ? `<text class="ax" x="${t[0] - 7}" y="${t[1] - 5}" text-anchor="end">${c}</text>` : `<text class="ax" x="${t[0]}" y="${t[1] - 8}" text-anchor="middle">${c}</text>`;
+  }
+  s += `<path class="env" d="${pathOf(P, xy)}"/>`;
+  // Weight scale on the right
+  const sx = right + 26;
+  s += `<path class="g" d="M${sx} ${y(ax.wt_max)}V${y(ax.wt_min)}" style="stroke:var(--muted)"/>`;
+  for (let w = ax.wt_min; w <= ax.wt_max; w += f.tick) { const big = w % 100 === 0; s += `<path class="g" d="M${sx} ${y(w)}h${big ? 9 : 5}" style="stroke:var(--muted)"/>` + (big ? `<text class="ax" x="${sx + 13}" y="${y(w)}" dominant-baseline="central">${w}</text>` : ''); }
+  s += `<text class="cap" transform="translate(${sx - 9} ${y((ax.wt_min + wTop) / 2 - 250)}) rotate(-90)" text-anchor="middle">AIRPLANE WEIGHT - LBS.</text>`;
+  s += `<text class="cap" x="${(xy(ax.cg_min, wMin)[0] + xy(ax.cg_max, wMin)[0]) / 2}" y="${H - 8}" text-anchor="middle">C.G. LOCATION (INCHES AFT DATUM)</text>`;
+  // Captions along the forward and aft limit lines
+  const along = (cg, w, off, text) => { const p = xy(cg, w), q = xy(cg, w + 100), ang = Math.atan2(q[1] - p[1], q[0] - p[0]) * 180 / Math.PI;
+    return `<text class="cap halo" transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)}) rotate(${ang.toFixed(1)}) translate(0 ${off})" text-anchor="middle">${text}</text>`; };
+  const fwd = Math.min(...P.map(p => p[0])), aft = Math.max(...P.map(p => p[0])), knee = Math.max(...P.filter(p => p[0] === fwd).map(p => p[1]));
+  s += along(fwd, (wMin + knee) / 2, -7, `FWD. LIMIT ${fwd}`) + along(aft, (wMin + knee) / 2, -7, `AFT LIMIT ${aft}`);
+  s += `<text class="ttl" x="4" y="16">WEIGHT VS. C.G. ENVELOPE</text><text class="ttl" x="4" y="33">${a.limits.normal.max_takeoff} LBS. MAX. GROSS WT.</text>`;
+  s += plotPoints(pts, xy);
+  return { w: W, h: H, html: s };
+}
+
+const LEGEND = { zfw: 'Zero fuel', to: 'Takeoff', ldg: 'Landing' };
+function drawChart(a, r) {
+  const c = a.envelope.fan ? chartFan(a, r.pts) : chartLinear(a, r.cat, r.pts);
+  const svg = $('env'); svg.setAttribute('viewBox', `0 0 ${c.w} ${c.h}`); svg.innerHTML = c.html;
+  svg.setAttribute('aria-label', `CG envelope for the ${shortName(a)}` + (r.pts.length ? '. ' + r.pts.map(p => `${p.name}: ${fmt(p.w)} pounds at ${p.cg.toFixed(2)} inches, ${p.out ? 'outside' : 'inside'} the envelope`).join('. ') : ''));
+  $('pts').innerHTML = ['zfw', 'to', 'ldg'].map(k => {
+    const p = r.pts.find(q => q.k === k);
+    return `<li><svg viewBox="0 0 16 16" class="env-chart" aria-hidden="true">${marker(k, 8, 8, p && p.out)}</svg><span>${LEGEND[k]}</span>` +
+      (p ? `<span>${fmt(p.w, 1)} lb</span><span${p.out ? ' class="out"' : ''}>CG ${p.cg.toFixed(2)} in</span>` : '<span></span><span></span>') + '</li>';
+  }).join('');
+}
+
+function notesHtml(a, s) {
+  const p = [], L = a.limits.normal, U = a.limits.utility, manual = /Owner's Manual/.test(a.manual) ? "Owner's Manual" : 'POH/AFM';
+  p.push(`<strong>${esc(a.name)}</strong>, serial numbers ${esc(a.serials)}. Datum: ${esc(a.datum.charAt(0).toLowerCase() + a.datum.slice(1))}.`);
+  const rec = tailsOf(a).find(t => t.i === s.tail);
+  if (rec && rec.note) p.push(esc(rec.note));
+  let lim = `Maximum weights: ramp ${fmt(L.max_ramp)} lb, takeoff ${fmt(L.max_takeoff)} lb, landing ${fmt(L.max_landing)} lb.`;
+  if (L.note) lim += ' ' + esc(L.note) + '.';
+  if (U) lim += ` Utility category: ${fmt(U.max_takeoff)} lb.` + (s.cat === 'utility' && U.note ? ' ' + esc(U.note) + (/[.!]$/.test(U.note) ? '' : '.') : '');
+  p.push(lim);
+  const sn = a.stations.filter(x => x.note).map(x => `${esc(sentence(x.label))}: ${esc(x.note.charAt(0).toLowerCase() + x.note.slice(1))}${x.range ? ` (${x.range[0]} to ${x.range[1]} in)` : ''}.`);
+  if (sn.length) p.push(sn.join(' '));
+  let inc = a.oil.in_bew ? 'Full oil is already in the basic empty weight.' : '';
+  if (a.unusable_fuel && a.unusable_fuel.in_bew) inc += ' Unusable fuel is already in the basic empty weight.';
+  if (a.oil.note) inc += ' ' + esc(a.oil.note) + (/[.!]$/.test(a.oil.note) ? '' : '.');
+  if (inc.trim()) p.push(inc.trim());
+  a.flags.forEach(f => p.push(esc(f) + (/[.!]$/.test(f) ? '' : '.')));
+  p.push(`CG is rounded to the nearest 0.1 in before it is checked against the limits. Maneuvering speed: ${esc(a.va)}.`);
+  p.push((a.envelope.fan ? 'The envelope is replotted from the limits in the layout of POH Figure 6-15. ' : 'The envelope is drawn from the type certificate data sheet limits. ') +
+    `Sources: ${a.sources.map(esc).join('; ')}.`);
+  p.push(`<strong>Training aid only.</strong> The approved ${manual} and the airplane's current weight and balance record govern.`);
+  return p.map(t => `<p>${t}</p>`).join('');
+}
+
+function update() {
+  const a = cur, s = st(a), r = compute(a, s), q = sel => $('rows').querySelector(sel);
+  const cell = (attr, k, text, cls) => { const el = q(`[${attr}="${k}"]`); if (el) { el.textContent = text; if (cls != null) el.closest('tr').classList.toggle('over', cls); } };
+  q('[data-bewsub]').textContent = s.tail === '' ? "From the airplane's own record" : '';
+  // Row weights and moments
+  ['oil', 'fuel', 'burn'].forEach(k => cell('data-w', k, r.w[k] == null || (k !== 'oil' && !r.w[k]) ? '' : fmt(r.w[k], 1)));
+  Object.keys(r.m).forEach(k => cell('data-m', k, r.m[k] == null || !r.w[k] ? '' : fmt(r.m[k], 1)));
+  $('rows').querySelectorAll('[data-fa]').forEach(el => { el.textContent = r.arm.fuel.v == null ? '' : fmt(r.arm.fuel.v, 1); });
+  // Totals
+  const L = a.limits[r.cat], max = { ramp: L.max_ramp, to: L.max_takeoff, ldg: L.max_landing != null ? L.max_landing : L.max_takeoff };
+  Object.keys(r.tot).forEach(k => {
+    const t = r.tot[k], p = r.pts.find(x => x.k === k);
+    cell('data-w', k, r.ready ? fmt(t.w, 1) : '', r.ready && ((max[k] != null && t.w > max[k] + 1e-9) || !!(p && p.out)));
+    cell('data-m', k, r.ready ? fmt(t.m, 1) : '');
+    const cg = q(`[data-cg="${k}"]`); if (cg) cg.innerHTML = r.ready ? `<small>CG</small>${(t.m / t.w).toFixed(2)}` : '';
+  });
+  // Input states
+  $('rows').querySelectorAll('input[type="text"]').forEach(el => {
+    const k = el.dataset.k, v = num(el.value); let c = Number.isNaN(v) || v < 0 ? 'err' : '';
+    if (k.startsWith('arm:')) { const stt = r.arm[k.slice(4)]; if (stt) c = stt.state === 'ok' ? 'good' : stt.state === 'blank' ? '' : 'err'; }
+    if (k === 'seat' && r.arm.front && r.arm.front.state !== 'ok') c = 'err';
+    el.className = c;
+  });
+  // Verdict
+  const v = $('verdict'), to = r.tot.to, line = r.ready ? `Takeoff ${fmt(to.w, 1)} lb, CG ${(to.m / to.w).toFixed(2)} in. ` : '';
+  let head, sub, cls = '';
+  if (r.bad.length && r.ready) { head = 'Out of limits'; sub = line + (r.bad.length + r.entry.length === 1 ? '1 problem.' : `${r.bad.length + r.entry.length} problems.`); cls = 'bad'; }
+  else if (r.entry.length) { head = 'Check your entries'; sub = r.entry[0]; cls = 'bad'; }
+  else if (!r.bewReady) { head = 'Start with the empty weight'; sub = 'Enter the basic empty weight and its arm or moment from the airplane\'s weight and balance record.'; if (r.bad.length) cls = 'bad'; }
+  else if (!r.ready) { head = 'Arms needed'; sub = `Enter the arm for ${r.miss.join(', ')}.`; }
+  else { head = 'Within limits'; sub = line + 'All three points are inside the envelope.'; cls = 'ok'; }
+  v.className = 'verdict' + (cls ? ' ' + cls : ''); v.firstElementChild.textContent = head; v.lastElementChild.textContent = sub;
+  // Problems
+  $('checks').innerHTML = r.bad.concat(r.entry).map(t => `<li>${esc(t)}</li>`).join('') + r.notes.map(t => `<li class="note">${esc(t)}</li>`).join('');
+  $('checks').hidden = !(r.bad.length + r.entry.length + r.notes.length);
+  const F = fuelSt(a);
+  $('room').textContent = !r.ready ? '' : r.room < 0 ? 'No room for fuel: the zero fuel weight is already over the maximum.'
+    : `Room for fuel at this zero fuel weight: ${fmt(r.room, 1)} lb, or ${fmt(r.room / GAL, 1)} gal.` + (r.room / GAL >= F.max_gal ? ' Full tanks fit.' : '');
+  drawChart(a, r);
+  return r;
+}
+
+function select(a) {
+  cur = a; const s = st(a);
+  $('acSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ac === a.id)));
+  $('catSeg').hidden = !a.limits.utility;
+  $('catSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === s.cat)));
+  buildRows(); $('notes').innerHTML = notesHtml(a, s); update();
+}
+
+// Basic empty weight: type the arm or the moment and the other one is worked out
+function syncBew() {
+  const s = st(cur), w = num(s.bew), ar = num(s.bewArm), m = num(s.bewMom), box = k => $('rows').querySelector(`[data-k="${k}"]`);
+  if (s.bewBy === 'arm') { s.bewMom = w > 0 && ar > 0 ? fmt(w * ar, 1) : ''; box('bewMom').value = s.bewMom; }
+  else if (s.bewBy === 'mom') { s.bewArm = w > 0 && m > 0 ? (m / w).toFixed(2) : ''; box('bewArm').value = s.bewArm; }
+}
+
+$('acSeg').innerHTML = D.aircraft.map(a => `<button type="button" data-ac="${a.id}">${esc(shortName(a))}</button>`).join('');
+$('acSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const a = D.aircraft.find(x => x.id === b.dataset.ac);
+  try { history.replaceState(null, '', '#' + a.id); } catch (err) { /* opened from a file */ }
+  select(a);
+});
+$('catSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; st(cur).cat = b.dataset.cat; select(cur); });
+$('fill').addEventListener('change', e => { fill = e.target.checked; select(cur); });
+$('clear').addEventListener('click', () => { const cat = st(cur).cat; delete ST[cur.id]; st(cur).cat = cat; select(cur); });
+
+$('rows').addEventListener('input', e => {
+  const el = e.target, k = el.dataset.k, s = st(cur);
+  if (!k || el.type !== 'text') return;
+  if (k.startsWith('w:')) s.w[k.slice(2)] = el.value;
+  else if (k.startsWith('arm:')) s.arm[k.slice(4)] = el.value;
+  else s[k] = el.value;
+  if (k === 'bewArm') s.bewBy = 'arm';
+  if (k === 'bewMom') s.bewBy = 'mom';
+  if (k === 'bew' || k === 'bewArm' || k === 'bewMom') {
+    syncBew();
+    const pick = $('rows').querySelector('[data-k="tail"]'); if (pick && s.tail) { s.tail = ''; pick.value = ''; $('notes').innerHTML = notesHtml(cur, s); }   // typed over a stored record
+  }
+  update();
+});
+$('rows').addEventListener('change', e => {
+  const el = e.target, s = st(cur);
+  if (el.dataset.k === 'oilIn') { s.oilIn = el.checked; update(); }
+  if (el.dataset.k === 'tail') {
+    useTail(s, tailsOf(cur).find(x => x.i === el.value));
+    select(cur);
+  }
+});
+
+narrow.addEventListener('change', update);
+select(cur);
+if (/[?&]debug\b/.test(location.search)) window.__wb = { D, ST, st, compute, limitsAt, update, select, get cur() { return cur; }, get fill() { return fill; } };
+})();
+</script>
 <script>
 // Plots the example envelope and the takeoff and landing points from the walkthrough.
 (function(){
