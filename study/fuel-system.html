@@ -7,10 +7,10 @@
 <meta name="description" content="A working diagram of the Piper Pilot 100i fuel system. Move the fuel selector, the fuel pump, the throttle, and the mixture, or fail a part, and watch what happens to the fuel and the engine.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=B612+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../site.css?v=4">
 <style>
-:root{--fuel:#4F9DEB;--fuel-hi:#DCEcFF;--water:#C3CDD4;--hot:#E8873A;--amber:#E8B04A;--red:#F07272;--lever:#D0464B;--tube:#0E1114}
+:root{--fuel:#4F9DEB;--fuel-hi:#DCEcFF;--water:#C3CDD4;--hot:#E8873A;--amber:var(--am);--red:var(--rd);--lever:#D0464B;--tube:#0E1114}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
 .sim-head{max-width:1200px;margin:0 auto;padding:32px 16px 0}
@@ -20,13 +20,13 @@
 /* Wide screens: diagram on the left, engine display and controls on the right.
    Narrow screens: the display sticks to the top, the controls stick to the bottom, the diagram scrolls between them. */
 .sim{max-width:1200px;margin:24px auto 0;padding:0 16px;display:grid;grid-template-columns:minmax(0,500px) minmax(0,1fr);gap:24px;align-items:start}
-.board{position:sticky;top:min(12px,calc(100vh - var(--board-h,0px) - 12px));background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:clip}
+.board{position:sticky;top:min(12px,calc(100vh - var(--board-h,0px) - 12px));background:var(--surface);border:1px solid var(--line);border-radius:0;overflow:clip}
 .board svg{display:block;width:100%;height:auto;max-height:max(620px,calc(100vh - 170px))}
 .side{display:flex;flex-direction:column;gap:14px;min-width:0}
 .strip{position:sticky;top:0;z-index:8;background:var(--bg);padding:11px 0 8px;box-shadow:0 10px 10px -6px var(--bg)}
 
 /* Engine display */
-.panel{background:#0B0D0F;border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.panel{background:#0B0D0F;border:1px solid var(--line);border-radius:0;padding:6px 8px}
 #gauges{display:block;width:100%;height:auto}
 #gauges text{font-family:var(--cond);fill:var(--text);font-variant-numeric:tabular-nums}
 #gauges .gl{font-size:10.5px;font-weight:600;fill:var(--muted)}
@@ -98,7 +98,7 @@
 #schem .clog{fill:var(--amber);stroke:#5c4312;stroke-width:.8}
 
 /* Controls */
-.dock{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:210px minmax(0,1fr);grid-template-areas:"sel thr" "sel mix" "sel pump";gap:14px 24px;align-items:start}
+.dock{background:var(--surface);border:1px solid var(--line);border-radius:0;padding:16px;display:grid;grid-template-columns:210px minmax(0,1fr);grid-template-areas:"sel thr" "sel mix" "sel pump";gap:14px 24px;align-items:start}
 .selbox{grid-area:sel}.pumpbox{grid-area:pump}.mixbox{grid-area:mix}.thrbox{grid-area:thr}
 .knob{display:block;width:100%;max-width:210px;height:auto;margin:0 auto}
 .knob text{font:700 12px var(--cond);fill:var(--text)}
@@ -117,13 +117,11 @@
 .seg{display:none}
 .seg button{flex:1;min-width:0;min-height:40px;padding:0 2px;font:700 .95rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);cursor:pointer;position:relative}
 .seg button + button{margin-left:-1px}
-.seg button:first-child{border-radius:6px 0 0 6px}
-.seg button:last-child{border-radius:0 6px 6px 0}
 .seg button[aria-checked="true"]{background:var(--accent-soft);border-color:var(--accent);z-index:1}
 .seg button.armed{background:var(--red);border-color:var(--red);color:#1a0b0e;z-index:1}
-.switch{display:flex;align-items:center;gap:10px;width:100%;font:600 1rem/1.2 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:10px 12px;cursor:pointer;text-align:left}
+.switch{display:flex;align-items:center;gap:10px;width:100%;font:600 1rem/1.2 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:0;padding:10px 12px;cursor:pointer;text-align:left}
 .switch:hover{border-color:var(--muted)}
-.switch .track{flex:none;position:relative;width:38px;height:22px;border-radius:11px;background:var(--bg);border:1px solid var(--line)}
+.switch .track{flex:none;position:relative;width:38px;height:22px;border-radius:0;background:var(--bg);border:1px solid var(--line)}
 .switch .track::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .15s}
 .switch[aria-checked="true"] .track{background:var(--ok);border-color:var(--ok)}
 .switch[aria-checked="true"] .track::after{transform:translateX(16px);background:var(--surface)}
@@ -141,8 +139,8 @@
 input[type=range]{width:100%;margin:0;accent-color:var(--fuel)}
 /* Throttle and mixture look like the levers: a slot with a black or red knob */
 .lever{-webkit-appearance:none;appearance:none;height:30px;background:none;cursor:pointer;--knob:#08090A;--ring:#AEB6BC}
-.lever::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--bg);border:1px solid var(--line)}
-.lever::-moz-range-track{height:8px;border-radius:4px;background:var(--bg);border:1px solid var(--line)}
+.lever::-webkit-slider-runnable-track{height:8px;border-radius:0;background:var(--bg);border:1px solid var(--line)}
+.lever::-moz-range-track{height:8px;border-radius:0;background:var(--bg);border:1px solid var(--line)}
 .lever::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-11px;border-radius:50%;background:var(--knob);border:2px solid var(--ring);box-shadow:0 2px 5px rgba(0,0,0,.6)}
 .lever::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--knob);border:2px solid var(--ring);box-shadow:0 2px 5px rgba(0,0,0,.6)}
 .lever:focus{outline:none}
@@ -150,7 +148,7 @@ input[type=range]{width:100%;margin:0;accent-color:var(--fuel)}
 .lever:focus-visible::-moz-range-thumb{outline:2px solid var(--focus);outline-offset:2px}
 #mix{--knob:var(--lever);--ring:#F2B3B5}
 
-.more{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"faults loads" "chart chart";gap:18px 24px;align-items:start}
+.more{background:var(--surface);border:1px solid var(--line);border-radius:0;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"faults loads" "chart chart";gap:18px 24px;align-items:start}
 .more h2{font:700 1.05rem/1.2 var(--cond);margin:0 0 8px;border:0;padding:0}
 .faults{grid-area:faults}.loads{grid-area:loads}.curve{grid-area:chart;min-width:0;display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1fr);gap:0 20px;align-items:center}
 .curve h2{grid-column:1/-1}
@@ -163,7 +161,7 @@ input[type=range]{width:100%;margin:0;accent-color:var(--fuel)}
 .chart .cur{stroke:var(--lever);stroke-width:2}
 .chart .mk{fill:var(--surface);stroke:var(--chart);stroke-width:2}
 .chart .mklbl{fill:var(--text);font-weight:600}
-.btn{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:9px 12px;cursor:pointer}
+.btn{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:0;padding:9px 12px;cursor:pointer}
 .btn:hover{border-color:var(--muted)}
 .btn:disabled{opacity:.4;cursor:default}
 .chk{display:flex;gap:9px;align-items:center;font-size:.95rem;line-height:1.25;padding:5px 0;cursor:pointer}
@@ -211,7 +209,7 @@ input[type=range]{width:100%;margin:0;accent-color:var(--fuel)}
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="../index.html">172 Captain</a>
+    <a class="wordmark" href="../index.html"><b>172</b>Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="../aircraft/index.html">Aircraft</a>

@@ -7,8 +7,8 @@
 <meta name="description" content="Piper Pilot 100i: specs, V-speeds, systems, and weight and balance.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=B612+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../site.css?v=4">
 <style>
 article td:last-child,article th:last-child{text-align:left}
 </style>
@@ -16,7 +16,7 @@ article td:last-child,article th:last-child{text-align:left}
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="../index.html">172 Captain</a>
+    <a class="wordmark" href="../index.html"><b>172</b>Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="../aircraft/index.html" aria-current="true">Aircraft</a>
@@ -103,8 +103,9 @@ article td:last-child,article th:last-child{text-align:left}
 
     <h2 id="v-speeds">V-speeds</h2>
     <p>Procedure speeds are KIAS at maximum gross weight (2,550 lb) unless noted.</p>
+    <svg class="tape" data-range="30,170" data-white="45,102" data-green="50,125" data-yellow="125,154" data-red="154" data-bugs="VX:64,VY:76,VO:113" role="img" aria-label="Airspeed markings for the Piper Pilot 100i in knots: white arc 45 to 102, green arc 50 to 125, yellow arc 125 to 154, red line at 154."></svg>
     <div class="table-wrap">
-      <table>
+      <table class="vs">
         <caption>Pilot 100i V-speeds (POH VB-2960, S/N 28020001 and up)</caption>
         <thead><tr><th>Speed</th><th>KIAS</th><th>What it means</th></tr></thead>
         <tbody>
@@ -250,5 +251,6 @@ article td:last-child,article th:last-child{text-align:left}
 <footer class="site-foot">
   <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
 </footer>
+<script src="../tape.js"></script>
 </body>
 </html>

@@ -7,14 +7,14 @@
 <meta name="description" content="A 3D Lycoming IO-360, modeled in CAD, that you can turn, run, and pull apart to see how the parts work together.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=B612+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../site.css?v=4">
 <style>
-.eng{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:calc(100vh - 57px);min-height:600px}
+.eng{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:calc(100vh - 65px);min-height:600px}
 .stage{position:relative;overflow:hidden;background:var(--bg);touch-action:none}
 .stage canvas{display:block}
 .labels{position:absolute;inset:0;pointer-events:none}
-.lbl{font:700 .95rem/1 var(--cond);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:4px 7px}
+.lbl{font:700 .95rem/1 var(--cond);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:0;padding:4px 7px}
 .lbl.front{color:var(--muted);font-weight:600}
 .hint{position:absolute;left:16px;bottom:14px;margin:0;font-size:.9rem;color:var(--muted);pointer-events:none;max-width:calc(100% - 32px)}
 .reset{position:absolute;top:14px;right:14px}
@@ -22,39 +22,39 @@
 .loading.failed{color:var(--text)}
 
 .panel{border-left:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:24px 20px 32px}
-.panel h1{font:700 2.6rem/.95 var(--cond);margin:0;letter-spacing:-.02em}
+.panel h1{font:700 2rem/1.05 var(--sans);margin:0;letter-spacing:-.015em}
 .panel .lede{color:var(--muted);margin:10px 0 0;font-size:1rem}
 .panel h2{font:700 1.1rem/1.2 var(--cond);margin:26px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
-.btn{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:9px 12px;cursor:pointer}
-.btn:hover{border-color:var(--muted)}
-.btn[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn{font:400 .92rem/1 var(--sans);color:var(--cy);background:var(--bg);border:1px solid #8A8F94;border-radius:0;padding:10px 12px;cursor:pointer}
+.btn:hover{border-color:var(--cy)}
+.btn[aria-pressed="true"]{background:var(--cy);color:#000;border-color:var(--cy);font-weight:700}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .ctl{margin:12px 0 0}
 .ctl label{display:flex;justify-content:space-between;font:600 .95rem/1.2 var(--cond);margin-bottom:6px}
 .ctl label output{color:var(--muted);font-weight:500}
-input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--cy)}
 .check{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:.95rem;cursor:pointer}
-.check input{accent-color:var(--accent);width:16px;height:16px}
+.check input{accent-color:var(--cy);width:16px;height:16px}
 
 .strokes{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:center;margin:0}
 .strokes dt{font:700 .95rem/1 var(--cond);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2)}
 .strokes dd{margin:0;font:600 1rem/1.2 var(--cond);display:flex;align-items:center;gap:8px}
-.strokes dd i{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--muted)}
+.strokes dd i{display:inline-block;width:10px;height:10px;border-radius:0;background:var(--muted)}
 .st-power i{background:#E8873A!important}.st-exhaust i{background:#8A939B!important}.st-intake i{background:#5B9BE0!important}.st-compression i{background:#C9A43B!important}
 .small{font-size:.88rem;color:var(--muted);margin:10px 0 0}
 
-.info{background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--chart);border-radius:6px;padding:12px 14px}
+.info{background:var(--bg);border:1px solid var(--text);padding:12px 14px}
 .info h3{font:700 1.25rem/1.15 var(--cond);margin:0}
 .info .sys{font:500 .9rem/1.2 var(--cond);color:var(--muted);margin:3px 0 8px}
 .info p{margin:0;font-size:.97rem}
 .info .row{margin-top:12px}
-.info.empty{border-left-color:var(--line);color:var(--muted)}
+.info.empty{border-color:var(--line);color:var(--muted)}
 
 .plist h3{font:600 .95rem/1.2 var(--cond);color:var(--muted);margin:14px 0 4px}
 .plist ul{list-style:none;margin:0;padding:0}
-.plist button{width:100%;display:flex;justify-content:space-between;gap:8px;text-align:left;background:none;border:0;border-radius:4px;color:var(--text);font:500 1rem/1.25 var(--sans);padding:5px 8px;cursor:pointer}
+.plist button{width:100%;display:flex;justify-content:space-between;gap:8px;text-align:left;background:none;border:0;border-radius:0;color:var(--text);font:500 1rem/1.25 var(--sans);padding:5px 8px;cursor:pointer}
 .plist button:hover{background:var(--surface-2)}
-.plist button.sel{background:var(--surface-2);color:var(--chart)}
+.plist button.sel{background:var(--surface-2);color:var(--mg)}
 .plist button.off{color:var(--muted);text-decoration:line-through}
 .plist small{color:var(--muted);font:500 .85rem/1.25 var(--cond)}
 
@@ -95,7 +95,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="../index.html">172 Captain</a>
+    <a class="wordmark" href="../index.html"><b>172</b>Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="../aircraft/index.html">Aircraft</a>

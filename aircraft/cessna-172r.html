@@ -7,8 +7,8 @@
 <meta name="description" content="Cessna 172R: specs, V-speeds, systems, and weight and balance.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=B612+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../site.css?v=4">
 <style>
 article td:last-child,article th:last-child{text-align:left}
 </style>
@@ -16,7 +16,7 @@ article td:last-child,article th:last-child{text-align:left}
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="../index.html">172 Captain</a>
+    <a class="wordmark" href="../index.html"><b>172</b>Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="../aircraft/index.html" aria-current="true">Aircraft</a>
@@ -124,8 +124,9 @@ article td:last-child,article th:last-child{text-align:left}
     <h2 id="v-speeds">V-speeds</h2>
     <p>Stall speeds are at 2,450 lb with power off.</p>
     <p>KCAS corrects for instrument and position error. Near the stall the difference is large: the 30° flap stall is 33 KIAS but 47 KCAS.</p>
+    <svg class="tape" data-range="30,170" data-white="33,85" data-green="44,129" data-yellow="129,163" data-red="163" data-bugs="VX:60,VY:79,VA:99" role="img" aria-label="Airspeed indicator markings for the Cessna 172R in knots: white arc 33 to 85, green arc 44 to 129, yellow arc 129 to 163, red line at 163."></svg>
     <div class="table-wrap">
-      <table>
+      <table class="vs">
         <caption>172R V-speeds, 160 hp, KIAS unless noted</caption>
         <thead><tr><th>Speed</th><th>KIAS</th><th>What it means</th></tr></thead>
         <tbody>
@@ -263,5 +264,6 @@ article td:last-child,article th:last-child{text-align:left}
 <footer class="site-foot">
   <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
 </footer>
+<script src="../tape.js"></script>
 </body>
 </html>

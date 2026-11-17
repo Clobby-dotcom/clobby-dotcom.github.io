@@ -7,40 +7,16 @@
 <meta name="description" content="Practice VOR navigation: put the airplane anywhere, turn the OBS, and watch the needle on a CDI or an HSI. Covers reverse sensing, station passage, and intercepting a radial.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=B612+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="site.css?v=4">
 <style>
 :root{
-  --bg:#F2F4F5; --surface:#FFFFFF; --surface-2:#E8ECEE; --text:#1C2227; --muted:#58626A; --line:#D2D8DC;
-  --accent:#7B1E2E; --accent-ink:#FFFFFF; --accent-soft:#F4E4E7;
-  --map-bg:#E3EBD5; --map-rose:#2B55A3; --map-faint:rgba(43,85,163,.20);
-  --course:#17824A; --band:rgba(23,130,74,.15); --zone-from:rgba(23,130,74,.07); --zone-to:rgba(123,30,46,.07);
-  --plane:#7B1E2E; --trail:rgba(123,30,46,.55); --radial:#2B55A3;
-  --ok:#17733F; --bad:#A3242F; --focus:#2B55A3;
-  --inst-bezel:#2A2E32; --inst-face:#141617; --inst-mark:#F1F1F1; --inst-dim:#8F969C; --inst-knob:#41474D;
+  --map-bg:#000; --map-rose:#C9CED2; --map-faint:rgba(201,206,210,.20);
+  --course:var(--gn); --band:rgba(59,228,119,.15); --zone-from:rgba(59,228,119,.07); --zone-to:rgba(255,98,245,.07);
+  --plane:var(--cy); --trail:rgba(63,224,255,.55); --radial:#C9CED2;
+  --bad:var(--rd);
+  --inst-bezel:#2A2E32; --inst-face:#101214; --inst-mark:#F1F1F1; --inst-dim:#8F969C; --inst-knob:#41474D;
   --inst-green:#3BCB6E; --inst-red:#D8312E; --inst-window:#000000;
-  --sans:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
-  --cond:"Barlow Semi Condensed","Arial Narrow","Segoe UI",system-ui,sans-serif;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    color-scheme:dark;
-    --bg:#14171A; --surface:#1D2125; --surface-2:#272C31; --text:#E5E8EA; --muted:#9BA5AC; --line:#353B41;
-    --accent:#CF6B7B; --accent-ink:#1A0B0E; --accent-soft:#3A2329;
-    --map-bg:#18221E; --map-rose:#82A8E8; --map-faint:rgba(130,168,232,.18);
-    --course:#4CD483; --band:rgba(76,212,131,.15); --zone-from:rgba(76,212,131,.07); --zone-to:rgba(207,107,123,.10);
-    --plane:#F0909D; --trail:rgba(240,144,157,.6); --radial:#82A8E8;
-    --ok:#5CCB86; --bad:#F27E8A; --focus:#82A8E8;
-  }
-}
-:root[data-theme="dark"]{
-  color-scheme:dark;
-  --bg:#14171A; --surface:#1D2125; --surface-2:#272C31; --text:#E5E8EA; --muted:#9BA5AC; --line:#353B41;
-  --accent:#CF6B7B; --accent-ink:#1A0B0E; --accent-soft:#3A2329;
-  --map-bg:#18221E; --map-rose:#82A8E8; --map-faint:rgba(130,168,232,.18);
-  --course:#4CD483; --band:rgba(76,212,131,.15); --zone-from:rgba(76,212,131,.07); --zone-to:rgba(207,107,123,.10);
-  --plane:#F0909D; --trail:rgba(240,144,157,.6); --radial:#82A8E8;
-  --ok:#5CCB86; --bad:#F27E8A; --focus:#82A8E8;
 }
 *,*::before,*::after{box-sizing:border-box}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -53,18 +29,18 @@ h2{font:700 1.2rem/1.2 var(--cond);margin:0 0 6px}
 h3{font:700 1.05rem/1.2 var(--cond);margin:0 0 8px}
 .lede{margin:6px 0 18px;color:var(--muted);max-width:62ch}
 
-button{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-height:38px;cursor:pointer}
+button{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:0;padding:9px 12px;min-height:38px;cursor:pointer}
 button:hover{border-color:var(--muted)}
 button:disabled{opacity:.45;cursor:not-allowed}
-button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.primary{background:var(--cy);color:#000;border-color:var(--cy);font-weight:700}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-input[type=number],select{font:500 1rem var(--sans);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 8px;min-height:36px}
+input[type=number],select{font:500 1rem var(--sans);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:0;padding:6px 8px;min-height:36px}
 input[type=number]{width:4.6em;font-variant-numeric:tabular-nums}
 
 .scenarios{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
-.scenarios button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.scenarios button[aria-pressed="true"]{background:var(--cy);color:#000;border-color:var(--cy);font-weight:700}
 
-.brief{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.brief{background:var(--surface);border:1px solid var(--text);border-radius:0;padding:14px 16px;margin-bottom:18px}
 .brief p{margin:0;max-width:78ch}
 .brief-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px}
 .quiz{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
@@ -81,7 +57,7 @@ input[type=number]{width:4.6em;font-variant-numeric:tabular-nums}
   .main .transport{order:1}
   .main .map-wrap{order:2;align-self:center;max-width:max(240px,46vh);max-width:max(240px,46svh)}
   .main .inst-panel{order:3;margin:0}
-  .main .layers{order:4;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .main .layers{order:4;background:var(--surface);border:1px solid var(--line);border-radius:0;padding:14px 16px}
   .main .read-panel{order:5;margin:0}
   .inst-panel .inst-svg{max-width:clamp(200px,32vh,330px);max-width:clamp(200px,32svh,330px)}
 }
@@ -91,22 +67,22 @@ input[type=number]{width:4.6em;font-variant-numeric:tabular-nums}
   .inst-panel .inst-svg{max-width:clamp(180px,calc(100vh - 110px),330px)}
 }
 
-.map-wrap{position:relative;aspect-ratio:1/1;width:100%;border-radius:12px;overflow:hidden;background:var(--map-bg);border:1px solid var(--line);touch-action:none;cursor:crosshair;max-width:max(240px,calc(100vh - 24px));margin-inline:auto}
+.map-wrap{position:relative;aspect-ratio:1/1;width:100%;border-radius:0;overflow:hidden;background:var(--map-bg);border:1px solid var(--line);touch-action:none;cursor:crosshair;max-width:max(240px,calc(100vh - 24px));margin-inline:auto}
 .map-wrap.locked{cursor:default;touch-action:auto}
 .map-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:0;padding:14px 16px}
 .panel + .panel{margin-top:14px}
 .sim{margin-top:14px;display:grid;gap:12px}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
 .field{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:.95rem}
 .field b{color:var(--text);font-weight:500}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:0;overflow:hidden}
 .seg button{border:0;border-radius:0;border-right:1px solid var(--line);min-height:36px;padding:8px 11px}
 .seg button:last-child{border-right:0}
-.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.seg button[aria-pressed="true"]{background:var(--cy);color:#000;font-weight:700}
 .check{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:.95rem}
-.check input{width:17px;height:17px;accent-color:var(--accent)}
+.check input{width:17px;height:17px;accent-color:var(--cy)}
 
 .inst-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
 .inst-svg{width:100%;max-width:330px;display:block;margin:0 auto;user-select:none;-webkit-user-select:none}
@@ -148,7 +124,7 @@ dl.readouts dd{margin:0;text-align:right;font:600 1.08rem/1.35 var(--cond);font-
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="index.html">172 Captain</a>
+    <a class="wordmark" href="index.html"><b>172</b>Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="aircraft/index.html">Aircraft</a>

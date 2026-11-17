@@ -7,8 +7,8 @@
 <meta name="description" content="Cessna 172K: specs, V-speeds, systems, and weight and balance.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=B612+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../site.css?v=4">
 <style>
 td.txt,th.txt{text-align:left}
 </style>
@@ -16,7 +16,7 @@ td.txt,th.txt{text-align:left}
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="../index.html">172 Captain</a>
+    <a class="wordmark" href="../index.html"><b>172</b>Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="../aircraft/index.html" aria-current="true">Aircraft</a>
@@ -105,8 +105,9 @@ td.txt,th.txt{text-align:left}
       <p>The manual and the airspeed indicator use miles per hour. Knots in the table are conversions (MPH × 0.869, rounded), except the four limit speeds, which the TCDS gives in knots.</p>
     </div>
     <p>Limits and stall speeds are calibrated airspeed (CAS). Near the stall the indicator reads lower: 50 MPH indicated with flaps up is 58 MPH calibrated.</p>
+    <svg class="tape" data-range="40,190" data-white="52,100" data-green="59,140" data-yellow="140,174" data-red="174" data-bugs="VX:68,VY:82,VA:122" role="img" aria-label="Airspeed indicator markings for the Cessna 172K in miles per hour: white arc 52 to 100, green arc 59 to 140, yellow arc 140 to 174, red line at 174."></svg>
     <div class="table-wrap">
-      <table>
+      <table class="vs">
         <caption>Speeds from the 1970 Owner's Manual and TCDS 3A12 (MPH as printed; knots converted unless noted)</caption>
         <thead><tr><th class="txt">Speed</th><th>MPH</th><th>Knots</th><th class="txt">What it means</th></tr></thead>
         <tbody>
@@ -216,5 +217,6 @@ td.txt,th.txt{text-align:left}
 <footer class="site-foot">
   <p>For study only. In the airplane, the POH and current FAA publications always take priority.</p>
 </footer>
+<script src="../tape.js"></script>
 </body>
 </html>

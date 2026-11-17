@@ -7,42 +7,42 @@
 <meta name="description" content="A wing section in a simulated wind tunnel. Raise the angle of attack and watch the airflow separate as the wing stalls.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=B612+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../site.css?v=4">
 <style>
-.sim{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:calc(100vh - 57px);min-height:600px}
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:calc(100vh - 65px);min-height:600px}
 .stage{position:relative;overflow:hidden;background:var(--bg)}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.hint{position:absolute;left:12px;bottom:12px;margin:0;font-size:.9rem;color:var(--muted);pointer-events:none;max-width:calc(100% - 24px);background:var(--bg);padding:4px 8px;border-radius:6px}
-.legend{position:absolute;left:12px;top:12px;margin:0;padding:6px 8px;border-radius:6px;background:var(--bg);list-style:none;font:500 .9rem/1.3 var(--cond);color:var(--muted);pointer-events:none}
+.hint{position:absolute;left:12px;bottom:12px;margin:0;font-size:.9rem;color:var(--muted);pointer-events:none;max-width:calc(100% - 24px);background:var(--bg);padding:4px 8px;border-radius:0}
+.legend{position:absolute;left:12px;top:12px;margin:0;padding:6px 8px;border-radius:0;background:var(--bg);list-style:none;font:500 .9rem/1.3 var(--cond);color:var(--muted);pointer-events:none}
 .legend li{display:flex;align-items:center;gap:8px}
-.legend i{display:inline-block;width:18px;height:3px;border-radius:2px}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:0}
 .stagebtn{position:absolute;top:12px;right:12px;min-width:68px}
 
 .panel{border-left:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:24px 20px 32px}
-.panel h1{font:700 2.6rem/.95 var(--cond);margin:0;letter-spacing:-.02em}
+.panel h1{font:700 2rem/1.05 var(--sans);margin:0;letter-spacing:-.015em}
 .panel .lede{color:var(--muted);margin:10px 0 0;font-size:1rem}
 .panel h2{font:700 1.1rem/1.2 var(--cond);margin:26px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
 .panel p,.panel li{font-size:.97rem}
 .panel ul{padding-left:1.1em;margin:8px 0 0}
 .panel li{margin-bottom:6px}
-.btn{font:600 .95rem/1 var(--cond);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:9px 12px;cursor:pointer}
-.btn:hover{border-color:var(--muted)}
+.btn{font:400 .92rem/1 var(--sans);color:var(--cy);background:var(--bg);border:1px solid #8A8F94;border-radius:0;padding:10px 12px;cursor:pointer}
+.btn:hover{border-color:var(--cy)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
 .ctl label{display:flex;justify-content:space-between;align-items:baseline;font:600 1rem/1.2 var(--cond);margin-bottom:6px}
 .ctl output{font:700 1.6rem/1 var(--cond)}
-input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--cy)}
 .readout{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:14px 0 0;font-size:.97rem}
 .readout dt{font:600 .95rem/1.3 var(--cond);color:var(--muted)}
 .readout dd{margin:0;font:600 1rem/1.3 var(--cond)}
-.warn{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font:700 .95rem/1 var(--cond);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.warn{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font:700 .95rem/1 var(--cond);color:var(--muted);border:1px solid var(--line);border-radius:0;padding:8px 10px}
 .warn i{width:10px;height:10px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line)}
-.warn.on{color:#1a0b0e;background:#e8b04a;border-color:#e8b04a}
-.warn.on i{background:#1a0b0e;border-color:#1a0b0e}
+.warn.on{color:#000;background:var(--am);border-color:var(--am)}
+.warn.on i{background:#000;border-color:#000}
 .warn b{font-weight:700}
 .chart{margin-top:6px}
 .chart svg{display:block;width:100%;height:auto}
-.chart text{font:500 11px "Barlow Semi Condensed",sans-serif;fill:var(--muted)}
+.chart text{font:500 11px var(--sans);fill:var(--muted)}
 .small{font-size:.88rem;color:var(--muted);margin:10px 0 0}
 /* Narrow screens: the wing stays at the top while the controls scroll under it */
 @media (max-width:900px){
@@ -63,7 +63,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <body>
 <header class="site-head">
   <div class="site-head-in">
-    <a class="wordmark" href="../index.html">172 Captain</a>
+    <a class="wordmark" href="../index.html"><b>172</b>Captain</a>
     <nav class="site-nav" aria-label="Main">
       <div class="nav-drop">
         <a href="../aircraft/index.html">Aircraft</a>
@@ -516,20 +516,20 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       octx.strokeStyle = ACCENT; octx.lineWidth = 2;
       octx.beginPath(); octx.arc(rx, ry, R, Math.PI, Math.PI + alpha * Math.PI / 180, alpha < 0); octx.stroke();
     }
-    octx.font = '600 14px "Barlow Semi Condensed", sans-serif'; octx.fillStyle = TEXT; octx.textAlign = 'center';
+    octx.font = '600 14px var(--sans)'; octx.fillStyle = TEXT; octx.textAlign = 'center';
     octx.fillText(`${alpha.toFixed(1)}°`, rx - R * .78, ry - R * Math.sin(Math.max(.12, alpha * Math.PI / 180) / 2) - 10);
-    octx.fillStyle = MUTED; octx.font = '500 13px "Barlow Semi Condensed", sans-serif'; octx.textAlign = 'left';
+    octx.fillStyle = MUTED; octx.font = '500 13px var(--sans)'; octx.textAlign = 'left';
     octx.fillText('Chord line', sx(te[0]) + 10, sy(te[1]) + 16);
     octx.restore();
     const wy = Math.max(H * .2, 104);   // below the legend, however short the stage is
     arrow(octx, 18, wy, 18 + Math.min(130, W * .16), wy, MUTED, 2);
-    octx.fillStyle = MUTED; octx.textAlign = 'left'; octx.font = '600 13px "Barlow Semi Condensed", sans-serif';
+    octx.fillStyle = MUTED; octx.textAlign = 'left'; octx.font = '600 13px var(--sans)';
     octx.fillText('Relative wind', 18, wy - 10);
     const qc = toWind([LE[0] + CHORD * .25, .1]), qx = sx(qc[0]) + jx, qy = sy(qc[1]) + jy;
     const Lpx = CL(alpha) * scale * 1.1, Dpx = CD(alpha) * scale * 2.6;
-    if (CL(alpha) > .03) { arrow(octx, qx, qy, qx, qy - Lpx, '#7fb6f0', 3); octx.fillStyle = '#7fb6f0'; octx.font = '700 14px "Barlow Semi Condensed", sans-serif'; octx.fillText('Lift', qx + 8, qy - Lpx + 6); }
+    if (CL(alpha) > .03) { arrow(octx, qx, qy, qx, qy - Lpx, '#7fb6f0', 3); octx.fillStyle = '#7fb6f0'; octx.font = '700 14px var(--sans)'; octx.fillText('Lift', qx + 8, qy - Lpx + 6); }
     arrow(octx, qx, qy, qx + Math.max(10, Dpx), qy, '#e8873a', 3);
-    octx.fillStyle = '#e8873a'; octx.font = '700 14px "Barlow Semi Condensed", sans-serif'; octx.fillText('Drag', qx + Math.max(10, Dpx) + 6, qy + 5);
+    octx.fillStyle = '#e8873a'; octx.font = '700 14px var(--sans)'; octx.fillText('Drag', qx + Math.max(10, Dpx) + 6, qy + 5);
   }
 
   // ---------- Loop ----------
